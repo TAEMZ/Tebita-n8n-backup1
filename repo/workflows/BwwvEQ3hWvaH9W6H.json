@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T07:05:22.463Z",
-  "updatedAt": "2025-11-12T16:55:14.748Z",
+  "updatedAt": "2025-11-12T17:04:50.680Z",
   "id": "BwwvEQ3hWvaH9W6H",
   "name": "backup workflow",
   "active": false,
@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "command": "=git push https://github.com/yoni1342/Tebita-n8n-backup.git main\n"
+        "command": "=git push \"https://{{ $('Set Values').first().json.username }}:{{ $('Set Values').first().json.token }}@github.com/{{ $('Set Values').first().json.username }}/{{ $('Set Values').first().json.repo }}\" main"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -308,7 +308,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "0dc4ab8e-cba1-4585-8680-1de97e837c4b",
+  "versionId": "4d9d4f30-3ad1-46a8-b5fd-986506d329e6",
   "triggerCount": 0,
   "tags": [],
   "shared": [
