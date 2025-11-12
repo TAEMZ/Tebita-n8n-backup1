@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T07:05:22.463Z",
-  "updatedAt": "2025-11-12T11:40:31.506Z",
+  "updatedAt": "2025-11-12T11:54:41.737Z",
   "id": "BwwvEQ3hWvaH9W6H",
   "name": "backup workflow",
   "active": false,
@@ -180,7 +180,7 @@
     },
     {
       "parameters": {
-        "command": "=git -C repo commit -m \"Auto backup ($(date -Iseconds))\" || echo \"Nothing to commit\""
+        "command": "=git -C repo commit -m \"Auto backup ({{ new Date().toISOString() }})\""
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -308,7 +308,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "f587fae2-939c-4c08-bb26-72e9566ac0f5",
+  "versionId": "3d322e72-ae12-4645-baee-cd3b55a2effd",
   "triggerCount": 0,
   "tags": [],
   "shared": [
