@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T09:04:48.100Z",
-  "updatedAt": "2025-11-12T10:48:48.917Z",
+  "updatedAt": "2025-11-12T11:05:56.438Z",
   "id": "fUS4NSWd4AKaTYfG",
   "name": "_backup",
   "active": false,
@@ -98,7 +98,7 @@
             {
               "id": "a2307c01-cfe7-4be4-9b5b-65eb3ef46154",
               "name": "token",
-              "value": "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",
+              "value": "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",
               "type": "string"
             },
             {
@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "command": "git -C repo push origin main\n"
+        "command": "git -C repo push https://TAEMZ:{{ $('Set Values').first().json.token }}@github.com/TAEMZ/Tebita-n8n-backup.git main"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -306,7 +306,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "2c69ec71-9bca-429d-893d-cea0831d909b",
+  "versionId": "d540e3b5-780c-4df6-9b9d-02e83b26870a",
   "triggerCount": 0,
   "tags": [],
   "shared": [
