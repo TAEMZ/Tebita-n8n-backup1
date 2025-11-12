@@ -1,19 +1,314 @@
 {
   "createdAt": "2025-11-12T07:05:22.463Z",
-  "updatedAt": "2025-11-12T07:05:22.463Z",
+  "updatedAt": "2025-11-12T08:57:25.590Z",
   "id": "BwwvEQ3hWvaH9W6H",
   "name": "backup workflow",
   "active": false,
   "isArchived": false,
-  "nodes": [],
-  "connections": {},
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -800,
+        -32
+      ],
+      "id": "9c9df8bb-e810-4909-8328-9812a30b3e4b",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "command": "ls .git"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -16
+      ],
+      "id": "8532b55e-3e9b-4a89-9171-943d903583e9",
+      "name": "Execute Command",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "73d2b9ee-9fdd-468f-b3e0-c1d9d4a7a1bf",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -96,
+        -96
+      ],
+      "id": "b03c57a8-2d93-4dc1-8a65-a25ce59de19a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "command": "=export GITHUB_USER={{ $('Set Values').first().json.username }}\nexport GITHUB_TOKEN={{ $('Set Values').first().json.token }}\n\ngit init\ngit config user.name \"{{ $('Set Values').first().json.username }}\"\ngit config user.email \"{{ $('Set Values').first().json.email }}\"\necho \"= ndb Backups\" > README.md\ngit add README.md\ngit commit -m \"Initial commit: backup files\"\ngit branch -m main\ngit remote add origin \"https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/${GITHUB_USER}/{{ $('Set Values').first().json.repo }}\"\ngit push -u origin main"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -192
+      ],
+      "id": "1bd14284-fd58-4934-9806-1d0519300f79",
+      "name": "Execute Command1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21e60933-3eca-4eff-b1f8-fc80cd073239",
+              "name": "username",
+              "value": "yoni1342",
+              "type": "string"
+            },
+            {
+              "id": "a2307c01-cfe7-4be4-9b5b-65eb3ef46154",
+              "name": "token",
+              "value": "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",
+              "type": "string"
+            },
+            {
+              "id": "b64122cd-314a-49d4-a1cb-dce704e22d26",
+              "name": "repo",
+              "value": "Tebita-n8n-backup.git",
+              "type": "string"
+            },
+            {
+              "id": "9e54106c-fe6e-4660-b06e-d60e64e4b069",
+              "name": "email",
+              "value": "yonatantesfaye30@gmail.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        -32
+      ],
+      "id": "039fa4a0-8629-4459-ad91-71447cd5e44a",
+      "name": "Set Values"
+    },
+    {
+      "parameters": {
+        "command": "npx n8n export:workflow --backup --output repo/workflows/"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        432,
+        -96
+      ],
+      "id": "7875ac70-1f5d-4de8-b022-aa1cfa56f98b",
+      "name": "Execute Command2"
+    },
+    {
+      "parameters": {
+        "command": "npx  n8n export:credentials --backup --output repo/credentials/"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        208
+      ],
+      "id": "72ec7fff-7a6e-486a-b639-4c99fcb28a71",
+      "name": "cred"
+    },
+    {
+      "parameters": {
+        "command": "git -C . add repo/"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        176,
+        208
+      ],
+      "id": "fe7a3b48-4558-4336-981d-e2723ce6dc5f",
+      "name": "git add"
+    },
+    {
+      "parameters": {
+        "command": "git -C repo push"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        928,
+        224
+      ],
+      "id": "8a3d09b6-8e3b-4b40-953e-18b3f999ff4d",
+      "name": "git push"
+    },
+    {
+      "parameters": {
+        "command": "=git -C repo commit -m \"Auto backup ({{ new Date().toISOString()}})\" "
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        384,
+        208
+      ],
+      "id": "94e0f752-a486-456e-9572-edfd17c1d55d",
+      "name": "Execute Command3"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Command2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Values": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command1": {
+      "main": [
+        [
+          {
+            "node": "Execute Command2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command2": {
+      "main": [
+        [
+          {
+            "node": "cred",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cred": {
+      "main": [
+        [
+          {
+            "node": "git add",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "git add": {
+      "main": [
+        [
+          {
+            "node": "Execute Command3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command3": {
+      "main": [
+        [
+          {
+            "node": "git push",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "settings": {
     "executionOrder": "v1"
   },
   "staticData": null,
-  "meta": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
   "pinData": {},
-  "versionId": "fcf802c6-8ba9-42e4-98be-7c23d093d5a6",
+  "versionId": "bc113ad4-e173-45fa-bb72-142777658c2a",
   "triggerCount": 0,
   "tags": [],
   "shared": [
