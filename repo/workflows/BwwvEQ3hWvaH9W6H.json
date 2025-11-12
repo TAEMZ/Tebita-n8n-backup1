@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T07:05:22.463Z",
-  "updatedAt": "2025-11-12T11:54:41.737Z",
+  "updatedAt": "2025-11-12T16:15:33.908Z",
   "id": "BwwvEQ3hWvaH9W6H",
   "name": "backup workflow",
   "active": false,
@@ -17,10 +17,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        -944,
-        160
+        -1440,
+        -112
       ],
-      "id": "0a407b89-90af-4698-8bd9-8d6b60a0328a",
+      "id": "569e4199-42e0-4054-b264-fab58627915a",
       "name": "Schedule Trigger"
     },
     {
@@ -30,10 +30,10 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -480,
-        176
+        -976,
+        -96
       ],
-      "id": "39b007bd-d730-4dc1-a46c-510e49121e8a",
+      "id": "3894860a-6cd2-48d1-850c-62e278f87dbc",
       "name": "Execute Command",
       "alwaysOutputData": true,
       "onError": "continueRegularOutput"
@@ -66,10 +66,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -240,
-        96
+        -736,
+        -176
       ],
-      "id": "b39c8f04-3c11-46e1-b197-e3dbcac834a6",
+      "id": "f4352fd1-3a79-4c62-a442-c580dbef3f59",
       "name": "If"
     },
     {
@@ -79,10 +79,10 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        0,
-        0
+        -496,
+        -272
       ],
-      "id": "bcfe851c-2554-4e71-a878-935604a30fe4",
+      "id": "a0256581-bbb9-4280-bf93-1d2995bbdf8d",
       "name": "Execute Command1"
     },
     {
@@ -92,7 +92,7 @@
             {
               "id": "21e60933-3eca-4eff-b1f8-fc80cd073239",
               "name": "username",
-              "value": "TAEMZ",
+              "value": "yoni1342",
               "type": "string"
             },
             {
@@ -104,13 +104,13 @@
             {
               "id": "b64122cd-314a-49d4-a1cb-dce704e22d26",
               "name": "repo",
-              "value": "Tebita-n8n-backup1.git",
+              "value": "Tebita-n8n-backup.git",
               "type": "string"
             },
             {
               "id": "9e54106c-fe6e-4660-b06e-d60e64e4b069",
               "name": "email",
-              "value": "abiykibru6@gmail.com",
+              "value": "yonatantesfaye30@gmail.com",
               "type": "string"
             }
           ]
@@ -120,10 +120,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -704,
-        160
+        -1200,
+        -112
       ],
-      "id": "233caf43-1de9-46b7-b859-0d8732fdfb6a",
+      "id": "9703480e-2f3b-4973-9716-f2a97b067c93",
       "name": "Set Values"
     },
     {
@@ -133,10 +133,10 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        224,
-        112
+        -272,
+        -160
       ],
-      "id": "fbb53aad-8fca-44be-bbf2-ae00c0ddec87",
+      "id": "0944b705-8151-4a71-8600-83b0a7c42aac",
       "name": "Execute Command2"
     },
     {
@@ -146,10 +146,10 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -272,
-        400
+        -688,
+        144
       ],
-      "id": "4f10ba4e-f7d4-49aa-836c-bd1c8838d9a2",
+      "id": "d721c9bb-ccd1-40fb-9efb-8093bdd395c0",
       "name": "cred"
     },
     {
@@ -159,36 +159,36 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -96,
-        400
+        -432,
+        144
       ],
-      "id": "c1928097-977b-4dda-a7ed-f05284e2c365",
+      "id": "a3fb21a6-2aaf-407c-a883-2c6f3efc1029",
       "name": "git add"
     },
     {
       "parameters": {
-        "command": "git -C repo push"
+        "command": "=git push \"https://{{ $('Set Values').first().json.username }}:{{ $('Set Values').first().json.token }}@github.com/{{ $('Set Values').first().json.username }}/{{ $('Set Values').first().json.repo }}\" main"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        288,
-        400
+        -32,
+        144
       ],
-      "id": "9a5fd896-ddd2-4811-8489-0c2d4ddaafb0",
+      "id": "5abf1917-56b6-4d39-b24f-02dc72f17dd1",
       "name": "git push"
     },
     {
       "parameters": {
-        "command": "=git -C repo commit -m \"Auto backup ({{ new Date().toISOString() }})\""
+        "command": "=git -C repo commit -m \"Auto backup ($(date -Iseconds))\" || echo \"Nothing to commit\""
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        96,
-        400
+        -256,
+        144
       ],
-      "id": "a138099c-5674-47d2-aab6-d675eda7803d",
+      "id": "2bef0439-27e7-4ee6-9971-a644e242f543",
       "name": "Execute Command3"
     }
   ],
@@ -308,7 +308,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "3d322e72-ae12-4645-baee-cd3b55a2effd",
+  "versionId": "907c18e6-c1a0-4832-b169-212bd879a5c9",
   "triggerCount": 0,
   "tags": [],
   "shared": [
