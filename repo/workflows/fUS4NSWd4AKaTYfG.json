@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T09:04:48.100Z",
-  "updatedAt": "2025-11-12T10:07:58.501Z",
+  "updatedAt": "2025-11-12T10:48:48.917Z",
   "id": "fUS4NSWd4AKaTYfG",
   "name": "_backup",
   "active": false,
@@ -133,8 +133,8 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        208,
-        160
+        144,
+        176
       ],
       "id": "94db9451-1d53-4d40-abe1-d5a11f37351e",
       "name": "Execute Command2"
@@ -172,8 +172,8 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        400,
-        480
+        384,
+        464
       ],
       "id": "ec16d14a-ed49-4f0a-aff9-7fb4a3fa3615",
       "name": "git push"
@@ -306,7 +306,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "b2dae69f-e3c3-4467-872e-8aa2cb6866a1",
+  "versionId": "2c69ec71-9bca-429d-893d-cea0831d909b",
   "triggerCount": 0,
   "tags": [],
   "shared": [
