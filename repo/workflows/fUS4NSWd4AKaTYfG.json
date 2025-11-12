@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T09:04:48.100Z",
-  "updatedAt": "2025-11-12T12:29:25.700Z",
+  "updatedAt": "2025-11-12T12:52:30.122Z",
   "id": "fUS4NSWd4AKaTYfG",
   "name": "_backup",
   "active": false,
@@ -92,7 +92,7 @@
             {
               "id": "21e60933-3eca-4eff-b1f8-fc80cd073239",
               "name": "username",
-              "value": "TAEMZ",
+              "value": "yoni1342",
               "type": "string"
             },
             {
@@ -104,13 +104,13 @@
             {
               "id": "b64122cd-314a-49d4-a1cb-dce704e22d26",
               "name": "repo",
-              "value": "Tebita-n8n-backup1.git",
+              "value": "Tebita-n8n-backup.git",
               "type": "string"
             },
             {
               "id": "9e54106c-fe6e-4660-b06e-d60e64e4b069",
               "name": "email",
-              "value": "abiykibru6@gmail.com",
+              "value": "yonatantesfaye30@gmail.com",
               "type": "string"
             }
           ]
@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "command": "=git push origin main"
+        "command": "=git push \"https://{{ $('Set Values').first().json.username }}:{{ $('Set Values').first().json.token }}@github.com/{{ $('Set Values').first().json.username }}/{{ $('Set Values').first().json.repo }}\" main"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -306,7 +306,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "9922c5e7-b730-461f-9026-7a2c6a6bd0ee",
+  "versionId": "1d1412b5-fe9e-4126-916c-c0df1af6f380",
   "triggerCount": 0,
   "tags": [],
   "shared": [
