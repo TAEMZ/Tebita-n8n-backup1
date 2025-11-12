@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T09:04:48.100Z",
-  "updatedAt": "2025-11-12T11:16:47.040Z",
+  "updatedAt": "2025-11-12T12:29:25.700Z",
   "id": "fUS4NSWd4AKaTYfG",
   "name": "_backup",
   "active": false,
@@ -104,7 +104,7 @@
             {
               "id": "b64122cd-314a-49d4-a1cb-dce704e22d26",
               "name": "repo",
-              "value": "Tebita-n8n-backup.git",
+              "value": "Tebita-n8n-backup1.git",
               "type": "string"
             },
             {
@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "command": "=git"
+        "command": "=git push origin main"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -306,7 +306,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "cd70ee4c-c7fe-4aee-b770-3ed50ee2e9be",
+  "versionId": "9922c5e7-b730-461f-9026-7a2c6a6bd0ee",
   "triggerCount": 0,
   "tags": [],
   "shared": [
