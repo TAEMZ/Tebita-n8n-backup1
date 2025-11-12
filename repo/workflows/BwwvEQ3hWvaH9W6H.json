@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T07:05:22.463Z",
-  "updatedAt": "2025-11-12T08:57:25.590Z",
+  "updatedAt": "2025-11-12T09:02:18.678Z",
   "id": "BwwvEQ3hWvaH9W6H",
   "name": "backup workflow",
   "active": false,
@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "command": "git -C repo push"
+        "command": "git -C repo push --set-upstream origin main\n"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -308,7 +308,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "bc113ad4-e173-45fa-bb72-142777658c2a",
+  "versionId": "84345a53-17f0-440e-8881-2516a55cf802",
   "triggerCount": 0,
   "tags": [],
   "shared": [
