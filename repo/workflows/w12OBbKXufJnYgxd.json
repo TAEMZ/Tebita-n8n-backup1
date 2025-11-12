@@ -1,0 +1,1232 @@
+{
+  "createdAt": "2025-02-26T13:58:11.948Z",
+  "updatedAt": "2025-02-27T10:10:51.521Z",
+  "id": "w12OBbKXufJnYgxd",
+  "name": "My workflow 17",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da322ea3-9185-4f7b-b882-82f3c20c6083",
+              "name": "body.knowledgeBase",
+              "value": "={{ $json.webViewLink }}",
+              "type": "string"
+            },
+            {
+              "id": "7d91145f-9fb7-4c1c-95cf-4159e554d95c",
+              "name": "body.text",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            },
+            {
+              "id": "282ebcef-279c-41e4-bee3-5967461b99e6",
+              "name": "file",
+              "value": "=data",
+              "type": "string"
+            },
+            {
+              "id": "58bcb78d-0f39-41e6-8b2b-f918f4a47b29",
+              "name": "fileExtension",
+              "value": "={{ $json.fileExtension }}",
+              "type": "string"
+            },
+            {
+              "id": "1956b1be-2834-4b13-8872-87a5dc981147",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "b364a547-0bb4-4717-b743-91b074e3b50d",
+      "name": "Set File ID1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        860,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "id": "3da14639-c109-4a7d-9635-1727949a8506",
+      "name": "Download File",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        680,
+        140
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        440,
+        0
+      ],
+      "id": "500520ee-bcd4-464a-9040-faf4731247db",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da322ea3-9185-4f7b-b882-82f3c20c6083",
+              "name": "body.knowledgeBase",
+              "value": "={{ $json.webViewLink }}",
+              "type": "string"
+            },
+            {
+              "id": "7d91145f-9fb7-4c1c-95cf-4159e554d95c",
+              "name": "body.text",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            },
+            {
+              "id": "282ebcef-279c-41e4-bee3-5967461b99e6",
+              "name": "file",
+              "value": "=data",
+              "type": "string"
+            },
+            {
+              "id": "58bcb78d-0f39-41e6-8b2b-f918f4a47b29",
+              "name": "fileExtension",
+              "value": "={{ $json.fileExtension }}",
+              "type": "string"
+            },
+            {
+              "id": "1956b1be-2834-4b13-8872-87a5dc981147",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "dae6c4a2-c706-40c7-bf31-622ecd7c647e",
+      "name": "Set File ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "id": "fb68a920-ce1f-464a-9f2e-712d668ac791",
+      "name": "Download File1",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -100,
+        420
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -280,
+        300
+      ],
+      "id": "372b139b-a533-4ddd-98f9-54a5bd004e3d",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da322ea3-9185-4f7b-b882-82f3c20c6083",
+              "name": "body.knowledgeBase",
+              "value": "={{ $json.webViewLink }}",
+              "type": "string"
+            },
+            {
+              "id": "7d91145f-9fb7-4c1c-95cf-4159e554d95c",
+              "name": "body.text",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            },
+            {
+              "id": "282ebcef-279c-41e4-bee3-5967461b99e6",
+              "name": "file",
+              "value": "=data",
+              "type": "string"
+            },
+            {
+              "id": "58bcb78d-0f39-41e6-8b2b-f918f4a47b29",
+              "name": "fileExtension",
+              "value": "={{ $json.fileExtension }}",
+              "type": "string"
+            },
+            {
+              "id": "1956b1be-2834-4b13-8872-87a5dc981147",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "89ab5113-fef7-4cc3-90a4-6b9b31df9194",
+      "name": "Set File ID2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        40,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "id": "2ab1d027-22ba-4d47-a393-9a5221ed8373",
+      "name": "Download File2",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -180,
+        680
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -340,
+        600
+      ],
+      "id": "3bdcc520-e72c-4b11-a2a2-7b4177672ca9",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da322ea3-9185-4f7b-b882-82f3c20c6083",
+              "name": "body.knowledgeBase",
+              "value": "={{ $json.webViewLink }}",
+              "type": "string"
+            },
+            {
+              "id": "7d91145f-9fb7-4c1c-95cf-4159e554d95c",
+              "name": "body.text",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            },
+            {
+              "id": "282ebcef-279c-41e4-bee3-5967461b99e6",
+              "name": "file",
+              "value": "=data",
+              "type": "string"
+            },
+            {
+              "id": "58bcb78d-0f39-41e6-8b2b-f918f4a47b29",
+              "name": "fileExtension",
+              "value": "={{ $json.fileExtension }}",
+              "type": "string"
+            },
+            {
+              "id": "1956b1be-2834-4b13-8872-87a5dc981147",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "dde627c2-e916-44b8-9ff6-822cfe2c4dce",
+      "name": "Set File ID3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -200,
+        980
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "id": "7625e022-5de3-4a2b-b1e5-6ab89db1d456",
+      "name": "Download File3",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -360,
+        960
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -580,
+        900
+      ],
+      "id": "1d37690f-93c0-46ad-a18f-27083e1a23de",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "da322ea3-9185-4f7b-b882-82f3c20c6083",
+              "name": "body.knowledgeBase",
+              "value": "={{ $json.webViewLink }}",
+              "type": "string"
+            },
+            {
+              "id": "7d91145f-9fb7-4c1c-95cf-4159e554d95c",
+              "name": "body.text",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            },
+            {
+              "id": "282ebcef-279c-41e4-bee3-5967461b99e6",
+              "name": "file",
+              "value": "=data",
+              "type": "string"
+            },
+            {
+              "id": "58bcb78d-0f39-41e6-8b2b-f918f4a47b29",
+              "name": "fileExtension",
+              "value": "={{ $json.fileExtension }}",
+              "type": "string"
+            },
+            {
+              "id": "1956b1be-2834-4b13-8872-87a5dc981147",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "e422dd42-603d-4d38-8c84-b04f2402cf8a",
+      "name": "Set File ID4",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -40,
+        1400
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "id": "e24b49b2-cbb3-476a-b68d-58460c210931",
+      "name": "Download File4",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -220,
+        1360
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -460,
+        1280
+      ],
+      "id": "7244a630-cecd-43b8-899e-e6346ab9b000",
+      "name": "Loop Over Items4"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "oHSF8XVRMKd2rrgA",
+          "mode": "list",
+          "cachedResultName": "Personal Knowledge Base"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        120,
+        1420
+      ],
+      "id": "0abdddcf-68ec-41dc-a42d-f89ee126acdc",
+      "name": "Execute Personal Knowledge Base"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "9t5qRHFT2qgm7LMK",
+          "mode": "list",
+          "cachedResultName": "Marketing Knowledge"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        1060
+      ],
+      "id": "bd4193fa-071e-4762-bc8c-bbb93f019afc",
+      "name": "Execute Marketing Knowledge Base"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "uGRp9BB6cjKj6IXY",
+          "mode": "list",
+          "cachedResultName": "Amazon Knowledge Base"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        700
+      ],
+      "id": "e85897cb-8733-4a61-ba50-9606e51613da",
+      "name": "Execute Amazon Knowledge Base"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "JQ2KJNsCBLLEw9Km",
+          "mode": "list",
+          "cachedResultName": "Sales Knowledge Base"
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        280,
+        440
+      ],
+      "id": "5abb3449-81c0-47c4-89bb-4b94d4f28783",
+      "name": "Execute Sales Knowledge Base"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "aoZp18gqV1UhEbS3",
+          "mode": "list",
+          "cachedResultName": "Amazon Account Management Base"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        160
+      ],
+      "id": "a9109f78-9174-4e5d-a95b-888f0f43fe35",
+      "name": "Execute Amazon Account Management"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1z2-KVTm9rl2LokPHVquRg0V7DIDF7AUs",
+          "mode": "list",
+          "cachedResultName": "Amazon360",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1z2-KVTm9rl2LokPHVquRg0V7DIDF7AUs"
+        },
+        "event": "folderUpdated"
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1600,
+        640
+      ],
+      "id": "5fdacc1f-4e38-42a0-b738-1b83a45b7a02",
+      "name": "Google Drive Amazon Account Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/folders/1RzutJeb_evkegRrP8mij46UWHZaC3Zhd",
+          "mode": "url"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        940
+      ],
+      "id": "137c3aa6-880c-4b38-8948-847f43f69e15",
+      "name": "Google Drive Sales Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/folders/1qC-7Pttk111CXDDdrarSiKI4UKKo5_MZ",
+          "mode": "url"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1160,
+        1320
+      ],
+      "id": "8f4de77a-2d8d-47c5-8107-3ad2df0c2c93",
+      "name": "Google Drive Amazon Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/folders/1Qn6ZJrHce2o_L1g-kJr7GiIc4oN_cXsl",
+          "mode": "url"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        1480
+      ],
+      "id": "c29d657d-b973-4e53-a6de-6b72c7a7ddee",
+      "name": "Google Drive Marketing Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "https://drive.google.com/drive/folders/1urDJc09fAqARzZiGj8EXy0cykgNMu9Bj",
+          "mode": "url"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        1760
+      ],
+      "id": "af10cd6d-ef03-43e9-99ac-319e7c2cee6c",
+      "name": "Google Drive Personal Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1vmDW2-Cz92R8cZ_taTVuwTo8qIw0f5ad",
+            "mode": "list",
+            "cachedResultName": "Amazon Account Knowledge base",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1vmDW2-Cz92R8cZ_taTVuwTo8qIw0f5ad"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -580,
+        100
+      ],
+      "id": "93463094-04d9-4780-b6c7-be68483aede5",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1xHsHi7d3-XxolMNnJ-zPvLv2Uqv2U7mL",
+            "mode": "list",
+            "cachedResultName": "Amazon Knowledge base",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1xHsHi7d3-XxolMNnJ-zPvLv2Uqv2U7mL"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -840,
+        520
+      ],
+      "id": "44526143-495b-48f7-8f2a-882b0cd7af3d",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1WmVQ4pN-R2n_sIITb10ZXl2zEHWOnHlH",
+            "mode": "list",
+            "cachedResultName": "Marketing Knowledge base",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1WmVQ4pN-R2n_sIITb10ZXl2zEHWOnHlH"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1040,
+        880
+      ],
+      "id": "7f84dee2-5571-4200-8c28-7dce58da2461",
+      "name": "Google Drive2",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1d1zIoVUmLrMgZpJQaTf-hqDvh9wU4KFh",
+            "mode": "list",
+            "cachedResultName": "Sales Knowledge base",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1d1zIoVUmLrMgZpJQaTf-hqDvh9wU4KFh"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -660,
+        300
+      ],
+      "id": "557e99cf-396d-46f6-a20b-7b2f770cdde3",
+      "name": "Google Drive3",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1d1zIoVUmLrMgZpJQaTf-hqDvh9wU4KFh",
+            "mode": "list",
+            "cachedResultName": "Sales Knowledge base",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1d1zIoVUmLrMgZpJQaTf-hqDvh9wU4KFh"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1060,
+        1280
+      ],
+      "id": "d955c30a-a873-40b2-8eef-dc52a840e522",
+      "name": "Google Drive4",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "j6UzDMktwlVPb7Xy",
+          "name": "Google Drive account 6"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Set File ID1": {
+      "main": [
+        [
+          {
+            "node": "Execute Amazon Account Management",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Set File ID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set File ID": {
+      "main": [
+        [
+          {
+            "node": "Execute Sales Knowledge Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File1": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set File ID2": {
+      "main": [
+        [
+          {
+            "node": "Execute Amazon Knowledge Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File2": {
+      "main": [
+        [
+          {
+            "node": "Set File ID2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set File ID3": {
+      "main": [
+        [
+          {
+            "node": "Execute Marketing Knowledge Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File3": {
+      "main": [
+        [
+          {
+            "node": "Set File ID3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download File3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set File ID4": {
+      "main": [
+        [
+          {
+            "node": "Execute Personal Knowledge Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File4": {
+      "main": [
+        [
+          {
+            "node": "Set File ID4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download File4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Personal Knowledge Base": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Marketing Knowledge Base": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Amazon Knowledge Base": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Sales Knowledge Base": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Amazon Account Management": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Amazon Account Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Drive3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Drive2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Drive4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Sales Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Google Drive Amazon Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Google Drive Marketing Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Google Drive Personal Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Google Drive Amazon Account Trigger": {
+      "lastTimeChecked": "2025-02-27T08:02:05Z"
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "42c44830-2c46-4d35-9258-46910e1fed0b",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-26T13:58:11.948Z",
+      "updatedAt": "2025-02-26T13:58:11.948Z",
+      "role": "workflow:owner",
+      "workflowId": "w12OBbKXufJnYgxd",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,360 @@
+{
+  "createdAt": "2025-06-14T09:57:20.211Z",
+  "updatedAt": "2025-06-18T06:06:02.858Z",
+  "id": "r259PVlrx59L2X5R",
+  "name": "stats",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        160,
+        0
+      ],
+      "id": "d6ae4132-5c8f-4f09-a793-965bb0d66cdd",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://stats.ncaa.org/search/players/data?sEcho=5&iColumns=3&sColumns=%2C%2C&iDisplayStart=25&iDisplayLength=25&mDataProp_0=people-last_name&sSearch_0=&bRegex_0=false&bSearchable_0=true&bSortable_0=true&mDataProp_1=players-seasons_played&sSearch_1=&bRegex_1=false&bSearchable_1=true&bSortable_1=false&mDataProp_2=players-career&sSearch_2=&bRegex_2=false&bSearchable_2=true&bSortable_2=false&sSearch=&bRegex=false&iSortCol_0=0&sSortDir_0=asc&iSortingCols=1&org_id_filter=26172&sport_code_filter=&_=1750159352702",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"accept\": \"application/json, text/javascript, */*; q=0.01\",\n  \"x-requested-with\": \"XMLHttpRequest\",\n  \"x-csrf-token\": \"oDi4h2CqxZeb4pi5G6jYqRQHDfML1EuPY3nxskwTZpY0vH2XPoOJ0vd5OTxUO0E7P4/31dqaHmRANSYMZZH66w==\",\n  \"user-agent\": \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36\",\n  \"referer\": \"https://stats.ncaa.org/search/players\",\n  \"cookie\": \"X-Oracle-BMC-LBS-Route=e0e8f5ccc6c39fedaa6765ef3ac329941e557d93; _stats_session=wyjXef3pMUlD2qL0fXChVsDoNgjQN1cVsaJj5gdKlCWUMQNQb8C8FdF3otcQJ8sf6GH4rke0egy%2B37GiS5Ip3HzZHCtkNhkWIQEpDSqGTnafVi8kMGh0T1PlEkGxH2PTYcK2F8s1CBQ67KNKXP0Uuo8Z5Rf6v0AsCrieZoSznb0iTA%3D%3D--kLIJ6vLG9Yur09h9--eqegdZ37noRivXuTMHY4Yg%3D%3D\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        600,
+        -200
+      ],
+      "id": "d65cfb76-af7b-4c3b-b927-0390a61658d3",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json.aaData.map(player => {\n  const nameHtml = player[\"people-last_name\"] || '';\n\n  const nameMatch = nameHtml.match(/>([^<]+)<\\/a>/);\n  const idMatch = nameHtml.match(/\\/players\\/(\\d+)/);\n\n  return {\n    json: {\n      name: nameMatch ? nameMatch[1].trim() : null,\n      player_id: idMatch ? idMatch[1].trim() : null\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ],
+      "id": "38ed2865-f630-410a-8e1e-7e1fc8b75b73",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"start\": 0,\n  \"limit\": 25,\n  \"max\":1336\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        420,
+        0
+      ],
+      "id": "7b459779-2485-4119-ac8a-d9c27f4eb2d9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "=https://stats.ncaa.org/search/players/data?sEcho=5&iColumns=3&sColumns=%2C%2C\n&iDisplayStart={{$json[\"start\"]}}&iDisplayLength={{$json[\"limit\"]}}\n&mDataProp_0=people-last_name&sSearch_0=&bRegex_0=false&bSearchable_0=true&bSortable_0=true\n&mDataProp_1=players-seasons_played&sSearch_1=&bRegex_1=false&bSearchable_1=true&bSortable_1=false\n&mDataProp_2=players-career&sSearch_2=&bRegex_2=false&bSearchable_2=true&bSortable_2=false\n&sSearch=&bRegex=false&iSortCol_0=0&sSortDir_0=asc&iSortingCols=1\n&org_id_filter=26172&sport_code_filter=",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Accept\": \"application/json, text/javascript, */*; q=0.01\",\n  \"X-Requested-With\": \"XMLHttpRequest\",\n  \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36\",\n  \"Referer\": \"http://stats.ncaa.org/team/inst_team_list\",\n  \"Accept-Language\": \"en-US,en;q=0.9\",\n  \"Origin\": \"http://stats.ncaa.org\",\n  \"Connection\": \"keep-alive\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        600,
+        0
+      ],
+      "id": "5f3cdf68-a73c-4e01-a2c4-21b196a590fc",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e05de27b-2039-422d-a169-504fedb7b023",
+              "leftValue": "={{ $('Edit Fields').item.json.start + $('Edit Fields').item.json.limit }}",
+              "rightValue": "={{ $('Edit Fields').item.json.max }}",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1000,
+        0
+      ],
+      "id": "f74c81c7-2d1f-4318-8831-67d9a269feda",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "=https://stats.ncaa.org/search/players/1741600",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Accept\": \"application/json, text/javascript, */*; q=0.01\",\n  \"X-Requested-With\": \"XMLHttpRequest\",\n  \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36\",\n  \"Referer\": \"http://stats.ncaa.org/team/inst_team_list\",\n  \"Accept-Language\": \"en-US,en;q=0.9\",\n  \"Origin\": \"http://stats.ncaa.org\",\n  \"Connection\": \"keep-alive\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        -20
+      ],
+      "id": "f1f386ef-6328-4791-aea3-cda4336f31c0",
+      "name": "HTTP Request2"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "HTTP Request1": [
+      {
+        "json": {
+          "sEcho": 5,
+          "iTotalRecords": 2796093,
+          "iTotalDisplayRecords": 1336,
+          "aaData": [
+            {
+              "people-last_name": "<a target=\"person_1059685_win\" class=\"skipMask\" href=\"/players/3300633\"> #13</a>",
+              "players-seasons_played": "1",
+              "players-career": "2009-10 - 2009-10 @<a href=\"/teams/history/WVB/26172\">A&amp;M-Corpus Christi Women&#39;s Volleyball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_1072487_win\" class=\"skipMask\" href=\"/players/3369319\"> #18</a>",
+              "players-seasons_played": "1",
+              "players-career": "2009-10 - 2009-10 @<a href=\"/teams/history/WVB/26172\">A&amp;M-Corpus Christi Women&#39;s Volleyball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_853256_win\" class=\"skipMask\" href=\"/players/2915700\"> #20</a>",
+              "players-seasons_played": "1",
+              "players-career": "2007-08 - 2007-08 @<a href=\"/teams/history/WVB/26172\">A&amp;M-Corpus Christi Women&#39;s Volleyball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_278203_win\" class=\"skipMask\" href=\"/players/1741600\">Ashley Abrams</a>",
+              "players-seasons_played": "1",
+              "players-career": "2002-03 - 2002-03 @<a href=\"/teams/history/WBB/26172\">A&amp;M-Corpus Christi Women&#39;s Basketball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2549817_win\" class=\"skipMask\" href=\"/players/8443290\">Rylee Achtzehn</a>",
+              "players-seasons_played": "4",
+              "players-career": "2021-22 - 2022-23 @<a href=\"/teams/history/WVB/667\">Southern Utah Women&#39;s Volleyball</a><br/>2023-24 - 2024-25 @<a href=\"/teams/history/WVB/26172\">A&amp;M-Corpus Christi Women&#39;s Volleyball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2853876_win\" class=\"skipMask\" href=\"/players/8468555\">Faith Adams</a>",
+              "players-seasons_played": "2",
+              "players-career": "2023-24 - 2024-25 @<a href=\"/teams/history/WSO/26172\">A&amp;M-Corpus Christi Women&#39;s Soccer</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_852291_win\" class=\"skipMask\" href=\"/players/3090905\">Nyesha Adams</a>",
+              "players-seasons_played": "2",
+              "players-career": "2007-08 - 2008-09 @<a href=\"/teams/history/WBB/26172\">A&amp;M-Corpus Christi Women&#39;s Basketball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_1511593_win\" class=\"skipMask\" href=\"/players/4810262\">Shola Adebayo</a>",
+              "players-seasons_played": "3",
+              "players-career": "2013-14 - 2015-16 @<a href=\"/teams/history/WBB/26172\">A&amp;M-Corpus Christi Women&#39;s Basketball</a>"
+            },
+            {
+              "people-last_name": "Brooke Adkisson",
+              "players-seasons_played": "1",
+              "players-career": "2020-21 - 2020-21 @<a href=\"/teams/history/WSV/26172\">A&amp;M-Corpus Christi Women&#39;s Beach Volleyball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2441498_win\" class=\"skipMask\" href=\"/players/8872239\">Mireia Aguado</a>",
+              "players-seasons_played": "5",
+              "players-career": "2020-21 - 2024-25 @<a href=\"/teams/history/WBB/26172\">A&amp;M-Corpus Christi Women&#39;s Basketball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_664965_win\" class=\"skipMask\" href=\"/players/2639475\">Randy Aguayo</a>",
+              "players-seasons_played": "2",
+              "players-career": "2005-06 - 2006-07 @<a href=\"/teams/history/MBA/26172\">A&amp;M-Corpus Christi Baseball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2654162_win\" class=\"skipMask\" href=\"/players/8863984\">Alyssa Aguilar</a>",
+              "players-seasons_played": "4",
+              "players-career": "2021-22 - 2021-22 @<a href=\"/teams/history/WSB/26172\">A&amp;M-Corpus Christi Softball</a><br/>2022-23 - 2024-25 @<a href=\"/teams/history/WSB/77\">BYU Softball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_300287_win\" class=\"skipMask\" href=\"/players/1775241\">Humberto Aguilar</a>",
+              "players-seasons_played": "1",
+              "players-career": "2002-03 - 2002-03 @<a href=\"/teams/history/MBA/26172\">A&amp;M-Corpus Christi Baseball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2949090_win\" class=\"skipMask\" href=\"/players/8422658\">Precious Aholelei</a>",
+              "players-seasons_played": "1",
+              "players-career": "2023-24 - 2023-24 @<a href=\"/teams/history/WSB/26172\">A&amp;M-Corpus Christi Softball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2807553_win\" class=\"skipMask\" href=\"/players/9213473\">Primrose Aholelei</a>",
+              "players-seasons_played": "3",
+              "players-career": "2022-23 - 2023-24 @<a href=\"/teams/history/WSB/26172\">A&amp;M-Corpus Christi Softball</a><br/>2024-25 - 2024-25 @<a href=\"/teams/history/WSB/30028\">UT Tyler Softball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2474263_win\" class=\"skipMask\" href=\"/players/7096228\">Alie Alcantar</a>",
+              "players-seasons_played": "1",
+              "players-career": "2020-21 - 2020-21 @<a href=\"/teams/history/WSB/26172\">A&amp;M-Corpus Christi Softball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2026683_win\" class=\"skipMask\" href=\"/players/6427803\">Noora Aldossary</a>",
+              "players-seasons_played": "2",
+              "players-career": "2018-19 - 2018-19 @<a href=\"/teams/history/WSO/26172\">A&amp;M-Corpus Christi Women&#39;s Soccer</a><br/>2019-20 - 2019-20 @<a href=\"/teams/history/WSO/553\">Prairie View Women&#39;s Soccer</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_1289295_win\" class=\"skipMask\" href=\"/players/4690609\">Hameed Ali</a>",
+              "players-seasons_played": "5",
+              "players-career": "2011-12 - 2015-16 @<a href=\"/teams/history/MBB/26172\">A&amp;M-Corpus Christi Men&#39;s Basketball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_1652736_win\" class=\"skipMask\" href=\"/players/5192462\">Brian Allec</a>",
+              "players-seasons_played": "3",
+              "players-career": "2014-15 - 2016-17 @<a href=\"/teams/history/MBA/26172\">A&amp;M-Corpus Christi Baseball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2026711_win\" class=\"skipMask\" href=\"/players/7523242\">Hanleigh Allen</a>",
+              "players-seasons_played": "4",
+              "players-career": "2018-19 - 2021-22 @<a href=\"/teams/history/WSO/26172\">A&amp;M-Corpus Christi Women&#39;s Soccer</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_964967_win\" class=\"skipMask\" href=\"/players/3611384\">Jeremy Allen</a>",
+              "players-seasons_played": "3",
+              "players-career": "2008-09 - 2010-11 @<a href=\"/teams/history/MBB/26172\">A&amp;M-Corpus Christi Men&#39;s Basketball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2441501_win\" class=\"skipMask\" href=\"/players/8872240\">Paige Allen</a>",
+              "players-seasons_played": "5",
+              "players-career": "2020-21 - 2024-25 @<a href=\"/teams/history/WBB/26172\">A&amp;M-Corpus Christi Women&#39;s Basketball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_2915387_win\" class=\"skipMask\" href=\"/players/8369726\">Amont&#39;e Allen-Johnson</a>",
+              "players-seasons_played": "1",
+              "players-career": "2023-24 - 2023-24 @<a href=\"/teams/history/MBB/26172\">A&amp;M-Corpus Christi Men&#39;s Basketball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_1284136_win\" class=\"skipMask\" href=\"/players/4160545\">Sarah Alva</a>",
+              "players-seasons_played": "2",
+              "players-career": "2011-12 - 2012-13 @<a href=\"/teams/history/WBB/26172\">A&amp;M-Corpus Christi Women&#39;s Basketball</a>"
+            },
+            {
+              "people-last_name": "<a target=\"person_300822_win\" class=\"skipMask\" href=\"/players/1995871\">Luis Alvarado</a>",
+              "players-seasons_played": "2",
+              "players-career": "2002-03 - 2003-04 @<a href=\"/teams/history/MBA/26172\">A&amp;M-Corpus Christi Baseball</a>"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "versionId": "ebe95ed0-41e3-48dd-a27e-929d59af55af",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-06-14T09:57:20.211Z",
+      "updatedAt": "2025-06-14T09:57:20.211Z",
+      "role": "workflow:owner",
+      "workflowId": "r259PVlrx59L2X5R",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

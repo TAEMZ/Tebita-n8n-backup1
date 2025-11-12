@@ -1,0 +1,1371 @@
+{
+  "createdAt": "2025-09-17T11:30:53.335Z",
+  "updatedAt": "2025-10-13T07:31:34.537Z",
+  "id": "Y1RVACvnRQKChtOe",
+  "name": "drive test",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5cba7460-3ff9-44ac-80d8-a6d649d19dd5",
+              "name": "driveId",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "id": "667d142b-d36c-4ee4-a672-dcc247649960",
+              "name": "channelId",
+              "type": "string",
+              "value": "clientMemory"
+            },
+            {
+              "id": "8f1cc4e7-2dbc-47a8-bdd4-222598531684",
+              "name": "channelToken",
+              "type": "string",
+              "value": "password"
+            },
+            {
+              "id": "c4446141-516d-4f44-b39e-eaff25356db6",
+              "name": "webhookUrl",
+              "type": "string",
+              "value": "={{ 'https://' + $execution.resumeUrl.extractDomain() + '/webhook/' +$('Webhook').params.path }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6e33888f-a04d-46e7-a546-06f8fe415692",
+      "name": "Set Variables",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1328,
+        928
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/changes/startPageToken",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "supportsAllDrives",
+              "value": "true"
+            },
+            {
+              "name": "driveId",
+              "value": "={{ $('Set Variables').first().json.driveId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fd5cd13d-a837-4005-9f0a-cbaf6598198e",
+      "name": "Get StartPageToken",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2048,
+        752
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yAN7plSvHEZlFqiz",
+          "name": "Google Drive account kefe2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/changes/watch",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pageToken",
+              "value": "={{ $json.startPageToken }}"
+            },
+            {
+              "name": "supportsAllDrives",
+              "value": "true"
+            },
+            {
+              "name": "includeItemsFromAllDrives",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"id\": \"{{ $('Set Variables').first().json.channelId }}\",\n  \"type\": \"web_hook\",\n  \"address\": \"{{ $('Set Variables').first().json.webhookUrl }}\",\n  \"token\": \"{{ $('Set Variables').first().json.channelToken }}\",\n  \"expiration\": {{ $now.plus({ \"days\": 7 }).toMillis() }}\n}",
+        "options": {}
+      },
+      "id": "a9cf5a33-5254-4d7d-bebd-693d135d797b",
+      "name": "Register Webhook",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2224,
+        752
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yAN7plSvHEZlFqiz",
+          "name": "Google Drive account kefe2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const workflowStaticData = $getWorkflowStaticData('global') || {};\n\n// Save the registration object from input\nworkflowStaticData.registration = $input.item.json;\n\n// Optionally add resourceId for convenience\nworkflowStaticData.registration.resourceId = $input.item.json.resourceId || null;\n\n// Return to check\nreturn [{\n    json: {\n        workflowStaticData,\n        registration: workflowStaticData.registration\n    }\n}];\n"
+      },
+      "id": "3d43701f-5a0d-4797-937a-837e350ed84e",
+      "name": "Save Registration to WorkflowStaticData",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2400,
+        752
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "a490cbb7-febd-4266-8fb1-4e557ee325d2",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('Webhook').item.json.headers[\"x-goog-channel-id\"] }}",
+              "rightValue": "={{ $json.workflowStaticData.registration.id }}"
+            },
+            {
+              "id": "0ce9621d-f200-4093-8b22-bfbb422790c0",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('Webhook').item.json.headers[\"x-goog-channel-token\"] }}",
+              "rightValue": "={{ $json.workflowStaticData.registration.token }}"
+            },
+            {
+              "id": "4403843f-5e74-4e11-929b-1085726f12bf",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $('Webhook').item.json.headers[\"x-goog-resource-state\"] }}",
+              "rightValue": "change"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c7285b16-f9d7-4662-bfc6-dfc828855143",
+      "name": "Is Valid Request?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        3088,
+        912
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {},
+      "id": "59fbab3f-8915-46a7-b991-399462ef5251",
+      "name": "Invalid Request",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        3312,
+        1008
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/changes",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pageToken",
+              "value": "={{ $json.workflowStaticData.lastPageToken || 10000 }}"
+            },
+            {
+              "name": "supportsAllDrives",
+              "value": "true"
+            },
+            {
+              "name": "includeItemsFromAllDrives",
+              "value": "true"
+            },
+            {
+              "name": "fields",
+              "value": "changes(file(id,name,trashed,parents,mimeType),removed,fileId,time,changeType),newStartPageToken"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4d412f7c-037f-4e96-95e0-de29185f5412",
+      "name": "Get Changes List",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        3312,
+        832
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yAN7plSvHEZlFqiz",
+          "name": "Google Drive account kefe2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "changes",
+        "options": {}
+      },
+      "id": "58735f66-a325-4625-871a-a5d72f46dd01",
+      "name": "Change Events to Items",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        3664,
+        1264
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "b76abb68-b859-47d9-b952-cedd0055a4f9",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              },
+              "leftValue": "={{ $json.removed }}",
+              "rightValue": ""
+            },
+            {
+              "id": "24878191-ad0d-4572-95b5-878f1eed5f28",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              },
+              "leftValue": "={{ $json.file.mimeType }}",
+              "rightValue": "application/vnd.google-apps.folder"
+            },
+            {
+              "id": "1b1fcda9-25e7-4b1b-ae9a-1899bbacc359",
+              "operator": {
+                "name": "filter.operator.equals",
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.changeType }}",
+              "rightValue": "file"
+            },
+            {
+              "id": "7ffcc26c-6e25-4c36-8623-07794f5022b9",
+              "leftValue": "={{ $json.file.name }}",
+              "rightValue": ".del953412",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "196b1bd5-8438-445b-a090-cc766bc695a3",
+              "leftValue": "={{ $json.file.trashed }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "ec2c592e-ca84-42d6-b309-d7e3acfe6e24",
+      "name": "Filter Changed Events",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        3872,
+        1264
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "jsCode": "const workflowStaticData = $getWorkflowStaticData('global') || {};\n\n// Save registration from webhook headers\nworkflowStaticData.registration = {\n    id: $input.item.json.headers['x-goog-channel-id'] || null,\n    token: $input.item.json.headers['x-goog-channel-token'] || null,\n    resourceId: $input.item.json.headers['x-goog-resource-id'] || null,\n    resourceUri: $input.item.json.headers['x-goog-resource-uri'] || null\n};\n\nreturn [{\n    json: {\n        workflowStaticData,\n        registration: workflowStaticData.registration,\n        driveId: workflowStaticData.registration.resourceId\n    }\n}];\n"
+      },
+      "id": "a4c503ad-7730-4a6d-b16e-21493901ec3b",
+      "name": "Get Registration From WorkflowStaticData",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2896,
+        912
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## 1. Register a Google Drive Notification Channel (Webhook)\n[Learn more about Google Drive Notification Channels](https://developers.google.com/workspace/drive/api/guides/push)\n\nWith Push Notifications, Google Drive can create a POST request to any URL when a file or folder change is detected.\nThis is greatly superior to polling as it's really efficient and reliable. Here are some notes of the variables to set:\n\n**driveId** - Unless defined, changes are monitored for all drives which is slow. Defining a drive speeds up receiving notifications considerably.\n**ChannelId** - Set a name of your notification (channel).\n**ChannelToken** - Set an auth token value for notification messages. Google will send this along with the notification payload to the webhook.\n**webhookUrl** - this is the webhook URL of the webhook trigger in this template. Feel free to change this if your webhook is somewhere else.\n\n",
+        "height": 640,
+        "width": 1552,
+        "color": 7
+      },
+      "id": "1720f306-6133-425c-a1da-fc2b11d76af1",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1024,
+        608
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 6,
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "42c9c9a9-5e28-451e-8d02-66cd446c81d6",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        1104,
+        928
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "content": "## 2. Listening For Push Notifications\n[Learn more about Receiving Google Drive Push Notifications](https://developers.google.com/workspace/drive/api/guides/push#receive-notifications)\n\nOnce the Google Notification Channel is set, we can now use a webhook trigger to accept the actual notification messages.\nBe aware that push notification can fire multiple times and in quick succession - especially true when working with bulk actions or file changes. You'll want to keep your calls idempotent and use something like the \"remove duplicates\" node to prevent duplicate changes being processed again.\n\n**📋 Remember to Activate the workflow to enable the Webhook trigger!**",
+        "height": 640,
+        "width": 896,
+        "color": 7
+      },
+      "id": "ee86c188-34da-4d7f-8f79-65c00cdcc8c3",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2624,
+        608
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.file.id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "id,kind,name,createdTime,modifiedTime,mimeType,trashed,driveId,parents"
+            },
+            {
+              "name": "supportsAllDrives",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5e0473ef-bb80-4d78-a302-bbb190b04542",
+      "name": "Get Files Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        4096,
+        1264
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yAN7plSvHEZlFqiz",
+          "name": "Google Drive account kefe2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 3. Update LastPageToken For Next Push Notification\n[Learn more about WorkflowStaticData](https://docs.n8n.io/code/cookbook/builtin/get-workflow-static-data/)\n\nThe page token is like a \"cursor\" and is used to bookmark where changes were last checked. We need to save and reference this token every time we perform a new check to ensure we're only getting the latest changes. For this template, we're using the `WorkflowStaticData` for our data storage but feel free to use Redis, PostgreSQL or similar.",
+        "height": 416,
+        "width": 720,
+        "color": 7
+      },
+      "id": "a0d62a1d-445b-497a-8257-f65b5c8787ac",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3584,
+        608
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 4. Post-Filter the Changes List\nThe **changes list** contains events for the entire drive and can't be pre-filtered by folder. It is therefore important to post-filter the changes list to ensure you're only actioning on the events you actually want.\n\nOnce you have your events, you may then want to make the extra Google Drive API call to get the files details as the event only contains basic meta information.",
+        "height": 416,
+        "width": 720,
+        "color": 7
+      },
+      "id": "2d0c969d-6048-4dc5-9d9e-8c2b88ea4ca2",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3584,
+        1056
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "### ⚠️ Only Works In Production Mode!\nTo use workflowStaticData, the workflow must be run in production mode and not editor mode.\nIf you need this to work in both modes, consider switching to another data storage solution.",
+        "height": 144,
+        "width": 384
+      },
+      "id": "369f0b3d-04fa-4a32-8631-da3383ea931d",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3968,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Watch for Google Drive File Changes with Google Push Notifications!\n\n**Tired of being let down by the Google Drive Trigger? Rather not exhaust system resources by polling every minute? Then this workflow is for you!**\n\nGoogle drive is a great storage option for automation due to its relative simplicity, cheap costs and readily-available integrations. Using Google Drive as a trigger is the next logically step but many n8n users quickly realise the built-in Google Drive trigger just isn't that reliable. Disaster!\n\nTypically, the workaround is to poll the Google Drive search API in short intervals but the trade off is wasted server resources during inactivity. The ideal solution is of course, push notifications but they seem quite complicated to implement... or are they?\n\nThis template demonstrates that setting up **Google Push Notifications for Google Drive File Changes** actually isn't that hard! Using this approach, Google sends a POST request every time something in a drive changes which solves reliability of events and efficiency of resources.\n\n### How it works\n1. We begin with registering a **Notification channel (webhook)** with the Google Drive API. 2 key pieces of information is (a) the webhook URL which notifications will be pushed to and (b) because we want to scope to a single location, the driveId. Good to know that you can register as many as you like using http calls but you have to manage them yourself, there's no google dashboard for notification channels!\n2. The registration data along with the startPageToken are saved in `workflowStaticData` - This is a convenient persistence which we can use to hold small bits of data between executions.\n3. Now, whenever files or folders are created or updated in our target Google Drive, Google will send push notifications to our webhook trigger in this template.\n4. Once triggered, we need still need to call Google Drive's `Changes.list` to get the actual change events which were detected. we can do this with the HTTP request node.\n5. The Changes API will also return the `nextPageToken` - a marker to establish where next to get the new batch of changes. It's important that we use this token the next time we request from the changes API and so, we'll update the `workflowStaticData` with this updated value.\n6. Unfortunately, the `changes.list` API isn't able to filter change events by folder or action and so be sure to do your own set of filtering steps to get the files you want.\n7. Finally with the valid change events, optionally fetch the file metadata which gives you more attributes to play with. For example, you may want to know if the change event was triggered by n8n, in which case you'll want to check \"ModifiedByMe\" value.\n\n### How to use\n* Start with Step 1 and fill in the \"Set Variables\" node and Click on the Manual Execute Trigger. This will create a single Google Drive Notification Channel for a specific drive.\n* Activate the workflow to start recieving events from Google Drive.\n* To test, perform an action eg. create a file, on the target drive. Watch the webhook calls come pouring in!\n* Once you have the desired events, finish off this template to do something with the changed files.\n\n### Requirements\n* Google Drive Credentials. Note this workflow also works on Shared Drives.\n\n### Need Help?\nJoin the [Discord](https://discord.com/invite/XPKeKXeB7d) or ask in the [Forum](https://community.n8n.io/)!\n\nHappy Hacking!",
+        "height": 1344,
+        "width": 608
+      },
+      "id": "d7decb56-b302-406d-9deb-442232b3e51f",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        352,
+        192
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "\n### Renewing the Notification Channel\n* All Notifications Channels have a maximum active duration of 1 week.\n* To renew an existing notification channel, you can simply call the `changes.watch` API (See \"Register Webhook\") with the same variables.\n* This is why we use a scheduled trigger here to run the registration every 6 days.",
+        "width": 608,
+        "color": 7
+      },
+      "id": "7a80eded-23d4-47a2-b011-7f62bbff0fe9",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1888,
+        960
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Get the global workflow static data\nconst workflowStaticData = $getWorkflowStaticData('global');\n\n// Update its data\nconst lastPageToken = $json.newStartPageToken || $json.nextPageToken;\n\nworkflowStaticData.lastPageToken = lastPageToken;\n\nreturn { workflowStaticData }"
+      },
+      "id": "e9da594a-f90d-4f36-902f-713e8739a3f1",
+      "name": "Save NextPageToken to WorkflowStaticData",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        3744,
+        832
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get global workflow static data\nconst workflowStaticData = $getWorkflowStaticData('global') || {};\n\n// Get registration (handle if it’s stored as object or array)\nlet registration = workflowStaticData.registration || {};\nif (Array.isArray(registration)) {\n    registration = registration[0] || {};\n}\n\n// Safely get resourceId\nconst resourceId = registration.resourceId || null;\n\n// Return it\nreturn [{\n    json: {\n        resourceId\n    }\n}];\n"
+      },
+      "id": "495f7762-3596-4255-8dcb-e3c23530e4c6",
+      "name": "Get Registration",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1504,
+        928
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n### ⚠️ Edit me!\nAdd your details here and the template will do the rest.",
+        "height": 304,
+        "width": 192
+      },
+      "id": "ea608239-2777-4666-b219-882588befb3c",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1280,
+        880
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "a9f6aaa9-997d-44a8-afa6-2677480dc63e",
+      "name": "First Run? Click Here!",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        1088,
+        1312
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "![](https://cdn.subworkflow.ai/n8n-templates/banner_595x311.png#full-width)",
+        "height": 336,
+        "width": 608
+      },
+      "id": "7979aed0-ee79-4f3b-a07c-cef4cb85c3ca",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        352,
+        1568
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "44fac054-fc68-4360-9069-377bd3c6bc40",
+        "options": {}
+      },
+      "id": "08f3d160-f10f-490c-acbb-f9845801894e",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        2688,
+        912
+      ],
+      "webhookId": "44fac054-fc68-4360-9069-377bd3c6bc40",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "ac33404c-fac4-49eb-bdde-8afb38694df2",
+      "name": "Subworkflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        1104,
+        1072
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/drive/v3/channels/stop",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $json.registration?.id ?? $('Set Variables').first().json.channelId }}"
+            },
+            {
+              "name": "token",
+              "value": "={{ $json.registration?.token ?? $('Set Variables').first().json.channelToken }}"
+            },
+            {
+              "name": "resourceId",
+              "value": "={{ $json.resourceId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0b5ddbfa-8d52-49c3-9339-4182bf44bd2f",
+      "name": "Stop Any Existing Notifications",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1680,
+        928
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yAN7plSvHEZlFqiz",
+          "name": "Google Drive account kefe2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $workflow.id }}"
+        },
+        "workflowInputs": {
+          "value": {},
+          "schema": [],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "id": "c6c81bd7-322a-471d-90ce-6c88cb2ce539",
+      "name": "Register Notification Channel",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "position": [
+        1312,
+        1312
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.parents }}?fields=id,name,mimeType,parents",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4304,
+        1264
+      ],
+      "id": "9417d980-4389-44e6-a2c7-c270868c40e2",
+      "name": "get parent folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yAN7plSvHEZlFqiz",
+          "name": "Google Drive account kefe2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.parents || 0}}?fields=id,name,mimeType,parents",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4512,
+        1264
+      ],
+      "id": "07e4adb2-b1c5-459a-ad74-c1a99c918c06",
+      "name": "get grandparent folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yAN7plSvHEZlFqiz",
+          "name": "Google Drive account kefe2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f239e25e-33d5-4521-93aa-7d611f4e1129",
+              "name": "file_id",
+              "value": "={{ $('Get Files Details').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f5668655-cade-4f66-a3a5-c24057659298",
+              "name": "parent_folder",
+              "value": "={{ $('get parent folder').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "7bb7d6bd-3e4f-42f6-a209-2d2135c414ac",
+              "name": "grandparent_folder",
+              "value": "={{ $('get grandparent folder').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "4d3ee76d-bf4e-46d1-b7a8-cfd4d7178ef8",
+              "name": "source_type",
+              "value": "drive",
+              "type": "string"
+            },
+            {
+              "id": "07f1b24f-9648-46d2-a207-881d98bd34e1",
+              "name": "perspective",
+              "value": "internal",
+              "type": "string"
+            },
+            {
+              "id": "865d3496-1262-429e-ba38-9c3c51eb2b04",
+              "name": "date",
+              "value": "={{ $('Filter Changed Events').item.json.time }}",
+              "type": "string"
+            },
+            {
+              "id": "691f14a0-cdaa-4d40-9d3c-4b67f890df63",
+              "name": "file_name",
+              "value": "={{ $('Get Files Details').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "8ada09a2-7f7b-4503-95d6-9556793991db",
+              "name": "client_name",
+              "value": "={{ $('get grandparent folder').item.json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5168,
+        1264
+      ],
+      "id": "ae8e8d67-8ca0-48b9-af53-3c2aa741b75d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "Gets and sets the parent and grandparent folders to identify which client it belongs to",
+        "height": 176,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4352,
+        1056
+      ],
+      "typeVersion": 1,
+      "id": "f99e5c4d-062f-46e4-9345-2cd8a588a064",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "kVD6Qjide0ZNhZkk",
+          "mode": "list",
+          "cachedResultName": "Tabular data test"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        5392,
+        1264
+      ],
+      "id": "d53b0110-db9b-4dbf-bfb5-4943ef43761a",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.parents || 0}}?fields=id,name,mimeType,parents",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4720,
+        1264
+      ],
+      "id": "51178d84-45a5-4251-b4d2-cc02f055876a",
+      "name": "Get Main Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yAN7plSvHEZlFqiz",
+          "name": "Google Drive account kefe2"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.name }}",
+                    "rightValue": "Client Memory",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6085c5f4-3ed1-4c5c-956e-3d6f0a64d2c6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Client Memory"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        5008,
+        1056
+      ],
+      "id": "8cc47bb0-7aed-4976-9c48-fc9aad5d1310",
+      "name": "Check Main Folder"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "05f4c2d4-9657-4364-9fc5-678727bf7030",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "Client Memory",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "035512f8-321a-4d0d-849e-f619f6d5a44e",
+              "leftValue": "={{ $('Get Files Details').item.json.name }}",
+              "rightValue": ".del953412",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "946786de-b231-4129-aa54-40c5e93802b9",
+              "leftValue": "={{ $('get parent folder').item.json.name }}",
+              "rightValue": "Recycle Bin",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "13c8d369-bf2a-4e53-8844-9e65761177ad",
+              "leftValue": "={{ $('get grandparent folder').item.json.name }}",
+              "rightValue": "Recycle Bin",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        4944,
+        1264
+      ],
+      "id": "bbfb761e-0208-4dea-85b6-f1e4c261ef3a",
+      "name": "Filter Data Sent To Rag"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "091e8be4-a1d8-49d9-a0ff-86926f2be266",
+              "leftValue": "={{ $('Get Files Details').item.json.name }}",
+              "rightValue": "del953412",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "a7d562a8-cc28-41c8-b3cf-a331edae836c",
+              "leftValue": "={{ $json.parent_folder }}",
+              "rightValue": "Recycle Bin",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "649c2e43-5b65-48a9-8bdd-5917f3d654b9",
+              "leftValue": "={{ $json.grandparent_folder }}",
+              "rightValue": "Recycle Bin",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "0a0f0bfb-0a68-4122-be26-7af7af26b923",
+              "leftValue": "={{ $json.file_name }}",
+              "rightValue": "Recycle Bin",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "9b555ca0-3318-4f73-a004-b0fd459baf08",
+              "leftValue": "={{ $json.grandparent_folder }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "ef51541c-ebd7-4c0e-910e-1e5e768a4368",
+              "leftValue": "={{ $json.parent_folder }}",
+              "rightValue": "My Drive",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "75eeab65-ce30-48c6-a77b-078116b31b86",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5232,
+        1072
+      ],
+      "id": "0e472134-d615-4cbd-9482-0b72a9c344d4",
+      "name": "not text from metadata"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Registration From WorkflowStaticData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variables": {
+      "main": [
+        [
+          {
+            "node": "Get Registration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Changes List": {
+      "main": [
+        [
+          {
+            "node": "Save NextPageToken to WorkflowStaticData",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Change Events to Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Registration": {
+      "main": [
+        [
+          {
+            "node": "Stop Any Existing Notifications",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register Webhook": {
+      "main": [
+        [
+          {
+            "node": "Save Registration to WorkflowStaticData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Files Details": {
+      "main": [
+        [
+          {
+            "node": "get parent folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Valid Request?": {
+      "main": [
+        [
+          {
+            "node": "Get Changes List",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invalid Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get StartPageToken": {
+      "main": [
+        [
+          {
+            "node": "Register Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subworkflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Changed Events": {
+      "main": [
+        [
+          {
+            "node": "Get Files Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Change Events to Items": {
+      "main": [
+        [
+          {
+            "node": "Filter Changed Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "First Run? Click Here!": {
+      "main": [
+        [
+          {
+            "node": "Register Notification Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stop Any Existing Notifications": {
+      "main": [
+        [
+          {
+            "node": "Get StartPageToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Registration From WorkflowStaticData": {
+      "main": [
+        [
+          {
+            "node": "Is Valid Request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get parent folder": {
+      "main": [
+        [
+          {
+            "node": "get grandparent folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get grandparent folder": {
+      "main": [
+        [
+          {
+            "node": "Get Main Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        []
+      ]
+    },
+    "Get Main Folder": {
+      "main": [
+        [
+          {
+            "node": "Filter Data Sent To Rag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Main Folder": {
+      "main": [
+        []
+      ]
+    },
+    "Filter Data Sent To Rag": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "not text from metadata": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        263
+      ]
+    },
+    "node:Schedule Trigger1": {
+      "recurrenceRules": []
+    },
+    "global": {
+      "registration": {
+        "id": "clientMemory",
+        "token": "password",
+        "resourceId": "RUAOwL-EWUkwew_PSlyrM-LuG7s",
+        "resourceUri": "https://www.googleapis.com/drive/v3/changes?alt=json&includeItemsFromAllDrives=true&pageToken=3758&supportsAllDrives=true"
+      },
+      "lastPageToken": "3909"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Subworkflow Trigger": [
+      {
+        "json": {}
+      }
+    ],
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.tebita.com",
+            "user-agent": "APIs-Google; (+https://developers.google.com/webmasters/APIs-Google.html)",
+            "content-length": "0",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "192.178.15.34",
+            "cf-ipcountry": "US",
+            "cf-ray": "98739666ed1ef163-ORD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "x-forwarded-for": "172.70.130.32",
+            "x-forwarded-host": "n8n.tebita.com",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "ddde75687a15",
+            "x-goog-channel-expiration": "Mon, 06 Oct 2025 07:15:55 GMT",
+            "x-goog-channel-id": "clientMemory",
+            "x-goog-channel-token": "password",
+            "x-goog-message-number": "103760084",
+            "x-goog-resource-id": "RUAOwL-EWUkwew_PSlyrM-LuG7s",
+            "x-goog-resource-state": "change",
+            "x-goog-resource-uri": "https://www.googleapis.com/drive/v3/changes?alt=json&includeItemsFromAllDrives=true&pageToken=2531&supportsAllDrives=true",
+            "x-real-ip": "172.70.130.32"
+          },
+          "params": {},
+          "query": {},
+          "body": {},
+          "webhookUrl": "https://n8n.tebita.com/webhook/44fac054-fc68-4360-9069-377bd3c6bc40",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "4e5732fe-0f65-45cf-9279-1c4d08b8e15a",
+  "triggerCount": 2,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-09-17T11:30:53.335Z",
+      "updatedAt": "2025-09-17T11:30:53.335Z",
+      "role": "workflow:owner",
+      "workflowId": "Y1RVACvnRQKChtOe",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

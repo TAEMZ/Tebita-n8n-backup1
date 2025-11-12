@@ -1,0 +1,329 @@
+{
+  "createdAt": "2025-10-02T05:20:03.447Z",
+  "updatedAt": "2025-10-02T07:55:20.750Z",
+  "id": "2WuKyEJT3Hs7hrTA",
+  "name": "telegram-agent-2",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "60ee3b5f-8c71-4676-ba2c-65476bb7482f",
+      "name": "Telegram Trigger",
+      "webhookId": "93022399-13bb-4f7c-bb0d-1328d3f27927",
+      "credentials": {
+        "telegramApi": {
+          "id": "I1FtMRE1bqoeacfe",
+          "name": "lesson_two_telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant\nThe date and time is {{ $now }}\n\nIt is a must to use tools that are available to you.\nAll the tools must be used.\nyou have access to tools like google calendar, gmail and google sheets.\nwhenever you send an email, you must first find the email of the person you want to send it to by using the \"Get Contacts\" tool.\n\n\nwhenever you send an email use the \"Send Email to Contacts\" tool.\n\nwhenever you are trying to create a meeting use the \"Create Meeting\" tool.\n\ndon't ask follow up question. do what you are asked to do."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "bb1419e3-8c90-4005-87c2-1de8b5570f53",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        144
+      ],
+      "id": "12a49587-c6a2-4aa9-a663-bb22db509417",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7rlBRoc7bQuk8b5j",
+          "name": "yordanos-lesson-two"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        224
+      ],
+      "id": "c8d6cc26-018f-4e3e-b0b4-cdf1af06d90c",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        0
+      ],
+      "id": "bd591c11-b477-4ad0-b9de-98af2770ea65",
+      "name": "Send a text message",
+      "webhookId": "1e8a124b-7a9a-417b-8858-bc6e6d52d09c",
+      "credentials": {
+        "telegramApi": {
+          "id": "I1FtMRE1bqoeacfe",
+          "name": "lesson_two_telegram"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "use this to get the contact of the people you want to send an email to\nGet row(s) in sheet in Google Sheets",
+        "documentId": {
+          "__rl": true,
+          "value": "1SVFxkDCTP-zfWpQTWnv4ODR5OrCVf7Fu7EWzS8dsbqs",
+          "mode": "list",
+          "cachedResultName": "Contact Lesson",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SVFxkDCTP-zfWpQTWnv4ODR5OrCVf7Fu7EWzS8dsbqs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SVFxkDCTP-zfWpQTWnv4ODR5OrCVf7Fu7EWzS8dsbqs/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        528,
+        160
+      ],
+      "id": "e294893e-1f3c-41a6-9966-81413acf2cc7",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "U2T5AcZWZXCZQwjL",
+          "name": "yordanos-google-sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        352,
+        272
+      ],
+      "id": "39e98257-f7c3-4e56-b12a-2b002646990c",
+      "name": "Send a message in Gmail",
+      "webhookId": "e6b97114-236c-4f27-943a-216d10541692",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YolHf3KYOMJZbR3t",
+          "name": "yordanos.yirgu1@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create an event in Google Calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "yordanos.yirgu1@gmail.com",
+          "mode": "list",
+          "cachedResultName": "yordanos.yirgu1@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        224
+      ],
+      "id": "21c6a9ea-a4be-49fa-8092-f83ce9acd40f",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "IrvkdGuEum0YyWFk",
+          "name": "yordanos-calendar-account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 783637416,
+          "message": {
+            "message_id": 4,
+            "from": {
+              "id": 958191791,
+              "is_bot": false,
+              "first_name": "Yordanos",
+              "username": "yordanos_yirgu",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 958191791,
+              "first_name": "Yordanos",
+              "username": "yordanos_yirgu",
+              "type": "private"
+            },
+            "date": 1759386101,
+            "text": "please set up a meeting with stefan tomorrow at 9am and send him an email inviting him"
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "48b5b9ba-daf0-4694-91af-20050fbd8900",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-10-02T05:20:03.447Z",
+      "updatedAt": "2025-10-02T05:20:03.447Z",
+      "role": "workflow:owner",
+      "workflowId": "2WuKyEJT3Hs7hrTA",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

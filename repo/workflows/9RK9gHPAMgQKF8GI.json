@@ -1,0 +1,149 @@
+{
+  "createdAt": "2025-10-24T11:35:58.090Z",
+  "updatedAt": "2025-10-24T11:35:58.090Z",
+  "id": "9RK9gHPAMgQKF8GI",
+  "name": "My workflow 43",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9a0b0842-e66c-43f0-b373-c065f9982151",
+      "name": "Telegram Trigger",
+      "webhookId": "0eaf7198-cc69-486f-b85c-bd805bd3f5ac",
+      "credentials": {
+        "telegramApi": {
+          "id": "luymKvQ2tLLIkip0",
+          "name": "yordanos-lesson-bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "aa351556-fa79-419c-9960-22610090c49d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "7cbc64ac-a120-465e-9dbc-1c1636831ea6",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "dx3rpmyt3d6T9oJI",
+          "name": "yo-openrouter"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "6b5df090-0917-4e86-98f0-a244be74e562",
+      "name": "Send a text message",
+      "webhookId": "e2d766d5-94c2-4b87-a983-925fd0e3c569",
+      "credentials": {
+        "telegramApi": {
+          "id": "luymKvQ2tLLIkip0",
+          "name": "yordanos-lesson-bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d61f33fc-d785-45d0-b117-5958eb167682",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-10-24T11:35:58.090Z",
+      "updatedAt": "2025-10-24T11:35:58.090Z",
+      "role": "workflow:owner",
+      "workflowId": "9RK9gHPAMgQKF8GI",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,1133 @@
+{
+  "createdAt": "2025-06-24T09:20:08.475Z",
+  "updatedAt": "2025-06-26T10:44:47.242Z",
+  "id": "MY9P9GokXYCmJ20C",
+  "name": "floridatechsports",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "tuJWiVqX14TqBHn0",
+          "mode": "list",
+          "cachedResultName": "influxermerch"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "direction": "next",
+            "_data": "routes/($locale).athletes._index",
+            "cursor": "={{ $json.athletes.pageInfo.endCursor }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "cursor",
+              "displayName": "cursor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "_data",
+              "displayName": "_data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        -40
+      ],
+      "id": "966c6815-cecf-4428-bbf2-a564287be6c1",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "path": "ad050c22-d47d-4681-b948-6c192593465c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1540,
+        -20
+      ],
+      "id": "90402899-304c-4994-9fca-4ebbedd7b7ac",
+      "name": "Webhook",
+      "webhookId": "ad050c22-d47d-4681-b948-6c192593465c",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1540,
+        -280
+      ],
+      "id": "c1468fcf-be79-47be-94e0-bffa509f489f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"lists\": [\n    \"baseball\",\"mens-basketball\",\"mcross\",\"mens-lacrosse\",\"mens-swimming-and-diving\",\"mens-soccer\",\"mens-indoor-track\",\"mens-outdoor-track\",\"womens-basketball\", \"womens-swimming-and-diving\",\"womens-lacrosse\",\"womens-soccer\",\"softball\",\"womens-rowing\",\"womens-volleyball\",\"esports\",\"mens-ice-hockey\"\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1240,
+        -280
+      ],
+      "id": "438549fa-ee87-47b6-82df-421f8764d7d8",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "url": "=https://floridatechsports.com/sports/{{ $json.lists }}/roster",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -540,
+        -280
+      ],
+      "id": "87f52108-85d4-4c1d-9c50-a893529a0596",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "lists",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1020,
+        -280
+      ],
+      "id": "735ed127-e077-450d-bcc2-6de446d3247d",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and extract roster values from HTML for all sports\nfor (const item of $input.all()) {\n  // Get the HTML content from the input item\n  const htmlContent = item.json.html || item.json.content || item.json.data;\n  \n  if (!htmlContent) {\n    // If no HTML content found, skip this item\n    item.json.rosterValues = [];\n    continue;\n  }\n  \n  // List of sports to match\n  const sports = [\n    \"baseball\",\n    \"mens-basketball\",\n    \"mcross\",\n    \"mens-tennis\",\n    \"mens-lacrosse\",\n    \"mens-swimming-and-diving\",\n    \"mens-soccer\",\n    \"mens-indoor-track\",\n    \"mens-outdoor-track\",\n    \"womens-basketball\",\n    \"womens-swimming-and-diving\",\n    \"womens-lacrosse\",\n    \"womens-soccer\",\n    \"softball\",\n    \"womens-rowing\",\n    \"womens-volleyball\",\n    \"esports\",\n    \"mens-ice-hockey\"\n  ];\n  \n  // Regular expression to match option tags with value attributes\n  const optionRegex = /<option[^>]*value=\"([^\"]*)\"[^>]*>/g;\n  \n  // Array to store extracted values\n  const rosterValues = [];\n  \n  // Extract all matches\n  let match;\n  while ((match = optionRegex.exec(htmlContent)) !== null) {\n    const value = match[1];\n    \n    // Check if the value contains any of our sports roster URLs\n    const isRosterUrl = sports.some(sport => \n      value.includes(`/sports/${sport}/roster/`)\n    );\n    \n    if (isRosterUrl) {\n      rosterValues.push(value);\n    }\n  }\n  \n  // Add the extracted values to the item and remove the original HTML data\n  item.json = {\n    rosterValues: [...new Set(rosterValues)]\n  };\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        -280
+      ],
+      "id": "ea660317-f960-4424-ab4e-f9fb4ff937bb",
+      "name": "Code1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "=https://clarkatlantasports.com/{{ $json.value }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        -280
+      ],
+      "id": "36b90bd9-3177-4802-9a1c-528c18014ccc",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = items[0].json.data;\nconst rows = html.match(/<tr>(.*?)<\\/tr>/gs);\n\nconst players = [];\n\nif (rows) {\n  for (const row of rows) {\n    const getCell = (cls) => {\n      const match = row.match(new RegExp(`<td class=\".*?${cls}.*?\">(.*?)<\\\\/td>`, 's'));\n      return match ? match[1].replace(/<[^>]*>/g, '').trim() : null;\n    };\n\n    const nameMatch = row.match(/<td class=\".*?sidearm-table-player-name.*?\">.*?<a .*?>(.*?)<\\/a>/s);\n    const name = nameMatch ? nameMatch[1].trim() : null;\n\n    const imgMatch = row.match(/<img[^>]*data-src=['\"]([^'\"]+)['\"]/);\n    const image = imgMatch ? `https://asugoldenrams.com${imgMatch[1]}` : null;\n\n    const player = {\n      name,\n      position: getCell('rp_position_short'),\n      number: getCell('roster_jerseynum'),\n      height: getCell('height'),\n      weight: getCell('rp_weight'),\n      class: getCell('roster_class'),\n      hometown: getCell('player_hometown'),\n      school: getCell('player_previous_school'),\n      image,\n    };\n\n    // Remove null fields\n    const cleaned = Object.fromEntries(\n      Object.entries(player).filter(([_, value]) => value !== null)\n    );\n\n    players.push(cleaned);\n  }\n}\n\nreturn players.map(player => ({ json: player }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -280
+      ],
+      "id": "a66540de-166b-41a2-b18f-e98f65c03ce7",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1XyL-ScT9WnCysHMv0dZQrDNypNg5X-wJGwS0WnUiTso",
+          "mode": "list",
+          "cachedResultName": "floridatechsports",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XyL-ScT9WnCysHMv0dZQrDNypNg5X-wJGwS0WnUiTso/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1XyL-ScT9WnCysHMv0dZQrDNypNg5X-wJGwS0WnUiTso/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NAME": "={{ $json.name }}",
+            "SPORT": "={{ $json.sport }}",
+            "SCHOOL": "={{ $json.school }}",
+            "HOMETOWN": "={{ $json.hometown }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "NAME",
+              "displayName": "NAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SPORT",
+              "displayName": "SPORT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SCHOOL",
+              "displayName": "SCHOOL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HOMETOWN",
+              "displayName": "HOMETOWN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        740,
+        -1740
+      ],
+      "id": "86f943df-7699-43d2-9ed7-324b7212c516",
+      "name": "Google Sheets1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -280
+      ],
+      "id": "2ba067f4-b4a8-465e-a490-40ec871db6b4",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "11SCS9c0RRKuJX3pE_K1Rny768PjXr-Z4PzD6oHfNL4s",
+          "mode": "list",
+          "cachedResultName": "floridatechsports Links",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11SCS9c0RRKuJX3pE_K1Rny768PjXr-Z4PzD6oHfNL4s/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11SCS9c0RRKuJX3pE_K1Rny768PjXr-Z4PzD6oHfNL4s/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "path": "={{ $json.rosterValues }}"
+          },
+          "matchingColumns": [
+            "path"
+          ],
+          "schema": [
+            {
+              "id": "path",
+              "displayName": "path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -20,
+        -280
+      ],
+      "id": "13cfbfc7-60f2-462f-b19c-8e4eb27c2975",
+      "name": "Google Sheets",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "ff591a79-0e24-40df-a36d-694102643ef6",
+      "name": "Split In Batches1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -280
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -20
+      ],
+      "id": "fd13234e-5a4f-4177-b3a2-eb5397d53638",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -600,
+        -1380
+      ],
+      "id": "04e2dd26-b846-476a-ad45-b4484fe11fce",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "11SCS9c0RRKuJX3pE_K1Rny768PjXr-Z4PzD6oHfNL4s",
+          "mode": "list",
+          "cachedResultName": "floridatechsports Links",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11SCS9c0RRKuJX3pE_K1Rny768PjXr-Z4PzD6oHfNL4s/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11SCS9c0RRKuJX3pE_K1Rny768PjXr-Z4PzD6oHfNL4s/edit#gid=0"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -380,
+        -1380
+      ],
+      "id": "5626941f-9afd-41d2-a824-c76f29cc611e",
+      "name": "Google Sheets2",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -1380
+      ],
+      "id": "ef7f464c-6264-4f3e-bb6e-0123ee7e866a",
+      "name": "Limit2"
+    },
+    {
+      "parameters": {
+        "url": "=https://floridatechsports.com/{{ $json.path }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        -1380
+      ],
+      "id": "dc21e7f1-6396-4a06-8e51-e814440e3d15",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "11SCS9c0RRKuJX3pE_K1Rny768PjXr-Z4PzD6oHfNL4s",
+          "mode": "list",
+          "cachedResultName": "floridatechsports Links",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11SCS9c0RRKuJX3pE_K1Rny768PjXr-Z4PzD6oHfNL4s/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IPIxvD9dX7kVAO0NAye57BV9fZF2fgxqUGYZQnnvRSE/edit#gid=0"
+        },
+        "startIndex": "={{ $('Limit2').item.json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        600,
+        -1320
+      ],
+      "id": "926c3cf5-dc29-44a3-a094-2c61a167ad4a",
+      "name": "Google Sheets3",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "rosterValues",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        -420
+      ],
+      "id": "19978fb7-c1c8-4aac-a343-09d2a9f95f47",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "players",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -1640
+      ],
+      "id": "3ab31577-7111-4198-9629-e40a773d00c0",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "MY9P9GokXYCmJ20C",
+          "mode": "list",
+          "cachedResultName": "floridatechsports"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -1320
+      ],
+      "id": "45667463-6403-4d1e-a0c4-840b4d993ca4",
+      "name": "Execute Workflow1"
+    },
+    {
+      "parameters": {
+        "path": "e007981e-5e17-4608-9e1c-1e72db35910d",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -660,
+        -1080
+      ],
+      "id": "cd15b826-59be-4060-bc04-ec120e9712c4",
+      "name": "Webhook2",
+      "webhookId": "e007981e-5e17-4608-9e1c-1e72db35910d"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $json[\"data\"] || \"\";\n\nconst output = {};\n\n// Extract the sport and year from the header\nconst headerMatch = html.match(/<h2[^>]*>(\\d{4}) ([^<]+?) Roster<\\/h2>/);\nconst year = headerMatch ? headerMatch[1] : \"UnknownYear\";\nconst sport = headerMatch ? headerMatch[2].trim() : \"UnknownSport\";\n\n// Create a key like \"Baseball_2025\"\nconst groupKey = `${sport}_${year}`;\n\n// Extract all player blocks\nconst playerBlocks = html.match(/<li class=\"sidearm-roster-player\"[\\s\\S]*?<\\/li>/g) || [];\n\nconst players = [];\n\nfor (const block of playerBlocks) {\n    const nameMatch = block.match(/aria-label=\"([^\"]+?) - View Full Bio\"/);\n    const yearMatch = block.match(/<span class=\"sidearm-roster-player-academic-year[^>]*?\">([^<]+)<\\/span>/);\n    const prevSchoolMatch = block.match(/<span class=\"sidearm-roster-player-previous-school\">([^<]+)<\\/span>/);\n    const highschoolMatch = block.match(/<span class=\"sidearm-roster-player-highschool\">([^<]+)<\\/span>/);\n\n    const name = nameMatch ? nameMatch[1].trim() : null;\n    const academicYear = yearMatch ? yearMatch[1].trim() : null;\n    const university = prevSchoolMatch ? prevSchoolMatch[1].trim() : (highschoolMatch ? highschoolMatch[1].trim() : null);\n\n    if (name) {\n        players.push({\n            name,\n            academicYear,\n            university,\n            rosterYear: parseInt(year),\n            sport\n        });\n    }\n}\n\n// Attach to the grouped key\noutput[groupKey] = players;\n\n// Output as a single item\nreturn [{ json: output }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        -760
+      ],
+      "id": "6e689dcb-e052-46e7-9615-1baa1b54c5c6",
+      "name": "Code3",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "138B1tXLKWl6Qt4VK_ZFHCBOnZHY6zYuuD69C8WuARFs",
+          "mode": "list",
+          "cachedResultName": "asugoldenrams",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/138B1tXLKWl6Qt4VK_ZFHCBOnZHY6zYuuD69C8WuARFs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/138B1tXLKWl6Qt4VK_ZFHCBOnZHY6zYuuD69C8WuARFs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NAME": "={{ $json.name }}",
+            "SPORT": "={{ $json.sport }}",
+            "SCHOOL": "={{ $json.school }}",
+            "HOMETOWN": "={{ $json.hometown }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "NAME",
+              "displayName": "NAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SPORT",
+              "displayName": "SPORT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SCHOOL",
+              "displayName": "SCHOOL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HOMETOWN",
+              "displayName": "HOMETOWN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2720,
+        -1140
+      ],
+      "id": "d900e21b-2be6-4f3b-ad19-131c5acaf97b",
+      "name": "Google Sheets4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MYJ51fHpcG8U7E9j",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://ungathletics.com/sports/{{ $json.lists }}/roster",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        -760
+      ],
+      "id": "83725d42-f30a-44cd-a037-406278306b9f",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4",
+          "mode": "list",
+          "cachedResultName": "Linkes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4/edit#gid=0"
+        },
+        "startIndex": "={{ $('Limit3').item.json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2580,
+        -720
+      ],
+      "id": "d3771065-4739-42a0-9065-23087867d622",
+      "name": "Google Sheets6",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MYJ51fHpcG8U7E9j",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ufPTZ6E78j6I48HC",
+          "mode": "list",
+          "cachedResultName": "asugoldenrams"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "cursor",
+              "displayName": "cursor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "_data",
+              "displayName": "_data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2940,
+        -720
+      ],
+      "id": "1313c43d-6f58-4016-bc4a-28ed021b838d",
+      "name": "Execute Workflow2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"lists\": [\n    \"baseball\",\"mens-basketball\",\"football\",\"track-and-field\",\"womens-basketball\",\"womens-cross-country\", \"womens-soccer\",\"softball\",\"tennis\",\"womens-track-and-field\",\"womens-volleyball\"\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1580,
+        -760
+      ],
+      "id": "3b4d5a79-4631-40b7-bb42-f63b9368e55b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "lists",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        -760
+      ],
+      "id": "51a42fb7-f51f-43a4-9179-6e3cd777ad87",
+      "name": "Split Out4"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "8fd47067-162b-46b9-8511-1f192927d6fe",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        -760
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $json[\"data\"] || \"\";\nconst output = [];\n\n// Helper: safely get a matched regex group and trim\nfunction safeMatch(html, regex, group = 1) {\n    const match = html.match(regex);\n    return match && match[group] ? decodeHtml(match[group].trim()) : null;\n}\n\n// Helper: decode HTML entities like &#39; → '\nfunction decodeHtml(str) {\n    return str.replace(/&#(\\d+);/g, (_, dec) => String.fromCharCode(dec))\n              .replace(/&quot;/g, '\"')\n              .replace(/&amp;/g, '&')\n              .replace(/&lt;/g, '<')\n              .replace(/&gt;/g, '>')\n              .replace(/&#x27;/g, \"'\")\n              .replace(/&apos;/g, \"'\");\n}\n\nlet year = \"UnknownYear\";\nlet sport = null;\n\n// Try <h2> tag\nconst headerMatch = html.match(/<h2[^>]*>(\\d{4}) ([^<]+?) Roster<\\/h2>/);\nif (headerMatch && headerMatch[1] && headerMatch[2]) {\n    year = headerMatch[1];\n    sport = decodeHtml(headerMatch[2].trim());\n}\n\n// Try meta tag\nif (!sport) {\n    const metaMatch = html.match(/<meta[^>]+content=\"(\\d{4})-?\\d{0,2}? ([^\"]+?) Roster\"/);\n    if (metaMatch && metaMatch[1] && metaMatch[2]) {\n        year = metaMatch[1];\n        sport = decodeHtml(metaMatch[2].trim());\n    }\n}\n\n// Try JS variable\nif (!sport) {\n    sport = safeMatch(html, /associated_sport\\s*=\\s*{[^}]*\"title\"\\s*:\\s*\"([^\"]+?)\"/);\n}\n\n// Try from HTML class\nif (!sport) {\n    const code = safeMatch(html, /<html[^>]+class=\"[^\"]*sport\\s+([a-z0-9\\-]+)[^\"]*\"/i);\n    const codeToSportMap = {\n        // Men's\n        \"baseball\": \"Baseball\",\n        \"bsb\": \"Baseball\",\n        \"mens-basketball\": \"Men's Basketball\",\n        \"mbkb\": \"Men's Basketball\",\n        \"mens-cross-country\": \"Men's Cross Country\",\n        \"mxc\": \"Men's Cross Country\",\n        \"mens-soccer\": \"Men's Soccer\",\n        \"msoc\": \"Men's Soccer\",\n        \"mens-golf\": \"Men's Golf\",\n        \"mgolf\": \"Men's Golf\",\n        \"mens-lacrosse\": \"Men's Lacrosse\",\n        \"mlax\": \"Men's Lacrosse\",\n        \"mens-swimming\": \"Men's Swimming\",\n        \"mens-track-and-field\": \"Men's Track and Field\",\n        \"mtrack\": \"Men's Track and Field\",\n        \"mens-tennis\": \"Men's Tennis\",\n        \"mten\": \"Men's Tennis\",\n\n        // Women's\n        \"womens-basketball\": \"Women's Basketball\",\n        \"wbkb\": \"Women's Basketball\",\n        \"womens-cross-country\": \"Women's Cross Country\",\n        \"wxc\": \"Women's Cross Country\",\n        \"womens-soccer\": \"Women's Soccer\",\n        \"wsoc\": \"Women's Soccer\",\n        \"womens-golf\": \"Women's Golf\",\n        \"wgolf\": \"Women's Golf\",\n        \"womens-tennis\": \"Women's Tennis\",\n        \"wten\": \"Women's Tennis\",\n        \"womens-track-and-field\": \"Women's Track and Field\",\n        \"wtrack\": \"Women's Track and Field\",\n        \"womens-volleyball\": \"Women's Volleyball\",\n        \"wvball\": \"Women's Volleyball\",\n        \"womens-lacrosse\": \"Women's Lacrosse\",\n        \"wlax\": \"Women's Lacrosse\",\n        \"womens-swimming\": \"Women's Swimming\",\n\n        // Other sports\n        \"softball\": \"Softball\",\n        \"sball\": \"Softball\",\n        \"tennis\": \"Tennis\",\n        \"track-and-field\": \"Track and Field\",\n        \"xc\": \"Cross Country\",\n        \"football\": \"Football\",\n        \"cheerleading\": \"Cheerleading\",\n        \"equestrian\": \"Equestrian\",\n        \"beach-volleyball\": \"Beach Volleyball\"\n    };\n\n    if (code) {\n        const normalized = code.toLowerCase();\n        sport = codeToSportMap[normalized] || normalized;\n    }\n}\n\n// Fallback\nif (!sport) sport = \"UnknownSport\";\n\n// Extract all player blocks\nconst playerBlocks = html.match(/<li class=\"sidearm-roster-player\"[\\s\\S]*?<\\/li>/g) || [];\n\nfor (const block of playerBlocks) {\n    const name = safeMatch(block, /aria-label=\"([^\"]+?) - View Full Bio\"/);\n    const academicYear = safeMatch(block, /<span class=\"sidearm-roster-player-academic-year[^>]*?\">([^<]+)<\\/span>/);\n    const prevSchool = safeMatch(block, /<span class=\"sidearm-roster-player-previous-school\">([^<]+)<\\/span>/);\n    const highSchool = safeMatch(block, /<span class=\"sidearm-roster-player-highschool\">([^<]+)<\\/span>/);\n    const hometown = safeMatch(block, /<span class=\"sidearm-roster-player-hometown\">([^<]+)<\\/span>/);\n\n    const school = prevSchool || highSchool;\n\n    if (name) {\n        const player = {\n            name,\n            sport,\n            rosterYear: parseInt(year),\n            academicYear,\n            school,\n            hometown,\n        };\n\n        const cleaned = Object.fromEntries(\n            Object.entries(player).filter(([_, value]) => value !== null && value !== \"\")\n        );\n\n        if (Object.keys(cleaned).length > 1) {\n            output.push(cleaned);\n        }\n    }\n}\n\nreturn [{ json: { players: output } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        -1380
+      ],
+      "id": "fe4df674-3343-498f-bb36-f2f76bf03252",
+      "name": "Code4"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Limit2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets6": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out4": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "7c258ab6-2567-4d10-b9af-167b62540dfe",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-06-24T09:20:08.475Z",
+      "updatedAt": "2025-06-24T09:20:08.475Z",
+      "role": "workflow:owner",
+      "workflowId": "MY9P9GokXYCmJ20C",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,285 @@
+{
+  "createdAt": "2025-02-08T10:08:25.551Z",
+  "updatedAt": "2025-02-27T22:21:37.751Z",
+  "id": "JIKVg62d5F8PilTd",
+  "name": "youtube-transcript",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/topaz_sharingan~youtube-transcript-scraper-1/run-sync-get-dataset-items?token=apify_api_VGhaOy2bqjTqqWjUPFTmk9AYouovZD11xjSt",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"startUrls\": [\n        \"{{ $json.video_url }}\"\n    ]\n}",
+        "options": {}
+      },
+      "id": "d5674298-9f46-4969-91c6-523bd05c2533",
+      "name": "Request YouTube Transcript",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        240,
+        0
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "b8cd4963-61c6-4ced-9146-b929c71747fb",
+      "name": "Summarization of a YouTube script",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        460,
+        0
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "6afaf382-a2b1-4f5e-9180-34fa6448c157",
+      "name": "Summarization Engine",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        460,
+        180
+      ],
+      "typeVersion": 1.1,
+      "credentials": {
+        "openAiApi": {
+          "id": "LECbHwV7WQjNhD2I",
+          "name": "OpenAi account "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1jORu0XXaVgIzitIsHvt4UqmiIvzXk1y_j2qKtfJODn4",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jORu0XXaVgIzitIsHvt4UqmiIvzXk1y_j2qKtfJODn4/edit#gid=0"
+        },
+        "event": "rowAdded",
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "A1:C100"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ff8265b5-6bbe-4568-b1a3-2e47b3b41254",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "uv7QUUkzqV9HcSlu",
+          "name": "Google Sheets Trigger account "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1jORu0XXaVgIzitIsHvt4UqmiIvzXk1y_j2qKtfJODn4",
+          "mode": "list",
+          "cachedResultName": "youtube_video",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jORu0XXaVgIzitIsHvt4UqmiIvzXk1y_j2qKtfJODn4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jORu0XXaVgIzitIsHvt4UqmiIvzXk1y_j2qKtfJODn4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "video_url": "={{ $('Request YouTube Transcript').item.json.url }}",
+            "title": "={{ $('Request YouTube Transcript').item.json.videoTitle }}",
+            "transcript": "={{ $('Request YouTube Transcript').item.json.transcript }}",
+            "summary": "={{ $json.response.text }}"
+          },
+          "matchingColumns": [
+            "video_url"
+          ],
+          "schema": [
+            {
+              "id": "video_url",
+              "displayName": "video_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "transcript",
+              "displayName": "transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        820,
+        0
+      ],
+      "id": "a28cf722-1c4d-4bb8-88cf-cf18780ff6e3",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "nHKuKJJRLH7d69st",
+          "name": "Google Sheets account "
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Summarization Engine": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarization of a YouTube script",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request YouTube Transcript": {
+      "main": [
+        [
+          {
+            "node": "Summarization of a YouTube script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarization of a YouTube script": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Request YouTube Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Google Sheets Trigger": {
+      "documentId": "1jORu0XXaVgIzitIsHvt4UqmiIvzXk1y_j2qKtfJODn4",
+      "sheetId": 0,
+      "lastIndexChecked": 2
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "01563a74-73e5-496b-99d4-e800eb0e799c",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-04-29T07:28:32.695Z",
+      "updatedAt": "2025-04-29T07:28:32.695Z",
+      "role": "workflow:owner",
+      "workflowId": "JIKVg62d5F8PilTd",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

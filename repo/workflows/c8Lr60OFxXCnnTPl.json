@@ -1,0 +1,109 @@
+{
+  "createdAt": "2025-04-14T11:14:17.318Z",
+  "updatedAt": "2025-04-14T11:21:43.662Z",
+  "id": "c8Lr60OFxXCnnTPl",
+  "name": "My workflow 26",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5b980a18-e9a3-4ca2-8e00-a323488eb854",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~web-scraper/run-sync-get-dataset-items?token=apify_api_wdTWfOIkf0deXJ6rYsfwUIS7aM51eB0Rul76",
+        "sendBody": true,
+        "specifyBody": "={\n  \"breakpointLocation\": \"NONE\",\n  \"browserLog\": false,\n  \"closeCookieModals\": false,\n  \"debugLog\": false,\n  \"downloadCss\": true,\n  \"downloadMedia\": true,\n  \"excludes\": [\n    {\n      \"glob\": \"/**/*.{png,jpg,jpeg,pdf}\"\n    }\n  ],\n  \"headless\": true,\n  \"ignoreCorsAndCsp\": false,\n  \"ignoreSslErrors\": false,\n  \"injectJQuery\": true,\n  \"keepUrlFragments\": false,\n  \"maxCrawlingDepth\": 0,\n  \"maxPagesPerCrawl\": 0,\n  \"pageFunction\": \"async function pageFunction(context) {\\n    const $ = context.jQuery;\\n    const url = context.request.url;\\n\\n    const pageTitle = $('title').first().text().trim();\\n    const h1 = $('h1').first().text().trim();\\n    const firstH2 = $('h2').first().text().trim();\\n    const metaDescription = $('meta[name=\\\"description\\\"]').attr('content') || '';\\n    const ogTitle = $('meta[property=\\\"og:title\\\"]').attr('content') || '';\\n    const ogDescription = $('meta[property=\\\"og:description\\\"]').attr('content') || '';\\n    const buttonTexts = $('button').map((_, el) => $(el).text().trim()).get().slice(0, 5);\\n    const linkTexts = $('a').map((_, el) => $(el).text().trim()).get().slice(0, 5);\\n    const navLinks = $('nav a').map((_, el) => $(el).text().trim()).get().slice(0, 5);\\n\\n    const visibleText = $('body').text().replace(/\\\\s+/g, ' ').trim().substring(0, 3000);\\n\\n    context.log.info(`Scraped: ${url} - ${pageTitle}`);\\n\\n    return {\\n        url,\\n        pageTitle,\\n        metaDescription,\\n        ogTitle,\\n        ogDescription,\\n        h1,\\n        firstH2,\\n        buttonTexts,\\n        linkTexts,\\n        navLinks,\\n        visibleText\\n    };\\n}\",\n  \"postNavigationHooks\": [\n    \"async (crawlingContext) => {\\n        // Custom post-navigation logic here if needed\\n    }\"\n  ],\n  \"preNavigationHooks\": [\n    \"async (crawlingContext, gotoOptions) => {\\n        // Custom pre-navigation logic here if needed\\n    }\"\n  ],\n  \"proxyConfiguration\": {\n    \"useApifyProxy\": true\n  },\n  \"runMode\": \"DEVELOPMENT\",\n  \"startUrls\": [\n    {\n      \"url\": \"{{ $json.url }}\",\n      \"method\": \"GET\"\n    }\n  ],\n  \"useChrome\": false,\n  \"waitUntil\": [\n    \"networkidle2\"\n  ],\n  \"globs\": [],\n  \"pseudoUrls\": [],\n  \"proxyRotation\": \"RECOMMENDED\",\n  \"initialCookies\": [],\n  \"maxRequestRetries\": 3,\n  \"maxResultsPerCrawl\": 0,\n  \"maxConcurrency\": 50,\n  \"pageLoadTimeoutSecs\": 60,\n  \"pageFunctionTimeoutSecs\": 60,\n  \"maxScrollHeightPixels\": 5000,\n  \"customData\": {}\n}\n",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "74d11410-59d5-48ef-9dfc-34f77aaf94a0",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"brand\": \"value\",\n  \"url\": \"https://www.markasbolt.hu/ferfi/utcai-cipo/marcus-ferfi-utcai-cipo-felicio-m21-1felicio-scm-101-1218-barna?h_ads=facebook\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "id": "50e12cf1-8f02-439e-bce0-fdc038af61d7",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "b76e3ee6-20d8-4491-b40b-4dfee811b386",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-04-14T11:14:17.318Z",
+      "updatedAt": "2025-04-14T11:14:17.318Z",
+      "role": "workflow:owner",
+      "workflowId": "c8Lr60OFxXCnnTPl",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,267 @@
+{
+  "createdAt": "2025-03-20T11:17:44.079Z",
+  "updatedAt": "2025-03-20T12:47:06.595Z",
+  "id": "4TUFKFGXIkGbrauV",
+  "name": "vapi agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "7ecdd370-c8fb-48a7-a5b6-503d7c0a4a06",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e639dfb1-f341-4085-ab95-9ee07b743bb4",
+      "name": "Webhook",
+      "webhookId": "7ecdd370-c8fb-48a7-a5b6-503d7c0a4a06"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        740,
+        20
+      ],
+      "id": "9c99eac3-0870-4687-8a34-cb9314af2b56",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        0
+      ],
+      "id": "fddbf6ee-68a1-4b75-bebd-af5bd5f75366",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        660,
+        300
+      ],
+      "id": "37952d04-4c83-48fe-b1b5-b6f79b4c68f6",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "name": "Sales_Trainer_Agent",
+        "description": "train s"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        820,
+        280
+      ],
+      "id": "6736c3f8-1aab-4b84-a6b6-6247c887f501",
+      "name": "vector store",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "sales-agent",
+          "mode": "list",
+          "cachedResultName": "sales-agent"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        700,
+        480
+      ],
+      "id": "feda049b-e8eb-4487-9cb6-274561868418",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "vJK9dQMUeqBelwsc",
+          "name": "PineconeApi account bam"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1000,
+        520
+      ],
+      "id": "1c15d84f-129d-4bae-93ac-5e28d9838d1e",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        700
+      ],
+      "id": "03edf0d2-d003-40cf-83d4-3d021812a6b2",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "187132bf-ccfe-4d53-ab4b-6bb04bf3d0e7",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-03-20T11:17:44.079Z",
+      "updatedAt": "2025-03-20T11:17:44.079Z",
+      "role": "workflow:owner",
+      "workflowId": "4TUFKFGXIkGbrauV",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

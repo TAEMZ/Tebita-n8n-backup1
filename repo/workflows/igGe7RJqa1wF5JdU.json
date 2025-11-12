@@ -1,0 +1,1170 @@
+{
+  "createdAt": "2025-04-29T12:21:23.992Z",
+  "updatedAt": "2025-04-30T10:02:21.062Z",
+  "id": "igGe7RJqa1wF5JdU",
+  "name": "AI_Avatar___AI_B_Roll__Video_Actions",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "b7774650-a050-421b-bb73-fa302946f8c6",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -900,
+        460
+      ],
+      "id": "4a0a4b4a-5084-4051-b236-8264f23a4bcf",
+      "name": "Webhook",
+      "webhookId": "b7774650-a050-421b-bb73-fa302946f8c6"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.query.action }}",
+                    "rightValue": "generateVideo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "be9cf534-1101-4fc4-a4b3-0bde7a85eed3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Generate Video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c594b416-2926-407a-8f5a-bd9e46c3462c",
+                    "leftValue": "={{ $('Webhook').item.json.query.action }}",
+                    "rightValue": "generateSRT",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Generete SRT"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e8cbfeec-126e-4e23-a58e-bb6c37625254",
+                    "leftValue": "={{ $('Webhook').item.json.query.action }}",
+                    "rightValue": "generateSegments",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Generete Segments"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "4573bead-3a43-4d32-888e-67e2f76287b6",
+                    "leftValue": "={{ $('Webhook').item.json.query.action }}",
+                    "rightValue": "generateAudio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Generate Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "20cf0dad-2071-426b-aea5-80108b6f3757",
+                    "leftValue": "={{ $('Webhook').item.json.query.action }}",
+                    "rightValue": "combineVideo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Combine Video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b6899238-4cec-4362-bf21-cc1efab227f9",
+                    "leftValue": "={{ $('Webhook').item.json.query.action }}",
+                    "rightValue": "combineAV",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Combine V + A"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7a50c20e-1321-4192-bc0e-8972bbecec09",
+                    "leftValue": "={{ $('Webhook').item.json.query.action }}",
+                    "rightValue": "captionVideo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Caption Video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -460,
+        380
+      ],
+      "id": "68738c4d-e9a6-459c-aba3-7c9540ef28d3",
+      "name": "Router"
+    },
+    {
+      "parameters": {
+        "base": {
+          "__rl": true,
+          "value": "appSc5xBnMnl8xyB6",
+          "mode": "list",
+          "cachedResultName": "AI Video + B-Roll Magic 🪄 [v1.0]",
+          "cachedResultUrl": "https://airtable.com/appSc5xBnMnl8xyB6"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblQP6jkQ5od8aeUi",
+          "mode": "list",
+          "cachedResultName": "Videos",
+          "cachedResultUrl": "https://airtable.com/appSc5xBnMnl8xyB6/tblQP6jkQ5od8aeUi"
+        },
+        "id": "={{ $json.query.recordId }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -680,
+        460
+      ],
+      "id": "dfb7d99a-a502-4deb-9e52-4daa853cbd0e",
+      "name": "Get Video Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "8Y64LBMSiWcONWIp",
+          "name": "Airtable Personal Access Token account B-roll"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.all().map((item) => item.json);\nconst regex =\n  /(\\d+)\\n(\\d{2}:\\d{2}:\\d{2}\\.\\d{3} --> \\d{2}:\\d{2}:\\d{2}\\.\\d{3})\\n((?:.+\\n?)+)/g;\n\nconst result = input.map((item) => {\n  const segments = item.data.replace(/,/g, \".\").match(regex);\n  return segments.map((segment, index) => {\n    const [id, time, text] = segment.split(\"\\n\");\n    let [startTime, endTime] = time.split(\" --> \");\n    startTime = startTime.replace(\",\", \".\");\n    endTime = endTime.replace(\",\", \".\");\n    return { id, startTime, endTime, text };\n  });\n});\n\nreturn result.flat().map((segment) => ({ json: segment }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        260
+      ],
+      "id": "2f934ecf-2241-4e87-b7fe-bf1f0ce388dc",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"nik_blue_expressive_20240910\",\n        \"avatar_style\": \"normal\"\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": \"{{ $json['Video Script'].replace(/\\n/g, \"\").replace(/\\r/g, \"\") }}\",\n        \"voice_id\": \"e23c82c61d934fa2b7fbda39a2247228\"\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": {{ $json.Width }},\n    \"height\": {{ $json.Height }}\n  },\n  \"aspect_ratio\": null,\n\"trial\":true,\n\"callback_id\": \"{{ $('Get Video Data').item.json.id }}\",\n  \"callback_url\": \"https://hooks.airtable.com/workflows/v1/genericWebhook/appSc5xBnMnl8xyB6/wflvWWi1ni6dSHsEH/wtrtdZ4r62gcHEx8j\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        -140
+      ],
+      "id": "840f21a9-37a7-42db-8be3-dd175e0dd209",
+      "name": "Generate Video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ibEN5yQh4PyN2zEv",
+          "name": "Heygen"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sea-turtle-app-nlak2.ondigitalocean.app/v1/media/transcribe",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"media_url\": \"{{ $('Get Video Data').item.json['AI Video'][0].url }}\",\n    \"task\": \"transcribe\",\n    \"include_srt\": true,\n    \"include_text\": true,\n    \"response_type\": \"cloud\",\n    \"language\": \"en\",\n    \"words_per_line\": 8,\n    \"webhook_url\": \"https://hooks.airtable.com/workflows/v1/genericWebhook/appSc5xBnMnl8xyB6/wflYvyUMTx4uxWcal/wtrWMBGcChetmThEX\",\n    \"id\": \"{{ $('Get Video Data').item.json.id }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        60
+      ],
+      "id": "1323edce-2f89-4a79-a74e-8bd3e960cd5d",
+      "name": "Generate SRT",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2lVjEF3eGAi56Tnf",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Get Video Data').item.json[\"Video SRT\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        260
+      ],
+      "id": "e84009eb-cd76-4fc2-8d3a-0298d5c2fae0",
+      "name": "Generate Segments"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.goapi.ai/api/v1/task",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"Qubico/diffrhythm\",\n  \"task_type\": \"txt2audio-base\",\n  \"input\": {\n    \"lyrics\": \"NoLyrics\",\n    \"style_prompt\": \"upbeat techno music for a business video\",\n    \"style_audio\": \"\"\n  },\n  \"config\": {\n    \"webhook_config\": {\n      \"endpoint\": \"https://hooks.airtable.com/workflows/v1/genericWebhook/appSc5xBnMnl8xyB6/wflar0ISRHY2xH6jm/wtrY1fLaqf7LXPhNB\",\n      \"secret\": \"\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        460
+      ],
+      "id": "ea7557ef-b1c1-4dfa-a129-a2158566d1e6",
+      "name": "Generate Music",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2lVjEF3eGAi56Tnf",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appSc5xBnMnl8xyB6",
+          "mode": "list",
+          "cachedResultName": "AI Video + B-Roll Magic 🪄 [v1.0]",
+          "cachedResultUrl": "https://airtable.com/appSc5xBnMnl8xyB6"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblQP6jkQ5od8aeUi",
+          "mode": "list",
+          "cachedResultName": "Videos",
+          "cachedResultUrl": "https://airtable.com/appSc5xBnMnl8xyB6/tblQP6jkQ5od8aeUi"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Webhook').item.json.query.recordId }}",
+            "AI Music Task ID": "={{ $json.data.task_id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Video ID",
+              "displayName": "Video ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Active Video",
+              "displayName": "Active Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Video Script",
+              "displayName": "Video Script",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Width",
+              "displayName": "Width",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Height",
+              "displayName": "Height",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Video GO",
+              "displayName": "Video GO",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "AI Video",
+              "displayName": "AI Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Video + B-Roll Go",
+              "displayName": "Video + B-Roll Go",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Video + B-Roll",
+              "displayName": "Video + B-Roll",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Music",
+              "displayName": "Music",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Video + Music",
+              "displayName": "Video + Music",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Video + Captions",
+              "displayName": "Video + Captions",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Archive",
+              "displayName": "Archive",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "AI Music Task ID",
+              "displayName": "AI Music Task ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Video SRT",
+              "displayName": "Video SRT",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Segments",
+              "displayName": "Segments",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Transcript URL",
+              "displayName": "Transcript URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "# Segments",
+              "displayName": "# Segments",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Segments 2",
+              "displayName": "Segments 2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        460
+      ],
+      "id": "369e3b52-3273-4e58-bf96-f777c6bb40bd",
+      "name": "Update Music Task ID",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "8Y64LBMSiWcONWIp",
+          "name": "Airtable Personal Access Token account B-roll"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sea-turtle-app-nlak2.ondigitalocean.app/v1/ffmpeg/compose",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $('Webhook').item.json.query.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        660
+      ],
+      "id": "ac422bee-e2f0-4b2f-b7a3-4adb64b8130d",
+      "name": "Combine Video + B-Roll",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2lVjEF3eGAi56Tnf",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sea-turtle-app-nlak2.ondigitalocean.app/v1/ffmpeg/compose",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"webhook_url\": \"https://hooks.airtable.com/workflows/v1/genericWebhook/appSc5xBnMnl8xyB6/wflNR1c6XSiKiaq49/wtrL84YwGCsJ77vyL\",\n  \"id\": \"{{ $('Get Video Data').item.json.id }}\",\n  \"inputs\": [\n    {\n      \"file_url\": \"{{ $json['Video + B-Roll'][0].url }}\"\n    },\n    {\n      \"file_url\": \"{{ $('Get Video Data').item.json.Music[0].url }}\"\n    }\n  ],\n  \"filters\": [\n    {\n      \"filter\": \"[0:a]volume=1.0[a0]\"\n    },\n    {\n      \"filter\": \"[1:a]volume=0.50[a1]\"\n    },\n    {\n      \"filter\": \"[a0][a1]amix=inputs=2:duration=shortest:dropout_transition=2[aout]\"\n    }\n  ],\n  \"outputs\": [\n    {\n      \"options\": [\n        {\n          \"option\": \"-map\",\n          \"argument\": \"0:v\"\n        },\n        {\n          \"option\": \"-map\",\n          \"argument\": \"[aout]\"\n        },\n        {\n          \"option\": \"-c:v\",\n          \"argument\": \"copy\"\n        },\n        {\n          \"option\": \"-shortest\"\n        }\n      ]\n    }\n  ]\n}\n",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        860
+      ],
+      "id": "3433c116-5732-4c51-a413-de2624e9fae8",
+      "name": "Combine Video + Music",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2lVjEF3eGAi56Tnf",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sea-turtle-app-nlak2.ondigitalocean.app/v1/video/caption",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"video_url\": \"{{ $('Get Video Data').item.json['Video + Music'][0].url }}\",\n    \"replace\": [\n        {\n            \"find\": \"Steven's\",\n            \"replace\": \"Stephen's\"\n        },\n        {\n            \"find\": \"Steven's\",\n            \"replace\": \"Stephen's\"\n        },\n        {\n            \"find\": \"Hagen\",\n            \"replace\": \"Heygen\"\n        },\n        {\n            \"find\": \"Mid-Jerney\",\n            \"replace\": \"Midjourney\"\n        }\n    ],\n    \"settings\": {\n        \"line_color\": \"#FFFFFF\",\n        \"word_color\": \"#FFFF00\",\n        \"all_caps\": false,\n        \"max_words_per_line\": 3,\n        \"font_size\": 40,\n        \"bold\": false,\n        \"italic\": false,\n        \"underline\": false,\n        \"strikeout\": false,\n        \"outline_width\": 3,\n        \"shadow_offset\": 4,\n        \"style\": \"highlight\",\n        \"font_family\": \"The Bold Font\",\n        \"position\": \"bottom_center\"\n    },\n    \"webhook_url\": \"https://hooks.airtable.com/workflows/v1/genericWebhook/appSc5xBnMnl8xyB6/wflvjWFffmDdP33uo/wtrtAZrFY6NcE08Y0\",\n    \"id\": \"{{ $('Get Video Data').item.json.id }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -140,
+        1060
+      ],
+      "id": "5ad70a25-66eb-462c-a3b2-af0457f14068",
+      "name": "Add Captions",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ibEN5yQh4PyN2zEv",
+          "name": "Heygen"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appSc5xBnMnl8xyB6",
+          "mode": "list",
+          "cachedResultName": "AI Video + B-Roll Magic 🪄 [v1.0]",
+          "cachedResultUrl": "https://airtable.com/appSc5xBnMnl8xyB6"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblc86DDGKFh0adHu",
+          "mode": "list",
+          "cachedResultName": "Segments",
+          "cachedResultUrl": "https://airtable.com/appSc5xBnMnl8xyB6/tblc86DDGKFh0adHu"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "B-Roll": false,
+            "SRT Segment": "={{ $json.id }} {{ $json.startTime }}  -->  {{ $json.endTime }} {{ $json.text }}",
+            "Start Time": "={{ new Date('1970-01-01T' + $json.startTime + 'Z').getTime() / 1000 }}",
+            "SRT Text": "={{ $json.text }}",
+            "Timestamps": "={{ $json.startTime }}  -->  {{ $json.endTime }}",
+            "End Time": "={{ new Date('1970-01-01T' + $json.endTime + 'Z').getTime() / 1000 }}",
+            "SRT Segment ID": "={{ $json.id }}",
+            "Videos": "=[\"{{ $('Webhook').item.json.query.recordId }}\"]"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Segment ID",
+              "displayName": "Segment ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "SRT Text",
+              "displayName": "SRT Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Start Time",
+              "displayName": "Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "End Time",
+              "displayName": "End Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Duration",
+              "displayName": "Duration",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Video Script (from Videos)",
+              "displayName": "Video Script (from Videos)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "B-Roll",
+              "displayName": "B-Roll",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Image",
+              "displayName": "Image",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Video",
+              "displayName": "Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Original Video Link",
+              "displayName": "Original Video Link",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Video Ready",
+              "displayName": "Video Ready",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "SRT Segment ID",
+              "displayName": "SRT Segment ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "SRT Segment",
+              "displayName": "SRT Segment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamps",
+              "displayName": "Timestamps",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Videos",
+              "displayName": "Videos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Active Video (from Videos)",
+              "displayName": "Active Video (from Videos)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Width",
+              "displayName": "Width",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Height",
+              "displayName": "Height",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Midjourney ID",
+              "displayName": "Midjourney ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Midjourny Upscale ID",
+              "displayName": "Midjourny Upscale ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Kling Video ID",
+              "displayName": "Kling Video ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        260
+      ],
+      "id": "9290b967-5fb1-426a-a617-370f3f078647",
+      "name": "Create Segment Row",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "8Y64LBMSiWcONWIp",
+          "name": "Airtable Personal Access Token account B-roll"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Video Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router": {
+      "main": [
+        [
+          {
+            "node": "Generate Video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate SRT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Segments",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Music",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Combine Video + B-Roll",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Combine Video + Music",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Captions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Video Data": {
+      "main": [
+        [
+          {
+            "node": "Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Create Segment Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Segments": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Music": {
+      "main": [
+        [
+          {
+            "node": "Update Music Task ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "558fe497-cce7-447b-bdd2-b264380e09ba",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-04-29T12:21:23.992Z",
+      "updatedAt": "2025-04-29T12:21:23.992Z",
+      "role": "workflow:owner",
+      "workflowId": "igGe7RJqa1wF5JdU",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

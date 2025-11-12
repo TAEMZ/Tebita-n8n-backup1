@@ -1,0 +1,602 @@
+{
+  "createdAt": "2025-10-29T06:16:52.619Z",
+  "updatedAt": "2025-11-10T12:39:01.997Z",
+  "id": "czhhvj4OHkvbc2iJ",
+  "name": "lead gen first draft",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        16
+      ],
+      "id": "38d36c49-3408-4aa0-b8e6-8a63c9dd66f0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.data\nconst regex = /https?:\\/\\/[^\\/\\s\"'>]+/g\nconst websites = input.match(regex)\nreturn websites.map(website => ({json:{website}}))"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        16
+      ],
+      "id": "3360aa49-33d5-4b53-a1c8-b7e409707e43",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        16
+      ],
+      "id": "a219fa34-6e3a-465f-921f-2ae36385aed1",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "url": "https://www.google.com/maps/search/cafes+rome",
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -304,
+        16
+      ],
+      "id": "94c46dfd-3122-4a04-898d-303ff1d9a03e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1232,
+        16
+      ],
+      "id": "276a07e0-1279-4a40-b180-fb08fdc4e13e",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.website }}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        112
+      ],
+      "id": "3aec404c-9b44-4d96-8bec-43e8751f3627",
+      "name": "HTTP Request1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1616,
+        112
+      ],
+      "id": "4564d769-80af-437b-ad4f-1529fddb712f",
+      "name": "Wait",
+      "webhookId": "be34e870-ea52-4652-baf9-e128a5143a4f"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        576,
+        16
+      ],
+      "id": "c38536db-a47b-4f6c-8753-2ae59b8d28a7",
+      "name": "Remove Duplicates"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9df53665-6fe6-4db7-82c4-7b58019ce46d",
+              "leftValue": "={{ $json.website }}",
+              "rightValue": "schema",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "7c2c0eb4-393b-4720-b844-4281c9bd0989",
+              "leftValue": "={{ $json.website }}",
+              "rightValue": "google",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "cef4a687-e808-4a76-8940-56f572ebfbb8",
+              "leftValue": "={{ $json.website }}",
+              "rightValue": "gg",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            },
+            {
+              "id": "383a0a5c-455e-43c3-9bf3-f5e4e1e1b8a7",
+              "leftValue": "={{ $json.website }}",
+              "rightValue": "gstatic",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        16
+      ],
+      "id": "8665eb0b-5eed-428b-b755-8d0b64ead667",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json.data\nconst regex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.(?!png|jpg|jpeg|gif|webp|svg)[a-zA-Z]{2,}/g\nconst emails = input.match(regex)\nreturn {json:{emails:emails}}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        112
+      ],
+      "id": "0870e6f4-fa66-4d29-a3ee-452823b482fe",
+      "name": "Code1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        -80
+      ],
+      "id": "3c3de76b-5b89-43d1-ab9e-0428783303be",
+      "name": "Wait1",
+      "webhookId": "abf59381-2c01-47f3-b511-f17e04978a42"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "43b04fef-e6b8-4de7-a26c-601d0b43f33d",
+              "leftValue": "={{ $json.emails }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1648,
+        -80
+      ],
+      "id": "41c30f76-2a45-4f2a-adc8-38cc39723512",
+      "name": "Filter1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "emails",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1856,
+        -80
+      ],
+      "id": "46e662d2-9996-45a9-b917-007cf85bc7b9",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        -80
+      ],
+      "id": "8347a4f7-e31c-476e-ac42-409ded85b87e",
+      "name": "Remove Duplicates1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Lt3Zuf3MANnSdrrY5EqIsTrkZg5zMCZCjTF3LFvsQRI",
+          "mode": "list",
+          "cachedResultName": "scraping without paying for api",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Lt3Zuf3MANnSdrrY5EqIsTrkZg5zMCZCjTF3LFvsQRI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "emails",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Lt3Zuf3MANnSdrrY5EqIsTrkZg5zMCZCjTF3LFvsQRI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "emails": "={{ $json.emails }}"
+          },
+          "matchingColumns": [
+            "emails"
+          ],
+          "schema": [
+            {
+              "id": "emails",
+              "displayName": "emails",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2272,
+        -80
+      ],
+      "id": "0c1b3754-583b-4f78-953c-e0918ba75087",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QRDbPRePSjuJZQ2h",
+          "name": "lead scrape"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Filter1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Remove Duplicates1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Duplicates1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {}
+      }
+    ],
+    "Filter1": [
+      {
+        "json": {
+          "emails": [
+            "inglewoodfamilydental@gmail.com"
+          ]
+        }
+      },
+      {
+        "json": {
+          "emails": [
+            "info@metdental.ca",
+            "info@metdental.ca",
+            "info@metdental.ca"
+          ]
+        }
+      },
+      {
+        "json": {
+          "emails": [
+            "info@londonsquaredental.ca"
+          ]
+        }
+      }
+    ],
+    "Split Out": [
+      {
+        "json": {
+          "emails": "inglewoodfamilydental@gmail.com"
+        }
+      },
+      {
+        "json": {
+          "emails": "info@metdental.ca"
+        }
+      },
+      {
+        "json": {
+          "emails": "info@metdental.ca"
+        }
+      },
+      {
+        "json": {
+          "emails": "info@metdental.ca"
+        }
+      },
+      {
+        "json": {
+          "emails": "info@londonsquaredental.ca"
+        }
+      }
+    ],
+    "Remove Duplicates1": [
+      {
+        "json": {
+          "emails": "inglewoodfamilydental@gmail.com"
+        }
+      },
+      {
+        "json": {
+          "emails": "info@metdental.ca"
+        }
+      },
+      {
+        "json": {
+          "emails": "info@londonsquaredental.ca"
+        }
+      }
+    ]
+  },
+  "versionId": "dd7de6fe-0810-4cba-a439-9fa68a8ac678",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-10-29T06:16:52.619Z",
+      "updatedAt": "2025-10-29T06:16:52.619Z",
+      "role": "workflow:owner",
+      "workflowId": "czhhvj4OHkvbc2iJ",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

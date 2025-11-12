@@ -1,0 +1,1468 @@
+{
+  "createdAt": "2025-04-26T16:00:19.218Z",
+  "updatedAt": "2025-04-26T16:06:23.364Z",
+  "id": "tJhRRpcXRwGx2V6C",
+  "name": "The Human Code 2",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -760,
+        500
+      ],
+      "id": "1c499abc-c3ba-48f1-8f9d-35091702d99b",
+      "name": "When chat message received",
+      "webhookId": "cb24041b-ec10-4deb-b041-b9cbbde9f11e",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7f4f7fd2-dfec-4178-ad47-d0ac7ec270e8",
+              "name": "url",
+              "value": "={{ $json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "2625b583-08ae-4dab-a533-8342bd0ae068",
+              "name": "query",
+              "value": "={{ $json.query }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        500
+      ],
+      "id": "fac10de4-ea2c-47a4-8a8e-28b7f4f7e10a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/actor-tasks/david.bell~youtube-transcript-ninja/run-sync-get-dataset-items?token=apify_api_TGnQ8WMc0lTBZE2vqB5YrhIiPF3L0f3Igurs",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"startUrls\": [\n        \"{{ $json.url }}\",\n        \"{{ $json.query }}\"\n    ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -340,
+        500
+      ],
+      "id": "5815cd80-ab0a-462c-a920-93ffbd34ca0d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "0bb61a71-2b67-46be-a91a-3f55a83fcd16",
+      "name": "Summarization of a YouTube script",
+      "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+      "position": [
+        -1560,
+        100
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a4e05906-adaa-4654-b77b-b8fc3adf34da",
+      "name": "Summarization Engine",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        -1560,
+        260
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        20,
+        160
+      ],
+      "id": "f2de566c-9418-40e4-8496-fbde0fd4e68f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "9dZkBlQ9pjp5qbos",
+          "name": "Openai1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.transcript }}",
+        "options": {
+          "systemMessage": "=You areYou are a professional blog post writer.\nUsing the following transcription text from a video or podcast, write a well-structured blog post.\nThe blog post should:\n\nHave an engaging title.\n\nStart with a short, attention-grabbing introduction.\n\nOrganize the main points into clear sections with subheadings.\n\nSummarize key insights clearly and concisely.\n\nEnd with a conclusion or a call to action if appropriate.\n\nRewrite informal spoken language into natural, professional writing.\n\nEliminate filler words like \"um,\" \"uh,\" \"you know,\" etc.\n\nMake the blog sound friendly, informative, and easy to read.\n\nHere is the transcription text:\n\"\"\"\n{{ $json.channelName }}\n{{ $json.transcript }}\n\"\"\" a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6577c087-976d-424a-8aa8-fea3b3445ae5",
+      "name": "blog post"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        460
+      ],
+      "id": "75c1c3d1-e1f8-43d3-baf1-246e61979c9e",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "9dZkBlQ9pjp5qbos",
+          "name": "Openai1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        1080
+      ],
+      "id": "610736d0-b39d-4e31-abe0-f317f90cb0be",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "Y0Ot0snQQedL07ql",
+          "name": "nico OpenAi account "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        780
+      ],
+      "id": "2696476e-3a23-4100-b03d-ae71db8c0681",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "9dZkBlQ9pjp5qbos",
+          "name": "Openai1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        20,
+        1400
+      ],
+      "id": "02864bf1-473d-4fda-b818-b2ff19996504",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "9dZkBlQ9pjp5qbos",
+          "name": "Openai1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o1-mini",
+          "mode": "list",
+          "cachedResultName": "O1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert visual storyteller and prompt engineer.\nBased on the following LinkedIn post, create a detailed, creative, and inspiring image prompt that could be used to generate an eye-catching visual for the post.\n\nInstructions:\n\nSummarize the main idea or theme of the LinkedIn post in 1-2 sentences.\n\nBased on that idea, craft a clear, vivid, and descriptive image prompt.\n\nFocus on visuals that are professional, motivational, and LinkedIn-appropriate.\n\nAvoid text or logos in the image unless essential.\n\nStyle suggestions: modern, clean, minimalistic, or professional — depending on the mood of the post.\n\nFinal Output:\n\nShort description of the intended mood or feeling (optional).\n\nA ready-to-use image prompt that describes the scene, objects, style, colors, and atmosphere.\n\nHere is the LinkedIn post:\n\"\"\"\n{{ $json.output }}\n\"\"\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        640,
+        840
+      ],
+      "id": "08945123-a7d7-41ca-b862-53fddd4176c7",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "Y0Ot0snQQedL07ql",
+          "name": "nico OpenAi account "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        760,
+        1000
+      ],
+      "id": "fad2a916-d5eb-4815-84dc-8a2c9b569cd7",
+      "name": "Wait",
+      "webhookId": "50b95b5f-8f9f-4d1b-abce-04ce42971717"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.replicate.com/v1/models/black-forest-labs/flux-pro/predictions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"prompt\": \"**Mood:** Motivational and Inspirational, conveying a sense of exploration and professional growth in a technological era.\\\\n\\\\n**Image Prompt:** Create a modern, clean, and professional illustration depicting a diverse individual standing...\",\n    \"num_outputs\": 1,\n    \"aspect_ratio\": \"16:9\",\n    \"output_format\": \"jpg\",\n    \"output_quality\": 90,\n    \"disable_safety_checker\": true\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        540,
+        1000
+      ],
+      "id": "25f88787-8e75-449d-addb-bb226805005c",
+      "name": "Text-To-Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "HIEIyD5NYlV0VRGj",
+          "name": "Flux Pro"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.piapi.ai/api/v1/task/{{ $json.data.task_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"model\": \"Qubico/flux1-dev\", \n  \"task_type\": \"txt2img\", \n  \"input\": { \n  \"prompt\": \"{{ $json.message.content }} \", \n  \"width\": 540, \n  \"height\": 960\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        920,
+        1000
+      ],
+      "id": "2474948f-a791-4e03-b39b-b0f09bab4b0e",
+      "name": "Get-Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2lVjEF3eGAi56Tnf",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Tc5pYV5XMTuNqOLYKbQ-W4_k7C00LlUZXGon3P6iTB4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Tc5pYV5XMTuNqOLYKbQ-W4_k7C00LlUZXGon3P6iTB4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Blog posts": "={{ $json['blog post'] }}"
+          },
+          "matchingColumns": [
+            "Blog posts"
+          ],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog posts",
+              "displayName": "Blog posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "YouTube descriptions and highlights",
+              "displayName": "YouTube descriptions and highlights",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Twitter threads/posts",
+              "displayName": "Twitter threads/posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn posts",
+              "displayName": "LinkedIn posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Linkedin post image",
+              "displayName": "Linkedin post image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Newsletter content",
+              "displayName": "Newsletter content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1020,
+        200
+      ],
+      "id": "c8488864-272f-4f3c-b933-37aa377c4f61",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.transcript }}",
+        "options": {
+          "systemMessage": "=You are a professional content writer specializing in YouTube videos and podcasts.\nUsing the following transcription text, do the following:\n\nWrite a compelling YouTube video description that:\n\nSummarizes the main ideas of the video or podcast.\n\nHooks the viewer in the first 2 lines.\n\nIncludes relevant keywords naturally (but do not keyword stuff).\n\nIs friendly, clear, and encourages viewers to watch until the end.\n\nOptionally suggest hashtags at the bottom (#podcast, #inspiration, etc.).\n\nCreate a list of 5-7 Highlights or Key Takeaways:\n\nShort bullet points (each no more than 20 words).\n\nFocus on the most interesting or valuable moments.\n\nMake them catchy and informative.\n\nMake sure to rewrite informal spoken language into natural, easy-to-read writing.\nRemove filler words like \"um,\" \"uh,\" \"you know,\" and correct any awkward phrasing.\n\nHere is the transcription text:\n\"\"\"\n{{ $json.channelName }}\n{{ $json.transcript }}\n\"\"\" a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        300
+      ],
+      "id": "be70bfb6-3ac0-44f1-9894-a4edfb28b58a",
+      "name": "YouTube descriptions and highlights"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.transcript }}",
+        "options": {
+          "systemMessage": "=You are a creative social media content writer specializing in Twitter/X.\nUsing the following transcription text from a video or podcast, create an engaging Twitter thread or set of posts.\n\nInstructions:\n\nStart with a strong, attention-grabbing hook for the first tweet (make people want to read more).\n\nBreak down the main ideas into 5–10 short tweets.\n\nEach tweet should be under 280 characters and able to stand alone if needed.\n\nKeep the tone friendly, punchy, and easy to read.\n\nRewrite informal spoken language into clean, natural text.\n\nRemove filler words like \"um,\" \"uh,\" \"like,\" etc.\n\nEnd the thread with a call to action (e.g., \"Follow for more insights\" or \"Share if this was helpful!\").\n\nHere is the transcription text:\n\"\"\"\n{{ $json.channelName }}\n{{ $json.transcript }}\n\"\"\" a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        600
+      ],
+      "id": "6eac2ea1-ef89-47f7-abd5-1db9152766a1",
+      "name": "Twitter threads/posts"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.transcript }}",
+        "options": {
+          "systemMessage": "=You are a professional content creator for LinkedIn.\nBased on the following transcription text from a video or podcast, write a high-quality LinkedIn post.\n\nThe post should:\n\nStart with a strong hook that grabs attention in the first 1–2 lines.\n\nSummarize the key insight(s) from the content clearly and concisely.\n\nSound thoughtful, authentic, and professional.\n\nUse short paragraphs and line breaks for readability.\n\nAvoid filler words or overly casual language.\n\nEnd with a thought-provoking question or call to action that encourages engagement (e.g., comments or shares).\n\nBonus: Use emojis sparingly if it fits the tone.\nLength: Aim for 500–1200 characters max (typical LinkedIn post length).\n\nHere is the transcription text:\n\"\"\"\n{{ $json.channelName }}\n{{ $json.transcript }}\n\"\"\" a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        900
+      ],
+      "id": "48e8dd23-1ccc-4179-aeb8-b252d3a91252",
+      "name": "LinkedIn posts"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.transcript }}",
+        "options": {
+          "systemMessage": "=You are an expert newsletter content writer.\nBased on the following transcription text from a video or podcast, write a compelling newsletter that informs, engages, and adds value to the reader.\n\nThe newsletter should include:\n\nA catchy subject line.\n\nA short and engaging introduction (1–2 paragraphs) that sets the tone.\n\nA clear breakdown of the key points or takeaways in an easy-to-skim format (bullets or short sections).\n\nA friendly and informative tone (not too formal, not too casual).\n\nA natural flow that turns spoken content into readable, well-structured writing.\n\nAn optional call to action (CTA) at the end — e.g., \"Share this with a friend,\" \"Let us know your thoughts,\" or \"Watch the full episode here.\"\n\nAdditional rules:\n\nRemove filler words (like “um,” “you know,” etc.).\n\nRewrite awkward or incomplete spoken sentences into smooth, complete thoughts.\nHere is the transcription text:\n\"\"\"\n{{ $json.channelName }}\n{{ $json.transcript }}\n\"\"\" a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        1220
+      ],
+      "id": "e5626a4b-269a-4a6b-bddb-c3f9ba23dd97",
+      "name": "Newsletter content"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Tc5pYV5XMTuNqOLYKbQ-W4_k7C00LlUZXGon3P6iTB4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Tc5pYV5XMTuNqOLYKbQ-W4_k7C00LlUZXGon3P6iTB4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "YouTube descriptions and highlights": "={{ $json['Youtube des'] }}",
+            "Blog posts": "={{ $json['blog post'] }}"
+          },
+          "matchingColumns": [
+            "Blog posts"
+          ],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog posts",
+              "displayName": "Blog posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "YouTube descriptions and highlights",
+              "displayName": "YouTube descriptions and highlights",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Twitter threads/posts",
+              "displayName": "Twitter threads/posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn posts",
+              "displayName": "LinkedIn posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Linkedin post image",
+              "displayName": "Linkedin post image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Newsletter content",
+              "displayName": "Newsletter content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        720,
+        360
+      ],
+      "id": "27d936a7-a7cf-4079-9abd-53389348499c",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Tc5pYV5XMTuNqOLYKbQ-W4_k7C00LlUZXGon3P6iTB4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Tc5pYV5XMTuNqOLYKbQ-W4_k7C00LlUZXGon3P6iTB4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Twitter threads/posts": "={{ $json.output }}",
+            "Blog posts": "={{ $json['Twitter threads'] }}"
+          },
+          "matchingColumns": [
+            "Twitter threads/posts"
+          ],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog posts",
+              "displayName": "Blog posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "YouTube descriptions and highlights",
+              "displayName": "YouTube descriptions and highlights",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Twitter threads/posts",
+              "displayName": "Twitter threads/posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn posts",
+              "displayName": "LinkedIn posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Linkedin post image",
+              "displayName": "Linkedin post image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Newsletter content",
+              "displayName": "Newsletter content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        600,
+        600
+      ],
+      "id": "5d1a2ad2-331a-4483-a365-715e426aae15",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Tc5pYV5XMTuNqOLYKbQ-W4_k7C00LlUZXGon3P6iTB4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Tc5pYV5XMTuNqOLYKbQ-W4_k7C00LlUZXGon3P6iTB4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "LinkedIn posts": "={{ $json.output }}",
+            "Linkedin post image": "={{ $json.message.content }}"
+          },
+          "matchingColumns": [
+            "Blog posts"
+          ],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog posts",
+              "displayName": "Blog posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "YouTube descriptions and highlights",
+              "displayName": "YouTube descriptions and highlights",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Twitter threads/posts",
+              "displayName": "Twitter threads/posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn posts",
+              "displayName": "LinkedIn posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Linkedin post image",
+              "displayName": "Linkedin post image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Newsletter content",
+              "displayName": "Newsletter content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1540,
+        1120
+      ],
+      "id": "135c3543-7608-4f81-8cb0-21ee73bc42f9",
+      "name": "Google Sheets3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Tc5pYV5XMTuNqOLYKbQ-W4_k7C00LlUZXGon3P6iTB4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Tc5pYV5XMTuNqOLYKbQ-W4_k7C00LlUZXGon3P6iTB4/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Newsletter content": "={{ $json.Newsletter }}",
+            "Linkedin post image": "="
+          },
+          "matchingColumns": [
+            "Newsletter content"
+          ],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Blog posts",
+              "displayName": "Blog posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "YouTube descriptions and highlights",
+              "displayName": "YouTube descriptions and highlights",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Twitter threads/posts",
+              "displayName": "Twitter threads/posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn posts",
+              "displayName": "LinkedIn posts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Linkedin post image",
+              "displayName": "Linkedin post image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Newsletter content",
+              "displayName": "Newsletter content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        540,
+        1220
+      ],
+      "id": "de4fbdee-703b-4b90-bea8-b3d63b2b8366",
+      "name": "Google Sheets4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "110db8b1-a5e0-464e-b462-4d65c3da1673",
+              "name": "blog post",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        0
+      ],
+      "id": "7dfe731b-ed48-474e-8e14-eff959fc69dd",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "62d2b8ff-ad89-4360-9016-9e1eeac7346d",
+              "name": "Youtube des",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        300
+      ],
+      "id": "a52996eb-5a55-4816-a207-1886f97e90dd",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c38791ce-3a77-4931-a31c-412268c2a966",
+              "name": "Twitter threads",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        600
+      ],
+      "id": "f7f745bc-9ba5-4e48-a09a-56faa547b2b5",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0da5de6b-c3a4-48d2-98d0-5ada010e2850",
+              "name": "Linkedin post",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        820
+      ],
+      "id": "9f908be1-98c7-4daf-b215-89a6b8cd9967",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b6ff4db5-f754-4a8d-97b4-d05809ef8c11",
+              "name": "Newsletter",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        300,
+        1220
+      ],
+      "id": "c49720fe-2202-4463-85d5-d963e71d0642",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        680
+      ],
+      "id": "dffe14a5-157b-454e-b7ac-3d67871caf6e",
+      "name": "When clicking ‘Test workflow’"
+    }
+  ],
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "blog post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "YouTube descriptions and highlights",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter threads/posts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LinkedIn posts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Newsletter content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarization Engine": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summarization of a YouTube script",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "blog post",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "blog post": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "YouTube descriptions and highlights",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "LinkedIn posts",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Twitter threads/posts",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Newsletter content",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Text-To-Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get-Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text-To-Image": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube descriptions and highlights": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter threads/posts": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn posts": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Newsletter content": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "HTTP Request": [
+      {
+        "json": {
+          "videoTitle": "Interests Over Passion: Myles Gilsenan's Take on AI and Innovation",
+          "url": "https://www.youtube.com/watch?v=zKV_w8WwbwA",
+          "channelName": "The Human Code",
+          "views": "19 views",
+          "videoPostDate": "Nov 14, 2024",
+          "channelSubscription": "85 subscribers",
+          "transcript": "welcome to the human code the podcast where technology meets humanity and the future is shaped by the leaders and innovators of today I'm your host Don Finley inviting you on a journey through the fascinating world of tech leadership and personal growth here we delve into the stories of visionary Minds who are not only driving technological advancement but also embodying the personal Journeys and insights that Inspire us all each episode we explore the intersections where human Ingenuity meets The Cutting Edge of Technology unpacking the experiences challenges and triumphs that Define our era so whether you're a tech Enthusiast an inspiring entrepreneur or simply curious about the human narratives behind the digital Revolution you're in the right place welcome to the human code today we have a special guest miles gilsenan a veteran in it business intelligence with an extensive experience in managing Global it organization miles has a proven track record of reducing cost streamlining operations and enhancing access to critical business data through Innovative it Solutions in this episode miles and I discuss why following your interests might be more important than following your passion how to stay ahead in the fast-paced world of AI and essential tools you'll need to know the surprising importance of maintaining human Connection in the age of AI join us as we uncover these insights and more with Miles this episode is packed with valuable takeaways you won't want to miss miles and I have known each other for a few years now we're both playing in the app development space as well as miles is playing and many others that I can't wait to discuss with him but additionally an expert on data science data analytics AI personal development team building uh and a slew of other passions that I really can't wait to dig into but miles the the first question I got for you and also thank you for being here is what got you to today oh sure first of all thank you Don for inviting me really excited about doing this podcast with you uh give you two seconds on my background so I I made you an accounting I started off the price Waterhouse implementing large scale Erp systems and on one of those projects that was in London we were building a data warhouse and I thought wow this is really interesting this is really super interesting and it Peak my interest more than implementing the actual Erp so I gradually over time gradually migrated into data and analytic and I've always had an interest in uh AI I remember back in W Quote us here Don maybe might but I was doing a lot of reading on Expert systems back when that term was around and I went so far as to attempt to learn the prologue language and I was really excited about it and one of the big news cas es was diagnosing medical disease and they had expert systems that would diagnosed better and I felt interest then I got into my career all of a sudden I didn't hear so much about expert systems I thought it was going to take over and I didn't hear but I kept up the AI winter so now I know well we went into the AI winter uh and but I've always had an interest particularly in AI but what got me here is following my interest and talking with you Don people say follow your passion and I have to say that doesn't resonate with me really I don't know maybe I'm not passionate enough but following my interest absolutely because I'm interested in so many things and it's such an easy thing to do hey I'm interested let me read on that let me talk to people let me see where that goes so that I would say following my interest is really around sitting here talking to you because that's been an easy and natural thing to do I'm back in the Consulting world now for oh probably about year I started then I went into corporate world and then wanted to get back into the Consulting data now nice I love what you brought up about following your passion doesn't really resonate but following your interest was really a key Discovery for you the one thing that hits for me is like a passion feels like it's almost permanent whereas an interest allows you to explore and then decide whether or not you're continuing on is that graph is that the graph of what you were looking at yeah it it does I I have a passion and it's playing tennis I played in college they would try my hand at Satellite circuit for three or four months just to get my butt kicked and come back to my first bhouse job but nice it was a Walter M dream but I love tennis and that was my passion and after that there was a bit of a drop off a kind of a cliff and I used to think this guy wanted to be a veterinarian this guy wanted to be a dentist since he was 12 and I always thought those are the people that have a passion from their childhood and like you said it's a permanent thing and it burned inside of them and they went and they got their degree and now they're exer dentist and now I know that maybe that is the case but it's not it's probably not the majority and it happens naturally we do I think we do follow what we're interested in and we it's some natural thing hey I'm interested in that what is state of warehousing what are they talking why are they using the word warehous why would they use that term and then you know you start reading and I started reading Ral Ralph Kimble and and inma and the different ways of doing it corporate information Factory and you just get deeper and deeper into things that you're interested in and the but for some people I'm sure that that resonates but to me it it elicits a level of excitement and I'm not look I'm not Larry David I'm not a kagin but yeah yeah it's in a level of excitement that maybe is not my personality like it just doesn't resonate but the interest part for sure then it's like all right I could read and I'm going to sound n but listen I can find the weekend reading about a y looking at videos reading about it um trying to teach myself stuff that is interesting but you're gonna spend time and I think I I agree with you for the most part that like having an interest is something that you can explore you can decide how deep you want to go you're not making you're making a commitment to your own interest and to your own excitement and that's really the crucial piece here is that you are committed to yourself and your own sort of like level of excitement that can grow with it but also giving yourself the permission to say hey this is where my journey stops and this is where I like have a new interest I the reason why I'm digging into this is because the passion question is constantly coming up when people talk about their purpose and as we're coming into this new age of AI which I was also very excited about expert systems thinking that hey if I could just Define out how the model works and how like people are interacting with it then the computer can take over and do the job of what the people are doing today I'm not 100% sure why expert systems really fell out of favor but my thought around it would be that it it's rather difficult to document everything that a person does directly into a computer interface and prologue was a very interesting language you completely forgot about that in my own career but absolutely amazing now as you look at like how we're coming into this new AI culture right there's definitely some interest around generative AI what it's done we're seeing the benefits of neural networks and data analytics over the last 10 15 years uh and knowing that this has also been a an interest of yours I'm curious of like how you see people's interest in the workforce playing into this new culture of AI adoption yes yeah and I think it is it is fascinating and by the way I don't know if you remember but there was an effer I forget who I think he was from MIT but he and a group of people were trying to program into computer this going back 20 years Common Sense things be remember that could even be 30 common sense so that they could have the common sense the context in which you you're able to take activities undertake activities and I don't it didn't really go anywhere I was going to say where' that go no well it didn't it didn't go anywhere and and now the neural networks and everything that's happening now is and to to some degree having contact but we might call Common Sense we're not there yet artificial Dental intelligence artificial super intelligence and this is relatively recent maybe in in a year that really when CH GPT came out there's a tremendous amount of excitement in the corporate workspace the clients we work with within our company to use a and there's me but you mentioned there's also there's a little bit of thear last night I went up to see my son and he's doing his biology homework and he's got Chach but a week earlier he said to me I don't like ai ai is not going to be in my house when I'm grown he's 15 and I had to say I think it is I don't think you have a choice I think it is but the sentiment behind and he were say can we he likes to create so can we have things that we know are created by human can we and I thought to myself this is so fascinating to me because you've got a a person here who's not an expert he's just a 15 yeah and he has this desire for something that he knows was created by a human and he even if it's perfect it was created by a human and just having that connection to the other human and I think it's going to be an interesting part of the evolution of AI you do Wonder as we get so good at it and just every time you turn on YouTube there's something a new uh gpp that's coming along a new robotics you do wonder if there will become a premium whether it's in the entertainment the of literature smart field or any field the of things that were created while I don't know maybe not because the economy is a scale and the efficiency will overtake it maybe it would be a niche but that desire of fans to to interact with something that they know came from a hum it's I don't know it's interesting um no and I completely agree with you it's a very it's a very interesting topic because if we look at what's happened with let's say oil paintings acrylic paintings or just like the classics the price of a van go has continued to be valuable even in the wake of digital photography it hasn't been able to replace it but then additionally like the mass manufacturing of art has just made it more accessible for people to have pieces of art that they find thrilling in their own home and I but I do think that there's a definite desire for people to have things that share that human connection that human experience with are you familiar with the dead internet Theory okay so this is this has been coming up quite a bit for me the last few days and so dead internet theory is revolving around the idea that we are possibly only talking to bots on the internet and that generally like our social media site is filled with Bots you don't know who's a real human who isn't and it speaks to that problem that your son brings up I go places for connection I go to places to experience some some other piece of Consciousness that has a very similar experience to what I'm having or some sort of shared identity in that as being like a human and yet there's a good possibility that over 50% of the internet traffic today is created by Bots and then over time if that gets to 90% the amount of interaction that you would end up having on the internet would be less and less like an actual person and so unfortunately it would create separation and then islands of individuals of bringing people together instead of bring people and would humans gravitate more towards actual face-to-face interaction because they know it's real is that part of that theory I think it's it's basically highlighting like hey we might have to come up with a solution for this so something along the lines of what your son is asking for like I want to know that this was created by a person I want to know that I'm talking to somebody that is real today yeah it's such a natural kind of desire as we as we and I don't think it's I don't think it's retro I don't think it's resistance to change as such oh I want my voice and buggy leave me alone this car stuff what do you think there's going to be a gas station on every Court yes it's talk like but it's it's a natural it's about human connection it's just natural it's just a kind of a natural thing uh and you mentioned purpose as exciting an AI is tremendously exciting and with the fusing of Robotics and these large language models when they used to talk when Ray kwell used to talk about the singularity and that kind of thing I always said difficulty conceptualizing because okay I know it's in the box it's in the Box AI is in the computer it's in the box it's not walking Among Us doing stuff how are we going to wind up dead like how is it really going over takea and they talk about supercomputers creating super computers okay who's building the the motherboard who's who's actually doing stuff in the real world here it's the and but now with robotic and their dexterity that they have with artificial intelligence it's a little bit easier to conceptualize for intelligence walking among and doing things and potentially making decisions in somewhat of an autonomous way that impact our line and the jobs that we did and the 20 years from now what people would be doing and does it create a crisis of purpose now honest when I I okay you think about does it create because everybody likes a purpose and your purpose could be I got to get to the park and I got to clean up the L because that's what I do and maybe I'm retired or whatever doesn't really matter anime gets you out of B the you do and people need you if you don't do it there's lot of L whatever it is to you could be any scale if there's a bunch of robots doing all of it is there a crisis of purpose in the lives of people and I think we have to prepare for that I think and I if you how do you prepare for that I don't exactly know if my kids asking I'm not entirely sure and I don't know how long that's going to take I have to say when I hear the when you listen to the real expert like the real expert and the time frames that they give I'm skeptical although I know AI grows exponential is forur I get it it grows exponential year one year two year three is off the chart how long does it take to infiltrate our the world that we live in our JN the way that we you know the way that we our money the way that we transact and that just seems like it would take much longer it would seem to me and I think you're hitting on the idea that there's a a growth in Ai and the growth in intelligence and that feels exponential and it really ched out it's exponential and we don't know if it's actually gonna flatten out right we don't know if we're going to hit another let's say fall winter for AI or if we are on a current trajectory escape velocity for it but the other part of that equation that you're talking about is the how fast can we adopt it and and biologically that's what we're limited by there's only so much that an organization can take in and actually adopt and integrate which I do think that we're coming about a time where either your organization will be nimble and capable and being able to adopt these new technologies or we're going to find like an upshoot of new Enterprises coming into play and I don't know the actual numbers but with the Fortune 500 the amount of them that have been in existence for over a 100 years is very small right there's a very healthy sort of refreshment that comes about and additionally like you look at NASDAQ and most of the stocks on there are Technology based which weren't around 50 years ago and again another healthy kind of like revigor of the economy in that regard it looks like we might be in a situation where we're going to have new companies coming in that create a great amount of value very quickly even eclipsing what open AI has done in regards to getting their first 100 million users in record-breaking time what do you think that PE and I know you said you weren't quite sure what to tell your children in regards what to do but as you're looking at having a career that spans multiple different skill sets in which the AI may come in and change something what are the skills that you're telling your children to build upon here well first and foremost I tell them use AI use the tools get familiar with how to use them don't shy away from it uh and try to stay up to speed on it and I've told them bran out beond chat GPT and I've been so I think it's a mindset shift when you're starting when you're doing an activity more and more you should think how could AI help me what tools are available and for and I don't know the time period here but companies and individual will there I think they'll start a new separation of those that know how to use these tools and know how to use them in concert with each other which is a little bit of the agent AI yeah where maybe there's there's an overall Ai and it's orchestrating the agent so I have told them make sure that you know how to use those tools don't away from it and think of them as tools to help you achieve what you want to achieve the idea that humans won't really have anything to do I don't really I don't know that anyone's saying that but I don't subscribe to that I do feel like we're a human being we're still going to be doing things we're still going to want to be achieving things in the marketplace from an economic standpoint we want to be creating new things and AI will be an aid to to help with that and maybe there will be some autonomous creation but still I think there'll be more human Le creation for quite some period of time then just the absorption of this technology into organization whether they're large or small it's a massive change management effort how do you train people up how do you change their mindset how do you make sure that you factor in the privacy and the security ramifications what does it mean if by use an open source llm what if I use it on a public Cloud can I trust the policies of these major clouds that they're going to save part my data or my clients TOA so I think you have to I think you have like any change you have to embrace 100% because you have no chance the genie is not going back in the bottle there might be effort like there was that letter six months ago the letter whatever great the genie is not going back in the bottle whether it's just a bad guy or the good guys somebody will be taking AI to the Mac no and not saying we shouldn't part around not getting into the Poli should try to regulate it or whatever but there's no there's no holding it back so it should be embraced is what I on my kids and what my current work rft search at I'm allowed to say that we're like almost every other organization we're doing everything we can internally to embrace and Don I know partner with you I'm always amazed at the ways you're you using it for all sorts of things which is always very inquiry when you talk to me about it uh and you're probably able to do bigger and better things would all lost without it and for all we know we're on the verge of another Innovation explosion the internet and what and you think about teenagers now and young people who are using AI when they hit the workforce it's they will that's how they do things they use Aon it's not going to some big deal they use AO they got a question now they know where to go and I think that's the beauty of where we're at today is like the younger generation can they always seem to find a way to adopt technology that's outside of the perspective that you and I have had decades in industry and so it usually takes a a fresh set of eyes to see how to properly apply something or do something brand new and I know I've been fascinated with the the digital Creator role the number one job that young people want today is to be a YouTube Creator and I'm thinking I was like wow that's like the movie star of Our Generations right like of us growing up that was the person who's on screen but now YouTube generation or YouTube Creator is somebody who is an individual who creates something based on their own interest and passions and they find an audience because the world is enormous and for you to get you know one million people is 0.000000 z one% actually probably even less than that of the entire world so you don't really need a market share you don't need to look at like capturing an entire Market you just need to find your fans in that regard and I love what they're I love what they're doing because they're fully embracing that technology of what YouTube is and then I think we're going to see them embrace the embrace AI in a similar fashion I know I was watching a talk by Sam Altman this is probably like a month and a half ago now so severely outdated right but when it comes to he has a a bet going with some other Silicon Valley CEOs as to when they're going to see the first billion dollar valued company run by one person that's the tech that's what the technology can enable for us is that you are able to follow your passion your interest whatever it goes on and then the you can build the AI in like you're talking about with agenic AI or creatively structuring llms today to handle information and process flows that you couldn't do 10 years ago but now instead of needing like a team of 20 you can handle it with a team of one or a part-time person that so I haven't heard that that's fascinating and that's really interesting and it represents a big fork in the road that I'm excited about and that is like right now if we go to chat GPT if we're going to the Oracle we ask the question and get the answer back yeah but we are on the verge of AI doing things for us in the real world I'm GNA I'm going to set up your travel week I'm going to make the reservations for you I'm going to do the research I'm going to set up the travel reservations I'm going to Bull person for the podcast I'm going to answer your email I'm going to do things on your behalf in the real world and that's that is not and I hopefully you agree that's not that far that's oh yeah yeah we're here I've seen demos of it already that's where we're at we're at a point where under very controlled situations and I wouldn't say very controlled I would say Loosely controlled where it's able to actually perform those actions going to a website it's never seen before figuring out how to log in how to enter the information or compare the information that you have provided with what it needs and then asking questions if necessary to ensure a preference is met that I would say we're probably within a year of seeing like a commercial solution for that that's gonna be nice the weird part about it is I feel like such a cron when I say so what and it's just no in all reality like I am saying like for a restaurant reservation right I feel like that's such a small use case of what it could be like and I know we we've talked before about the power of habits and the things that you can create in your life by just being aware of what your intention is and where you're going and I think that once we solve the problem of like travel reservations online bookings restaurant reservations and whatnot the goals that I'm really excited to see AI participate in are those daily goals that we have for ourselves that we don't have anybody in the moment but ourselves to hold us accountable like me getting up at 7 o'clock in the morning is mostly natural now but there was a time when that required a an alarm right that was my digital kind of footprint to go along and so I'm curious about when we get these assistants to come into our lives that we get them in a way that is actually more about here's my lifelong goal right like here's what I'm trying to accomplish in this world how can that intelligence help to clear the path for that so that as my identity is cemented the AI is helping to bring forward the information the tasks the creative challenges that can help further our own self-development along that that's true that's actually that's very interesting Don that's uh some people would say that's almost the way the universe work it Keys into your interest and your desire that that you're broadcasting that whether you know it or not and it effectively clears a path but connects you to PE like when you're all of a sudden shopping for a red Honda and you're out on the road and there's red Hondas everywhere and you've never saw red hodas before but now it's you know that what you want is bursting at the to come to you so you've you almost just described it where you've got this AI That's operating on your behalf they're not just making reservations it it is somehow connected to your goals and desires professionally personally Beyond just wanting to go to dinner and it has it's now doing things in the 3D World on your behalf yeah maybe it's connecting with people that have a similar interest where whereas right now maybe your friend says you should call soand so you're describing a world where you you have this thing that is leading you clearing the path keeping you accountable connecting you to the resources that you might not know about but it's proactively connecting you to the resources that help you achieve your goal that I love I love that I love that description that is that's really say honestly and I and I don't see why that shouldn't be the case I also I love the way you just spit it back at me because the one thing that I was thinking about as you were talking about the universe can behave in that way and talking about like red Toyotas or red Hondas or the cars kind of thing and we have that I don't want to call it awareness bias to like the things that we are are looking at but I feel like you're describing Consciousness in a way yeah and we could probably spend another half an hour discussing like what it means for artificial intelligence to reach a threshold of Consciousness and and what is it but if you had any of those moments working with an AI where you're just like not 100% sure if there's something that's really behind the the text that you're getting back yes yeah I think yeah we probably all have calleded where especially when you give yourself the freedom to interact with it in a actal way and then it starts to interact with you in somewhat of a natural way well I'm sorry I was confused or this whatever it saying you can get that Sensation that there's a Consciousness here maybe it's just mimicking I have seen that question posed to the real luminaries the ray CS wilds and and these other is it we've all seen I I've never really heard a good answer and most people haven't said a firm yes or no that I've seen have that question cled to him and I I don't I don't know if it but it certainly feels that way yeah and you can only imagine when you have some kind of robot walking around your house who's responding to things and doing things for your family it could be hard not to think about that robot having a conscience especially if it gets able to read emotions a little bit this person's sad this happy and they now they're reacting to your emotions maybe they're comforting when they see you're down have do you not respond to them as though they they have a Content though maybe they I I don't do they not I don't know does it ever become self-aware I don't know that's going to be a I feel like we're going to be having this conversation for years now and if you think about the Turing test like the first time that somebody thought they had passed the Turing test was still in the 60s so we didn't even have close to the level of conversational AI that we have today and in fact that was a very controlled sort of dynamic But as time went on we we shifted the goalpost in one perspective but additionally like we we reached a milestone we said there's an even farther Milestone that we can get to and right now it feels like we're actually bumping up on that idea that there might be something that we have to sit down and say hey this is a conscious thing sitting here and at what point do we have to talk about like that conscious being or conscious idea right to live in some capacity and yeah we've got a lot of unanswered questions I'm sure that we will make plenty of mistakes in regards to this yes everything you say SP it'll be for years and we'll have to figure it out and the other thing that you hear people say if they go if they go off the rails if they decide that they're better than us will you know quote unquote on plug them and now I'm starting to think that you're not going to be able you're not going to be able to unplug them because they'll always where they they'll always connect to some source of information the internet somehow they'll always they'll always be able to connect I don't know that there's I don't know that once we get this thing going I don't think there is any shutting at all and I would add to that saying I think that once we decided to actually team up with technology as a species and this is like the first time that we lit a fire the first time that we like rolled a stone and called it a wheel kind of like perspective we adopted technology for productivity or some other kind of to make life easier and we're now at a point where vast majority probably 99% of the human population cannot survive on their own without the technology and there's no way that we could even adopt the technology of 40 years ago and still maintain the popul that we have today with the not even Necessities but just the the nice to haves and then let alone making sure that we get F food and energy to everyone would be a daunting task 40 years ago to do it at the scale that we do it today so I agree with you there's we've decided to adopt technology as a species and so we are definitely on this train that goes forward it doesn't go back it doesn't go back and I am a uh technology Optimist and I've heard a couple of people say that and I would fall into that camp but it doesn't mean that there are changes that people would have to make yes and it doesn't mean that there maybe could be some difficulties while we transition yeah maybe probably certainly uh but in the end I think we we always I think we always find a way to leverage the technology and and I think this would be any different and I feel like we have time because you're yes you'll have all this technology but how do you exorb it into institution that's that's going to take time and we I'd like to think that we as a human being even though the technology might be there and capable of doing XY and Z that we have some choice about how quickly we adopt it and the way that we adopt it and the degree of impact to our society structures and how quickly we let them I don't want to say disband I don't know if they're all going to still remain but I feel like we should have some choice and we'll have some choice about how quickly we adopt it yes like oh we can do XY and Z therefore I don't think it will happen but I think we'll have some time to to figure that out I totally I I agree with you I personally sometimes get lost in it because I am so close to that edge of where AI adoption what's possible what are we trying to actually create next but I do see this when talking to our customers that there are there's a limitation to how quickly you can change an organization there's also a limitation to how quickly Humanity wants to adopt it and if you're talking about one organization you might be able to go fast when you're talking about an entire industry there are going to be things change if you look at like what happened with the watch manufacturers when courts watches came out uh and it started to make time pieces cheaper they went through a significant change through that industry it wiped out a lot of the luxury manufacturers it made many of them question whether they were serving the luxury or the common individual as well but they figured it out they figured out how they were going to fit and where their Market was based on what the technology was and now you have what's a a market that's dominated by one or two companies actually a couple a handful of companies but a like hundreds of Brands underneath that one company I think another company yeah exactly it's like it's Swedish it's a company in Sweden I believe or Switzerland and yeah they have all the they have a bunch of major high-end Brands but then they also have serving the Common Man type of approach as well and I think we're going to see that but we are going to see that that change period and which people say what's a good adoption of this what's a bad adoption I personally see that we'll be making plays to help in our relationships with humans between companies and between organizations and that's usually where we like to play so that it's like you can take away the monotonous task and then the person can focus on building relationships and that's a core component to where we see AI being applied miles it has been a blast talking to you today I like absolutely love this space yeah I know we we definitely hit it and what a great Essence that we've covered the AI in culture the AI in your business what it's going to happen for your children and like what we can look for the Next Generation but Additionally the hopefulness of what this could actually create for everybody and that but isn't Doom and Gloom and so I really appreciate us having this conversation is is there anything that you'd like to leave the audience with today well first thank you Don I really enjoyed this and like I say I'm a technology Optimus I think Ai and all that is a great opportunity uh and incorporating it into the culture of companies and into proces of companies that is going to be an interesting challenge that's going to take some time but I think it's exciting and our company we do that we help companies do that just like you do and and we're looking forward to the Chanel so fantastic thank you so much my friend okay thank you Don appreciate thank you for tuning in to the human code sponsored by Industries where we harness AI to elevate your business by improving operational efficiency and accelerating growth we turn opportunities into reality let Industries be your guide to AI Mastery making success inevitable explore how at fustes doco"
+        }
+      }
+    ],
+    "blog post": [
+      {
+        "json": {
+          "output": "# The Human Code: Navigating AI and Personal Growth in Technology\n\nWelcome to **The Human Code**, the podcast where technology meets humanity and where today’s leaders and innovators help shape tomorrow. I’m your host, Don Finley, and I invite you to join me on a journey through the captivating world of tech leadership and personal growth.\n\nIn each episode, we delve into the stories of visionary minds who are not only advancing technology but also sharing their personal insights and experiences that inspire us all. Whether you're a tech enthusiast, an aspiring entrepreneur, or simply curious about the human stories behind the digital revolution, you’re in the right place.\n\n### The Journey of a Tech Veteran\n\nIn today’s episode, I speak with **Miles Gilsenan**, a seasoned expert in IT business intelligence with a rich history of managing global IT organizations. Miles has an impressive track record of cost reduction, operational streamlining, and enhancing businesses' access to critical data through innovative IT solutions.\n\nOur conversation began with Miles reflecting on his journey. He initially entered the world of accounting, implementing enterprise resource planning (ERP) systems. It was during a project in London, while building a data warehouse, that Miles discovered his passion for data and analytics, leading him down a path that eventually brought him back to consulting.\n\nHe shared a key revelation: **following interests may hold more significance than merely pursuing passions**. For Miles, the concept of passion felt too permanent and restrictive, while interest allows for exploration and the flexibility to pivot as one discovers new avenues. This insight resonates deeply in today’s fast-paced world, particularly in the rapidly evolving field of AI.\n\n### The Importance of Human Connection in an AI-Driven World\n\nOne of the most notable themes in our discussion was the **critical role of human connection amidst increasing reliance on AI technology**. While artificial intelligence continues to transform industries, Miles stressed that maintaining genuine human interaction is vital. This point became particularly poignant when discussing how his teenage son perceives AI. A desire for creations that bear the imprint of human experience highlights an inherent need for connection, even in a tech-driven landscape.\n\nAs Miles points out, **the potential rise of AI-generated content may shift public perception** and demand for human-created art and literature. This creates an intriguing landscape where the authenticity of human experience becomes valuable amidst the ease of AI production.\n\n### The Future of Work and Skills in an AI Era\n\nThe conversation took an analytical turn as we explored **how AI would affect the workforce**. Miles emphasized the importance of adopting new technologies and encouraged the younger generation to embrace AI, urging them to consider how it can be utilized as a tool for personal and professional growth. \n\n“It’s essential to understand how these tools work in tandem—how can AI help achieve your aspirations?” he advises. \n\nAs organizations navigate this new AI landscape, the focus will inevitably be on **change management**; training individuals to adjust to new workflows and integrating AI responsibly. \n\n### Embracing Technology: A Path Forward\n\nBoth Miles and I remain optimistic about technology's potential. While acknowledging potential upheavals, we believe that humans are fundamentally adaptive and capable of leveraging technology in ways that enhance productivity, creativity, and personal fulfillment.\n\nIn experiencing the current surge of generative AI, we find ourselves on the brink of an **innovation explosion**. However, the question remains: **how quickly can we integrate these advancements into our lives?** \n\nEvery technological shift, from AI to robotics, carries the potential to redefine our roles. \n\n### Conclusion: A Call to Action\n\nAs we wrapped up, Miles and I both felt invigorated by the dialogue. The journey through AI and technology, filled with challenges and triumphs, is just beginning. \n\nI leave you with this thought: **embrace your interests, remain curious, and stay open to the changes ahead**. In the words of Miles, let’s empower ourselves by using technology as a tool that enhances our human experience, rather than replacing it. \n\nThank you for tuning in to another episode of **The Human Code.** Join us next time as we continue exploring the fascinating intersections between technology and our everyday lives. Remember, as we delve into this journey together, we shape the future!"
+        }
+      }
+    ],
+    "YouTube descriptions and highlights": [
+      {
+        "json": {
+          "output": "**YouTube Video Description:**\n\nWelcome to The Human Code, where technology intersects with humanity to shape the future! 🚀 Join host Don Finley on an inspiring journey through the stories of today’s visionary leaders and innovators. In this episode, we sit down with Miles Gilsenan, a veteran in IT and business intelligence, who shares his incredible insights on the evolving landscape of artificial intelligence, the importance of following your interests over passion, and the human connections we must maintain in this fast-paced digital age.\n\nMiles discusses how to thrive in an AI-driven world, the tools you need to adapt, and his fascinating journey that has led him to where he is today. This episode is brimming with valuable takeaways that you won't want to miss!\n\nTune in as we explore the future of technology, innovation, and personal growth. Don’t forget to watch until the end for some game-changing insights!\n\n🔔 Subscribe for more episodes: [Your Channel Link Here]\n\n**Key Takeaways:**\n- Discover why following your interests can be more beneficial than pursuing a passion.\n- Learn essential tools for success in the rapidly changing AI landscape.\n- Explore the surprising need for human connection in an age dominated by technology.\n- Understand the impact of AI on job markets and societal roles.\n- Gain insight into how the younger generation is adopting new tech trends.\n- Explore the concept of \"dead internet theory\" and its implications on human interaction.\n- Delve into the optimistic future of AI and technology in our daily lives.\n\n#Podcast #AI #Technology #Innovation #PersonalGrowth #Leadership #Inspiration"
+        }
+      }
+    ],
+    "Twitter threads/posts": [
+      {
+        "json": {
+          "output": "🧵 1/10 🚀 Welcome to The Human Code! A space where technology meets humanity, curated by yours truly, Don Finley. Ready to explore how today's leaders and innovators are shaping the future? Let's dive in! #TheHumanCode #TechInnovation\n\n2/10 🤝 Each week, we celebrate visionary minds driving tech advancement while sharing their personal journeys. This isn't just about tech—it's about real stories and insights that inspire all of us. #TechLeadership #PersonalGrowth\n\n3/10 🌐 Today, I had the pleasure of chatting with Miles Gilsenan, a seasoned expert in IT business intelligence. With years of experience, Miles has made a name by enhancing business data access and streamlining operations. #BusinessIntelligence #Innovation\n\n4/10 🎯 One key takeaway from our conversation? Following your interests can be more crucial than merely pursuing your passion. Miles shared how curiosity has shaped his career and led him to success! #FollowYourInterests #Curiosity\n\n5/10 🌀 As we voyage deeper into the AI era, we discussed how staying curious will set you apart. With AI rapidly evolving, keeping pace with tech trends is vital for individuals and organizations alike. #AI #FutureOfWork\n\n6/10 💡 Miles underscored the importance of maintaining human connection in an increasingly AI-driven world. After all, it's the human touch that enriches our experiences—something we shouldn't forget! #HumanConnection #AIethics\n\n7/10 🤖 As we explored the emergence of generative AI and neural networks, the conversation turned to how these technologies can facilitate new creation while still valuing human insight and creativity. #GenerativeAI #NeuralNetworks\n\n8/10 🌍 What will the future look like as AI continues to develop? Will we have a crisis of purpose in a world dominated by automation? Miles believes there's room for human creativity to thrive alongside AI. #FutureOfAI #CrisisOfPurpose\n\n9/10 🔑 Ultimately, it’s about embracing AI as a tool, not a replacement. As Miles suggests, we should focus on using these tools to propel our interests and achieve our goals! #AIAsATool #EmbraceChange\n\n🔟 10/10 🎉 Thank you for joining us on this insightful journey with Miles Gilsenan. Got inspired? Share your thoughts and keep the conversation going! Follow for more insights on tech and humanity! #TheHumanCode #AI #TechInnovation 🎧✨"
+        }
+      }
+    ],
+    "Newsletter content": [
+      {
+        "json": {
+          "output": "**Subject: Discover the Intersection of Technology and Humanity in Our Latest Podcast Episode!**\n\n**Hello [Recipient's Name],**\n\nWelcome back to another exciting newsletter edition of *The Human Code,* where we delve deep into the fascinating terrain where technology intertwines with humanity. As we continually explore the stories of trailblazers, innovators, and thought leaders, we aim to bring you insights that can inspire your journey in tech leadership and personal growth.\n\nIn our latest episode, I had the pleasure of speaking with Miles Gilsenan, a seasoned expert in IT and business intelligence. His journey is one marked by a passion for learning and a keen eye for the transformative impact of artificial intelligence. Together, we uncover why following your interests may matter more than following your passions, how to stay agile in the fast-evolving AI landscape, and the vital need for personal connections in an age increasingly dominated by technology. Trust me—this episode is filled with valuable takeaways you won’t want to miss!\n\n**Here’s a quick breakdown of key highlights from the episode:**\n\n- **Follow Your Interests, Not Just Your Passions:** Miles shares how following his interests led him to foster a career in IT and data analytics, suggesting that curiosity can be a more fluid path to discovery compared to pursuing a rigid passion.\n\n- **Navigating the AI Revolution:** We delve into the rapid advancements in AI and the essential tools that are reshaping business practices. Miles emphasizes the need for continuous adaptation and learning as AI technologies evolve.\n\n- **The Importance of Human Connection:** In a world driven by machines, keeping our human connections strong is vital. Miles discusses his son’s curiosity for authentic human interactions and how it relates to AI creations.\n\n- **Crisis of Purpose in an AI-Driven World:** What happens when machines perform tasks traditionally done by humans? Miles and I reflect on the potential societal shifts and what it means for human purpose in the workforce.\n\n- **Adapting to Change:** As industries transform and new players emerge, we explore the skills necessary for the younger generation to thrive in an AI-enhanced world, emphasizing adaptability and proficiency with new tools.\n\n- **Inflection Point in Technology:** With rapid changes in technology, Miles points to a compelling future where our children might inhabit a world where AI not only supports their aspirations but becomes integral to realizing them.\n\nThis enlightening conversation is a must-listen for anyone eager to stay ahead in their careers or curious about our tech-driven future. \n\nFeel inspired? We hope you are! \n\n👉 **[Listen to the full episode here!](#)**\n\nAs always, we’d love to hear your thoughts! Feel free to reply to this email or share it with someone who could benefit from these insights.\n\nThank you for being part of our community. Until next time!\n\nWarm regards,  \nDon Finley  \nHost, *The Human Code*  \n[Website URL] | [Social Media Links] | [Contact Information]"
+        }
+      }
+    ],
+    "Edit Fields1": [
+      {
+        "json": {
+          "blog post": "# The Human Code: Navigating AI and Personal Growth in Technology\n\nWelcome to **The Human Code**, the podcast where technology meets humanity and where today’s leaders and innovators help shape tomorrow. I’m your host, Don Finley, and I invite you to join me on a journey through the captivating world of tech leadership and personal growth.\n\nIn each episode, we delve into the stories of visionary minds who are not only advancing technology but also sharing their personal insights and experiences that inspire us all. Whether you're a tech enthusiast, an aspiring entrepreneur, or simply curious about the human stories behind the digital revolution, you’re in the right place.\n\n### The Journey of a Tech Veteran\n\nIn today’s episode, I speak with **Miles Gilsenan**, a seasoned expert in IT business intelligence with a rich history of managing global IT organizations. Miles has an impressive track record of cost reduction, operational streamlining, and enhancing businesses' access to critical data through innovative IT solutions.\n\nOur conversation began with Miles reflecting on his journey. He initially entered the world of accounting, implementing enterprise resource planning (ERP) systems. It was during a project in London, while building a data warehouse, that Miles discovered his passion for data and analytics, leading him down a path that eventually brought him back to consulting.\n\nHe shared a key revelation: **following interests may hold more significance than merely pursuing passions**. For Miles, the concept of passion felt too permanent and restrictive, while interest allows for exploration and the flexibility to pivot as one discovers new avenues. This insight resonates deeply in today’s fast-paced world, particularly in the rapidly evolving field of AI.\n\n### The Importance of Human Connection in an AI-Driven World\n\nOne of the most notable themes in our discussion was the **critical role of human connection amidst increasing reliance on AI technology**. While artificial intelligence continues to transform industries, Miles stressed that maintaining genuine human interaction is vital. This point became particularly poignant when discussing how his teenage son perceives AI. A desire for creations that bear the imprint of human experience highlights an inherent need for connection, even in a tech-driven landscape.\n\nAs Miles points out, **the potential rise of AI-generated content may shift public perception** and demand for human-created art and literature. This creates an intriguing landscape where the authenticity of human experience becomes valuable amidst the ease of AI production.\n\n### The Future of Work and Skills in an AI Era\n\nThe conversation took an analytical turn as we explored **how AI would affect the workforce**. Miles emphasized the importance of adopting new technologies and encouraged the younger generation to embrace AI, urging them to consider how it can be utilized as a tool for personal and professional growth. \n\n“It’s essential to understand how these tools work in tandem—how can AI help achieve your aspirations?” he advises. \n\nAs organizations navigate this new AI landscape, the focus will inevitably be on **change management**; training individuals to adjust to new workflows and integrating AI responsibly. \n\n### Embracing Technology: A Path Forward\n\nBoth Miles and I remain optimistic about technology's potential. While acknowledging potential upheavals, we believe that humans are fundamentally adaptive and capable of leveraging technology in ways that enhance productivity, creativity, and personal fulfillment.\n\nIn experiencing the current surge of generative AI, we find ourselves on the brink of an **innovation explosion**. However, the question remains: **how quickly can we integrate these advancements into our lives?** \n\nEvery technological shift, from AI to robotics, carries the potential to redefine our roles. \n\n### Conclusion: A Call to Action\n\nAs we wrapped up, Miles and I both felt invigorated by the dialogue. The journey through AI and technology, filled with challenges and triumphs, is just beginning. \n\nI leave you with this thought: **embrace your interests, remain curious, and stay open to the changes ahead**. In the words of Miles, let’s empower ourselves by using technology as a tool that enhances our human experience, rather than replacing it. \n\nThank you for tuning in to another episode of **The Human Code.** Join us next time as we continue exploring the fascinating intersections between technology and our everyday lives. Remember, as we delve into this journey together, we shape the future!"
+        }
+      }
+    ],
+    "Edit Fields2": [
+      {
+        "json": {
+          "Youtube des": "**YouTube Video Description:**\n\nWelcome to The Human Code, where technology intersects with humanity to shape the future! 🚀 Join host Don Finley on an inspiring journey through the stories of today’s visionary leaders and innovators. In this episode, we sit down with Miles Gilsenan, a veteran in IT and business intelligence, who shares his incredible insights on the evolving landscape of artificial intelligence, the importance of following your interests over passion, and the human connections we must maintain in this fast-paced digital age.\n\nMiles discusses how to thrive in an AI-driven world, the tools you need to adapt, and his fascinating journey that has led him to where he is today. This episode is brimming with valuable takeaways that you won't want to miss!\n\nTune in as we explore the future of technology, innovation, and personal growth. Don’t forget to watch until the end for some game-changing insights!\n\n🔔 Subscribe for more episodes: [Your Channel Link Here]\n\n**Key Takeaways:**\n- Discover why following your interests can be more beneficial than pursuing a passion.\n- Learn essential tools for success in the rapidly changing AI landscape.\n- Explore the surprising need for human connection in an age dominated by technology.\n- Understand the impact of AI on job markets and societal roles.\n- Gain insight into how the younger generation is adopting new tech trends.\n- Explore the concept of \"dead internet theory\" and its implications on human interaction.\n- Delve into the optimistic future of AI and technology in our daily lives.\n\n#Podcast #AI #Technology #Innovation #PersonalGrowth #Leadership #Inspiration"
+        }
+      }
+    ],
+    "Edit Fields3": [
+      {
+        "json": {
+          "Twitter threads": "🧵 1/10 🚀 Welcome to The Human Code! A space where technology meets humanity, curated by yours truly, Don Finley. Ready to explore how today's leaders and innovators are shaping the future? Let's dive in! #TheHumanCode #TechInnovation\n\n2/10 🤝 Each week, we celebrate visionary minds driving tech advancement while sharing their personal journeys. This isn't just about tech—it's about real stories and insights that inspire all of us. #TechLeadership #PersonalGrowth\n\n3/10 🌐 Today, I had the pleasure of chatting with Miles Gilsenan, a seasoned expert in IT business intelligence. With years of experience, Miles has made a name by enhancing business data access and streamlining operations. #BusinessIntelligence #Innovation\n\n4/10 🎯 One key takeaway from our conversation? Following your interests can be more crucial than merely pursuing your passion. Miles shared how curiosity has shaped his career and led him to success! #FollowYourInterests #Curiosity\n\n5/10 🌀 As we voyage deeper into the AI era, we discussed how staying curious will set you apart. With AI rapidly evolving, keeping pace with tech trends is vital for individuals and organizations alike. #AI #FutureOfWork\n\n6/10 💡 Miles underscored the importance of maintaining human connection in an increasingly AI-driven world. After all, it's the human touch that enriches our experiences—something we shouldn't forget! #HumanConnection #AIethics\n\n7/10 🤖 As we explored the emergence of generative AI and neural networks, the conversation turned to how these technologies can facilitate new creation while still valuing human insight and creativity. #GenerativeAI #NeuralNetworks\n\n8/10 🌍 What will the future look like as AI continues to develop? Will we have a crisis of purpose in a world dominated by automation? Miles believes there's room for human creativity to thrive alongside AI. #FutureOfAI #CrisisOfPurpose\n\n9/10 🔑 Ultimately, it’s about embracing AI as a tool, not a replacement. As Miles suggests, we should focus on using these tools to propel our interests and achieve our goals! #AIAsATool #EmbraceChange\n\n🔟 10/10 🎉 Thank you for joining us on this insightful journey with Miles Gilsenan. Got inspired? Share your thoughts and keep the conversation going! Follow for more insights on tech and humanity! #TheHumanCode #AI #TechInnovation 🎧✨"
+        }
+      }
+    ],
+    "Edit Fields5": [
+      {
+        "json": {
+          "Newsletter": "**Subject: Discover the Intersection of Technology and Humanity in Our Latest Podcast Episode!**\n\n**Hello [Recipient's Name],**\n\nWelcome back to another exciting newsletter edition of *The Human Code,* where we delve deep into the fascinating terrain where technology intertwines with humanity. As we continually explore the stories of trailblazers, innovators, and thought leaders, we aim to bring you insights that can inspire your journey in tech leadership and personal growth.\n\nIn our latest episode, I had the pleasure of speaking with Miles Gilsenan, a seasoned expert in IT and business intelligence. His journey is one marked by a passion for learning and a keen eye for the transformative impact of artificial intelligence. Together, we uncover why following your interests may matter more than following your passions, how to stay agile in the fast-evolving AI landscape, and the vital need for personal connections in an age increasingly dominated by technology. Trust me—this episode is filled with valuable takeaways you won’t want to miss!\n\n**Here’s a quick breakdown of key highlights from the episode:**\n\n- **Follow Your Interests, Not Just Your Passions:** Miles shares how following his interests led him to foster a career in IT and data analytics, suggesting that curiosity can be a more fluid path to discovery compared to pursuing a rigid passion.\n\n- **Navigating the AI Revolution:** We delve into the rapid advancements in AI and the essential tools that are reshaping business practices. Miles emphasizes the need for continuous adaptation and learning as AI technologies evolve.\n\n- **The Importance of Human Connection:** In a world driven by machines, keeping our human connections strong is vital. Miles discusses his son’s curiosity for authentic human interactions and how it relates to AI creations.\n\n- **Crisis of Purpose in an AI-Driven World:** What happens when machines perform tasks traditionally done by humans? Miles and I reflect on the potential societal shifts and what it means for human purpose in the workforce.\n\n- **Adapting to Change:** As industries transform and new players emerge, we explore the skills necessary for the younger generation to thrive in an AI-enhanced world, emphasizing adaptability and proficiency with new tools.\n\n- **Inflection Point in Technology:** With rapid changes in technology, Miles points to a compelling future where our children might inhabit a world where AI not only supports their aspirations but becomes integral to realizing them.\n\nThis enlightening conversation is a must-listen for anyone eager to stay ahead in their careers or curious about our tech-driven future. \n\nFeel inspired? We hope you are! \n\n👉 **[Listen to the full episode here!](#)**\n\nAs always, we’d love to hear your thoughts! Feel free to reply to this email or share it with someone who could benefit from these insights.\n\nThank you for being part of our community. Until next time!\n\nWarm regards,  \nDon Finley  \nHost, *The Human Code*  \n[Website URL] | [Social Media Links] | [Contact Information]"
+        }
+      }
+    ]
+  },
+  "versionId": "8bb9a284-de3d-4800-9190-a26890bbf820",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-04-26T16:00:19.218Z",
+      "updatedAt": "2025-04-26T16:00:19.218Z",
+      "role": "workflow:owner",
+      "workflowId": "tJhRRpcXRwGx2V6C",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

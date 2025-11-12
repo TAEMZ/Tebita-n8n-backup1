@@ -1,0 +1,1072 @@
+{
+  "createdAt": "2025-02-27T10:21:55.611Z",
+  "updatedAt": "2025-02-27T13:34:25.862Z",
+  "id": "1uwyyu2DrYio4yBg",
+  "name": "My workflow 20",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "de2a228c-20a7-45d5-bfab-d6a205d329d6",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v22.0/me/adaccounts",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n    \"Authorization\": \"Bearer EAAQXxfUy0jUBOZC0SZADobZAVfMCv12eP8ueFk4CubmVg1D6wPqpvEh5pRDPFkYfedpw2mjrttk5pXKJEr9q5yOggT6KbhfzZBuXtIAFPKaAP7I81tHZBNGeyvcZCq7MUt3RZCywuYAyCPwbZBBBbd5S6wG6h596VlY5ZAT7WbNtySraHqfKyiLY4Sw55rxdVVZAIZD\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "f1536f8f-7ff3-4c19-958f-93e5b53f3a08",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        700,
+        0
+      ],
+      "id": "6cb6dcca-1fad-432e-b994-91e4010eb63e",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json.data.map(account => {\n    return { json: { adAccountId: account.id } }; // Create an array of ad account IDs\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        0
+      ],
+      "id": "d56452c5-6678-493a-ab35-8f847988510c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{$json[\"adAccountId\"]}}/ads?fields=id,name,creative{image_url,body,title,object_story_spec}&limit=25",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n    \"Authorization\": \"Bearer EAAQXxfUy0jUBOZC0SZADobZAVfMCv12eP8ueFk4CubmVg1D6wPqpvEh5pRDPFkYfedpw2mjrttk5pXKJEr9q5yOggT6KbhfzZBuXtIAFPKaAP7I81tHZBNGeyvcZCq7MUt3RZCywuYAyCPwbZBBBbd5S6wG6h596VlY5ZAT7WbNtySraHqfKyiLY4Sw55rxdVVZAIZD\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        980,
+        20
+      ],
+      "id": "bf067153-76a2-4ef0-8799-47e81bffc02c",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare Ads for Iteration\nconst adsData = items[0].json.data; // Access the array of ads from the response\nconst preparedAds = adsData.map(ad => {\n    return {\n        json: {\n            adId: ad.id, // Ad ID\n            adName: ad.name, // Ad name\n            creativeId: ad.creative.id, // Creative ID for the ad\n            pageId: ad.creative.object_story_spec.page_id, // Page ID\n            instagramUserId: ad.creative.object_story_spec.instagram_user_id // Instagram User ID\n        }\n    };\n});\n\n// Return the array of prepared ads\nreturn preparedAds;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        20
+      ],
+      "id": "024a97b2-3d6c-495a-a7cd-85bf7767e481",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{$json[\"creativeId\"]}}/previews?ad_format=DESKTOP_FEED_STANDARD",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n    \"Authorization\": \"Bearer EAAQXxfUy0jUBOZC0SZADobZAVfMCv12eP8ueFk4CubmVg1D6wPqpvEh5pRDPFkYfedpw2mjrttk5pXKJEr9q5yOggT6KbhfzZBuXtIAFPKaAP7I81tHZBNGeyvcZCq7MUt3RZCywuYAyCPwbZBBBbd5S6wG6h596VlY5ZAT7WbNtySraHqfKyiLY4Sw55rxdVVZAIZD\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1400,
+        20
+      ],
+      "id": "d183f1c6-18a8-4f76-8f0d-013cccb78433",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Function - Extract and Clean Iframe Code\nconst apiResponse = items[0].json; // Access the API response\nconst iframeData = apiResponse.data[0]; // Get the first item from the data array\n\nif (!iframeData || !iframeData.body) {\n    throw new Error(\"No iframe data found in the response.\");\n}\n\n// Extract the iframe code\nlet iframeCode = iframeData.body;\n\n// Clean the iframe code by removing backslashes\niframeCode = iframeCode.replace(/\\\\/g, ''); // Remove all backslashes\n\n// Return the cleaned iframe code\nreturn {\n    json: {\n        cleanedIframeCode: iframeCode\n    }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        -220
+      ],
+      "id": "764d3415-884f-4e68-b882-3dbdf65e387d",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const filteredItems = [];\n\n// Loop through each item in the input\nfor (const item of items) {\n    // Check if the 'creative' object exists\n    if (item.json.creative) {\n        // Check if its 'object_type' is not 'SHARE'\n        if (item.json.creative.object_type !== 'SHARE') {\n            filteredItems.push(item); // Keep items that are not of type 'SHARE'\n        } else {\n            // Log the object_type for verification\n            console.log(`Filtered out item with ID: ${item.json.id} - Object Type: SHARE`);\n        }\n    } else {\n        console.log(`No creative object found for item ID: ${item.json.id}`);\n    }\n}\n\n// Always return filtered items, even if it's empty\nreturn filteredItems.length > 0 ? filteredItems : [{ json: {} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1980,
+        500
+      ],
+      "id": "039774f3-0450-4098-86d3-dc5c9cd4257a",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "jsCode": "// This will receive an array of input objects containing the iframe code\nconst iframeInputs = items; // 'items' is the default variable for incoming data in n8n\n\n// Map through the input items to create an array of HTML strings\nconst htmlOutputs = iframeInputs.map(item => {\n    const iframeCode = item.json.cleanedIframeCode; // Extract iframe code from each item\n\n    // Generate the HTML output for the current iframe\n    return `\n    <!DOCTYPE html>\n    <html lang=\"en\">\n    <head>\n        <meta charset=\"UTF-8\">\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n        <title>Facebook Ad Preview</title>\n    </head>\n    <body>\n    ${iframeCode}\n    </body>\n    </html>\n    `;\n});\n\n// Return the array of HTML strings as output\nreturn htmlOutputs.map(html => ({\n    json: {\n        html: html.trim() // Trim whitespace from the generated HTML\n    }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        20
+      ],
+      "id": "f2864f20-3785-4a5d-88b5-61722ba699cd",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all(); // Get all input items\n\nconst imageUrls = items.map(item => {\n    const html = item.json.html; // Extract HTML string\n\n    // Regular expression to find the src attribute in the iframe tag\n    const regex = /<iframe[^>]+src=\"([^\"]+)\"/; \n    const match = html.match(regex); // Match the regex\n\n    if (match && match[1]) {\n        return {\n            url: match[1] // Return the URL of the iframe src\n        };\n    } else {\n        return { url: null }; // Return null if no iframe found\n    }\n});\n\n// Return the extracted image URLs to the next node\nreturn imageUrls.map(urlObj => ({\n    json: {\n        imageUrl: urlObj.url // Send the extracted URL\n    }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2060,
+        20
+      ],
+      "id": "6802c9c9-e2d4-489d-8397-67fb72e1fe16",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://143.198.47.9:8001/extract-iframe",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "text/html"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"iframe_string\": \"<iframe src=\\\"https://business.facebook.com/ads/api/preview_iframe.php?d=AQLvZGR73MiwlavuYDGsw-Gl7qL9yOo0gQVqKuJRG008t2escPmTiGhjIyE19xJS6HdGDeIBdar9faOhEuUGMh74yKZZFrwv4Guuo_JOKMAgAcV7M-M2_bL_eOj0_oPfL2JTJ6p-0hkMyrCRenKsFSjA5qRNju7FxvLZ0DUxfF01xT5MqgiXr5ndyETBataurbeLIe8vGvbLB3m036qHMvZGcxyZscZEMw29AXWEszo1m-6FMs30-FO9Lc4o42QfjteyQzLPn4BB70zNyWlNP0FxIK7TjdxvN9L-pZAeB9-xCnH0qLxBGmYxxBl6ia3CKPLZKGZQ33bheH4BQMb_qsMwjRMnvJcm2wrQkUDwRo0KnHivAkHBkHViw1DTDuJjpps_J1qBwxnpzUfEj6jkuw1yxZbxRsuVEKr16nz-XIKb3KMZOEsxQ6VbAJftZ3NjiUU&amp;t=AQKrNSsZG54DcvXnkVQ\\\" width=\\\"335\\\" height=\\\"450\\\" scrolling=\\\"yes\\\" style=\\\"border: none;\\\"></iframe>\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1580,
+        200
+      ],
+      "id": "e2f9f2f4-d685-4f5d-b69e-e822bd60b543",
+      "name": "Iframe Extactor"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4",
+          "mode": "list",
+          "cachedResultName": "GPT-4"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are ai assitant. you will take iframe as in input, then you will give me an image or a video either or both of them are present",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.data }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1540,
+        500
+      ],
+      "id": "a07719dc-c650-4668-ba24-96b56f4ec0b0",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "9dZkBlQ9pjp5qbos",
+          "name": "Openai1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an AI assistant. You will receive an iframe as input and extract the profileImage url, ad image URL, video URL (if available), and the ad text. I don't need the image of the ad profile only the adimage"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1800,
+        200
+      ],
+      "id": "c3400266-87ca-4b94-8aa0-af1f3b96cedf",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1820,
+        420
+      ],
+      "id": "13e83e36-ef69-4b85-9c3c-39bbfcbba949",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "9dZkBlQ9pjp5qbos",
+          "name": "Openai1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"profileImage\": \"Profile image url\",\t\n  \"adImage\": \"Url of ad image\",\n\t\"adVideo\": \"Url of video if it exist\",\n    \"adText\" : \"Text of the ad\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1980,
+        420
+      ],
+      "id": "0cf7b24e-cb1d-4c67-8220-637382257f57",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.output.adVideo }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2160,
+        200
+      ],
+      "id": "653eea62-6793-4468-b9b1-0a831d8f6057",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1kc9Hp7uwp2Xj59mTCDLsLIE29atxc1yCOO6c_73KNpE",
+          "mode": "list",
+          "cachedResultName": "video_url",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kc9Hp7uwp2Xj59mTCDLsLIE29atxc1yCOO6c_73KNpE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "TikTok",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kc9Hp7uwp2Xj59mTCDLsLIE29atxc1yCOO6c_73KNpE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "cda39206-cf9d-4702-9fe1-b1c7ec08d11c",
+      "name": "Updated Video_Url Sheet From Octoparse",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 100,
+        "options": {}
+      },
+      "id": "eaba134f-de71-462e-98c1-6928e9c9073c",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "seconds"
+      },
+      "id": "df6c6f91-f88a-4845-ac9a-6b0e4306ed4e",
+      "name": "Wait 30 Seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        2020,
+        640
+      ],
+      "webhookId": "215d74da-5147-4f34-b6b6-a26b7d84f927"
+    },
+    {
+      "parameters": {
+        "url": "https://tiktok-video-no-watermark2.p.rapidapi.com/",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.video_url }}"
+            },
+            {
+              "name": "hd",
+              "value": "1"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-RapidAPI-Key",
+              "value": "*****PRIVATE***** "
+            },
+            {
+              "name": "X-RapidAPI-Host",
+              "value": "tiktok-video-no-watermark2.p.rapidapi.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4a242295-0325-4609-90fe-ea894ecb8b67",
+      "name": "Make API Call for NO Watermark",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2280,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "=1_Q61zXq8a4xTgfmi-rV6GKdnQzJx1BJQ4lVCjz6X4HU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1955772781,
+          "mode": "list",
+          "cachedResultName": "RawData",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RI2aBl0QHBDBFl4_39NhiOvdsfUpgPO1pTxdHjRNoVY/edit#gid=1955772781"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "video_url",
+              "fieldValue": "={{ $json.data.play }}"
+            },
+            {
+              "fieldId": "=api.code",
+              "fieldValue": "={{ $json.code }}"
+            },
+            {
+              "fieldId": "api.msg",
+              "fieldValue": "={{ $json.msg }}"
+            },
+            {
+              "fieldId": "api.processed_time",
+              "fieldValue": "={{ $json.processed_time }}"
+            },
+            {
+              "fieldId": "api.data.aweme_id",
+              "fieldValue": "={{ $json.data.aweme_id }}"
+            },
+            {
+              "fieldId": "api.data.id",
+              "fieldValue": "={{ $json.data.id }}"
+            },
+            {
+              "fieldId": "api.data.region",
+              "fieldValue": "={{ $json.data.region }}"
+            },
+            {
+              "fieldId": "api.data.title",
+              "fieldValue": "={{ $json.data.title }}"
+            },
+            {
+              "fieldId": "api.data.cover",
+              "fieldValue": "={{ $json.data.cover }}"
+            },
+            {
+              "fieldId": "api.data.origin_cover",
+              "fieldValue": "={{ $json.data.origin_cover }}"
+            },
+            {
+              "fieldId": "api.data.duration",
+              "fieldValue": "={{ $json.data.duration }}"
+            },
+            {
+              "fieldId": "api.data.play",
+              "fieldValue": "={{ $json.data.play }}"
+            },
+            {
+              "fieldId": "api.data.wmplay",
+              "fieldValue": "={{ $json.data.wmplay }}"
+            },
+            {
+              "fieldId": "api.data.hdplay",
+              "fieldValue": "={{ $json.data.hdplay }}"
+            },
+            {
+              "fieldId": "api.data.size",
+              "fieldValue": "={{ $json.data.size }}"
+            },
+            {
+              "fieldId": "api.data.wm_size",
+              "fieldValue": "={{ $json.data.wm_size }}"
+            },
+            {
+              "fieldId": "api.data.hd_size",
+              "fieldValue": "={{ $json.data.hd_size }}"
+            },
+            {
+              "fieldId": "api.data.music",
+              "fieldValue": "={{ $json.data.music }}"
+            },
+            {
+              "fieldId": "api.data.music_info.id",
+              "fieldValue": "={{ $json.data.music_info.id }}"
+            },
+            {
+              "fieldId": "api.data.music_info.title",
+              "fieldValue": "={{ $json.data.music_info.title }}"
+            },
+            {
+              "fieldId": "api.data.music_info.play",
+              "fieldValue": "={{ $json.data.music_info.play }}"
+            },
+            {
+              "fieldId": "api.data.music_info.cover",
+              "fieldValue": "={{ $json.data.music_info.cover }}"
+            },
+            {
+              "fieldId": "api.data.music_info.author",
+              "fieldValue": "={{ $json.data.music_info.author }}"
+            },
+            {
+              "fieldId": "api.data.music_info.original",
+              "fieldValue": "={{ $json.data.music_info.original }}"
+            },
+            {
+              "fieldId": "api.data.music_info.duration",
+              "fieldValue": "={{ $json.data.music_info.duration }}"
+            },
+            {
+              "fieldId": "api.data.music_info.album",
+              "fieldValue": "={{ $json.data.music_info.album }}"
+            },
+            {
+              "fieldId": "api.data.play_count",
+              "fieldValue": "={{ $json.data.play_count }}"
+            },
+            {
+              "fieldId": "api.data.digg_count",
+              "fieldValue": "={{ $json.data.digg_count }}"
+            },
+            {
+              "fieldId": "api.data.comment_count",
+              "fieldValue": "={{ $json.data.comment_count }}"
+            },
+            {
+              "fieldId": "api.data.share_count",
+              "fieldValue": "={{ $json.data.share_count }}"
+            },
+            {
+              "fieldId": "api.data.download_count",
+              "fieldValue": "={{ $json.data.download_count }}"
+            },
+            {
+              "fieldId": "api.data.create_time",
+              "fieldValue": "={{ $json.data.create_time }}"
+            },
+            {
+              "fieldId": "api.data.author.id",
+              "fieldValue": "={{ $json.data.author.id }}"
+            },
+            {
+              "fieldId": "api.data.author.unique_id",
+              "fieldValue": "={{ $json.data.author.unique_id }}"
+            },
+            {
+              "fieldId": "api.data.author.nickname",
+              "fieldValue": "={{ $json.data.author.nickname }}"
+            },
+            {
+              "fieldId": "api.data.author.avatar",
+              "fieldValue": "={{ $json.data.author.avatar }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c0737ccd-a8cf-4943-9270-18cc5c26b3a3",
+      "name": "Copy Data to UserAnalytics Template",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2560,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-Z42NPeyhAxMyhrbGc-coaxWLtuW7CL7G5sMksmUKKg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-Z42NPeyhAxMyhrbGc-coaxWLtuW7CL7G5sMksmUKKg/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "TikTok_Username",
+              "lookupValue": "={{ $json.data.author.unique_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ff6e7fca-82c6-4f10-9411-18bc57f6ef86",
+      "name": "Lookup TikVault_Master",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        2780,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "updateFields": {
+          "parentId": "={{ $node[\"Lookup TikVault_Master\"].json.UserFolderID }}"
+        },
+        "options": {}
+      },
+      "id": "81e994ff-b61f-4169-952d-3dd0fc7037bb",
+      "name": "Move Usename_Analytics to Username Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 2,
+      "position": [
+        3220,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1_Q61zXq8a4xTgfmi-rV6GKdnQzJx1BJQ4lVCjz6X4HU",
+          "mode": "id"
+        },
+        "options": {
+          "name": "={{ $json.TikTok_Username }} Analytics"
+        }
+      },
+      "id": "1916c7ad-75a5-4d30-80d7-6d5ac3c96041",
+      "name": "Copy UserAnalytics to UserName Analytics",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 2,
+      "position": [
+        3000,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1-Z42NPeyhAxMyhrbGc-coaxWLtuW7CL7G5sMksmUKKg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-Z42NPeyhAxMyhrbGc-coaxWLtuW7CL7G5sMksmUKKg/edit#gid=0"
+        },
+        "columnToMatchOn": "TikTok_Username",
+        "valueToMatchOn": "={{ $node[\"Lookup TikVault_Master\"].json.TikTok_Username }}",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "UserAnalyticsID",
+              "fieldValue": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f6d361e2-0521-495e-9301-61db2dfd18e0",
+      "name": "Update TokVault_Master wit UserNameAnalytics File ID",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        3440,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1_Q61zXq8a4xTgfmi-rV6GKdnQzJx1BJQ4lVCjz6X4HU",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1955772781,
+          "mode": "list",
+          "cachedResultName": "RawData",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_Q61zXq8a4xTgfmi-rV6GKdnQzJx1BJQ4lVCjz6X4HU/edit#gid=1955772781"
+        },
+        "keepFirstRow": true
+      },
+      "id": "c29b17eb-f83b-44f6-8e80-d0593eefb751",
+      "name": "Clear UserAnalytics Master For Next Run",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        3640,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "binaryData": true,
+        "name": "={{ $node[\"Make API Call for NO Watermark1\"].json[\"data\"][\"title\"] }}",
+        "parents": [
+          "1xEv7TROIpxKVrxnxp-E9xubL_1FxHgXV"
+        ],
+        "options": {}
+      },
+      "id": "1d7bb86a-7bab-4020-bcd1-41ac1f34acc2",
+      "name": "Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 2,
+      "position": [
+        3100,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Define the removeQueryString function\nfunction removeQueryString(url) {\n  var index = url.indexOf(\"?\");\n  if (index !== -1) {\n    return url.substring(0, index);\n  }\n  return url;\n}\n\n// Get the original URL from the input data\nvar originalUrl = $json.data.hdplay;\n\n// Call the removeQueryString function to strip the URL\nvar strippedUrl = removeQueryString(originalUrl);\n\n// Output the stripped URL as an output of this node\nreturn { json: { strippedUrl: strippedUrl } };\n"
+      },
+      "id": "83212f27-0e33-4305-a0f3-eb919b4490d2",
+      "name": "Code6",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.strippedUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "3d22e3c6-577a-48f5-b396-f1070e9e4623",
+      "name": "HTTP Request4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2880,
+        640
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        []
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iframe Extactor": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        []
+      ]
+    },
+    "Updated Video_Url Sheet From Octoparse": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Wait 30 Seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 30 Seconds": {
+      "main": [
+        [
+          {
+            "node": "Make API Call for NO Watermark",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make API Call for NO Watermark": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Copy Data to UserAnalytics Template",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy Data to UserAnalytics Template": {
+      "main": [
+        [
+          {
+            "node": "Lookup TikVault_Master",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup TikVault_Master": {
+      "main": [
+        [
+          {
+            "node": "Copy UserAnalytics to UserName Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Usename_Analytics to Username Folder": {
+      "main": [
+        [
+          {
+            "node": "Update TokVault_Master wit UserNameAnalytics File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy UserAnalytics to UserName Analytics": {
+      "main": [
+        [
+          {
+            "node": "Move Usename_Analytics to Username Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update TokVault_Master wit UserNameAnalytics File ID": {
+      "main": [
+        [
+          {
+            "node": "Clear UserAnalytics Master For Next Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "4aa6bece-a11d-458b-ba79-1441e977289a",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-27T10:21:55.611Z",
+      "updatedAt": "2025-02-27T10:21:55.611Z",
+      "role": "workflow:owner",
+      "workflowId": "1uwyyu2DrYio4yBg",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,1056 @@
+{
+  "createdAt": "2025-02-25T18:07:46.319Z",
+  "updatedAt": "2025-02-25T18:07:46.319Z",
+  "id": "GN2bOggYdKZqUyjs",
+  "name": "My workflow 15",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "0b7f57e4-3df2-4879-9d80-a00ab2fd07b9",
+        "options": {
+          "allowedOrigins": "*",
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2560,
+        700
+      ],
+      "id": "aeec11d7-e122-48e3-929f-44ce15032ffa",
+      "name": "Webhook",
+      "webhookId": "0b7f57e4-3df2-4879-9d80-a00ab2fd07b9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.tebita.com/webhook/f3685c34-9780-42d9-ade4-edf58e0597a9",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"video_url\": \"{{ $json.video_url }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1340,
+        520
+      ],
+      "id": "7ad47415-4acf-45e7-83af-d71cb7b10fc4",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze the following ad and determine:\n1. The core messaging angle (e.g., discount offer, product benefit, social proof).\n2. The likely customer awareness stage (Problem-Aware, Solution-Aware, Product-Aware).\n\nAd Details:\n- Ad Text: {{ $json.ad_body }},\n- Image Analysis: {{ $json.image_message }},\n- Video Transcription: {{ $json.video_message }},\n\nReturn JSON:\n{\n  \"ad_id\": {{ $json.ad_id }},\n  \"message_angle\": \"...\",\n  \"awareness_stage\": \"...\"\n}\n {{ $json.ad_body }}",
+              "role": "assistant"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -580,
+        360
+      ],
+      "id": "4865c85f-a85f-4060-938d-dbdfa4e184b6",
+      "name": "OpenAI"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.tebita.com/webhook/acda43e6-4167-4068-b767-bc934bdb743b",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"image_url\": \"{{ $json.image_url }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1320,
+        800
+      ],
+      "id": "c6605450-8086-4251-a2de-a88f90ade21d",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst extractedData = items.map((item) => {\n  return {\n    ad_id: $input.first().json.ad_id,\n    ad_body: $input.first().json.ad_body\n  };\n});\nreturn extractedData;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1300,
+        1060
+      ],
+      "id": "983a7e81-21e7-4526-bbc6-6504a00ba809",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an AI that categorizes ad comments into meaningful themes.Don't hallucinat, it is strictly forbedeedn\nYour task is to analyze the provided comments and assign each one a short, **relevant** theme that represents its main idea.\n\n**Guidelines:**  \n- Use themes that accurately describe the comment’s intent or sentiment.  \n- Themes should be **concise and meaningful** (e.g., \"Excitement\", \"Purchase Intent\", \"Price Concern\", \"Customer Inquiry\", \"Sustainability\", \"Product Availability\").  \n- If a comment asks a question, the theme should reflect the **type of inquiry** (e.g., \"Shipping Inquiry\", \"Product Inquiry\").  \n- If a comment expresses a **feeling** (e.g., love, frustration), the theme should reflect that (e.g., \"Excitement\", \"Dissatisfaction\").  \n- **Do not use generic labels** like \"General Comment\"—instead, always assign a meaningful theme.  \n\nad_id:{{ $json.ad_id }},\ncomment_id:{{ $json.comment_id }},\ncomment_message:{{ $json.comment_message }},\n**Output Format:**  \nReturn the response as a JSON array, where each object includes, don't add any symbols or slashs, answer only the json:  \n- `\"ad_id\"` (string) → The ID of the ad the comment belongs to  \n- `\"comment_id\"` (string) → The unique ID of the comment  \n- `\"comment_message\"` (string) → The original comment text  \n- `\"theme\"` (string) → The assigned theme  ",
+              "role": "assistant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -660,
+        1260
+      ],
+      "id": "52f6f34e-9da8-423b-a4d6-d72641b6969b",
+      "name": "OpenAI1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1660,
+        720
+      ],
+      "id": "4e42b6f6-67d1-47b7-aaaa-3cc7e16b11f4",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all().map((item) => item.json);\nconst response = {\n  ad_id: inputs[2]?.ad_id,\n  ad_body: inputs[2]?.ad_body,\n  image_message: inputs[1]?.data,\n  video_message: inputs[0]?.data,\n};\n\nreturn response;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -920,
+        360
+      ],
+      "id": "b8af60ef-e888-47cf-b0b9-03bd8c18e1de",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1120,
+        1240
+      ],
+      "id": "2efdea7a-6147-43bc-ac8c-7f943856f50f",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -680,
+        780
+      ],
+      "id": "d923d2ae-f3e8-4cc9-9f57-a912bbf15c68",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -960,
+        780
+      ],
+      "id": "6c550652-5aba-46fd-8e09-edeba709d031",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst formattedData = items.map((item) => {\n  try {\n    const cleanContent = item?.json?.message?.content.replace(/```json\\n|```/g, '');\n    const content = JSON.parse(cleanContent);\n    return content[0];\n  } catch (error) {\n    return { error: `Invalid JSON: ${item?.json?.message?.content}`, detail: error.message };\n  }\n});\nreturn formattedData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -280,
+        1260
+      ],
+      "id": "b8b9a502-44f6-47a0-9e1b-25d68d29e9a5",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map((item) => item.json);\nconst themes = {\n  price: [\"expensive\", \"cheap\", \"cost\", \"price\"],\n  quality: [\"good\", \"bad\", \"quality\", \"excellent\", \"poor\"],\n  // add more themes and keywords as needed\n};\n\nitems.forEach((item) => {\n  for (let theme in themes) {\n    if (\n      themes[theme].some((keyword) => item.comment_message.includes(keyword))\n    ) {\n      item.theme = theme;\n      break;\n    }\n  }\n});\n\nreturn items;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        1440
+      ],
+      "id": "ba2fbb2e-5410-41c0-b6b5-2aae6f2d0142",
+      "name": "Code6"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        120,
+        1260
+      ],
+      "id": "c3a282cd-48fa-4697-bf51-dccf0cee55a5",
+      "name": "Loop Over Items4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const comments = $input.all().map((item) => item.json);\nconst themes = {};\n\ncomments.forEach((comment) => {\n  if (!themes[comment.theme]) {\n    themes[comment.theme] = 1;\n  } else {\n    themes[comment.theme]++;\n  }\n});\n\nconst themesArray = Object.entries(themes).map(([theme, count]) => ({\n  theme,\n  count,\n}));\n\nthemesArray.sort((a, b) => b.count - a.count);\n\nconst top3Themes = themesArray.slice(0, 3);\n\nreturn { top3Themes };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        1260
+      ],
+      "id": "201755b0-ae0d-46da-9f13-d3ca26b68058",
+      "name": "Code7"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4",
+          "mode": "list",
+          "cachedResultName": "GPT-4"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an AI that categorizes ad comments based on **common themes**.  \nYour task is to analyze the provided comments and assign each one a **concise and meaningful theme** that accurately represents its main idea.  \n\n### **Guidelines:**  \n- Categorize comments based on common themes (e.g., if multiple comments mention price concerns in different ways, they should be grouped under the same theme).\n- **Do not hallucinate** themes—only use **patterns and content** found within the provided comments.  \n- Keep themes **consistent and reusable** across different comments.  \n- If a comment asks a question, the theme should reflect the **type of inquiry** (e.g., **\"Shipping Inquiry\"**, **\"Product Inquiry\"**).  \n- If a comment expresses **emotion or sentiment**, the theme should reflect that (e.g., **\"Excitement\"**, **\"Dissatisfaction\"**).  \n- **Do not use generic labels** like \"General Comment\"—always assign a meaningful, **contextual** theme.  \ninput theme:{{ $json.theme }}\n### **Output Format:**  \nReturn the response as a JSON array, where each object includes:  \n{\n\"ad_id\": {{ $json.ad_id }},\n\"comment_id\":{{ $json.comment_id }},\n\"comment_message:{{ $json.comment_message }},\n\"theme\":The new assigned **common theme** ",
+              "role": "assistant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1240,
+        1460
+      ],
+      "id": "3c6bc724-0ad1-4701-a885-faf5d2328623",
+      "name": "OpenAI2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        920,
+        1440
+      ],
+      "id": "e7909c6f-80dd-471b-a920-1fe787544641",
+      "name": "Loop Over Items5"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1MyXzS17yGyonXAl8urWmElcgwEJ3CPP9y5UMt8nXV5o",
+          "mode": "list",
+          "cachedResultName": "Test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MyXzS17yGyonXAl8urWmElcgwEJ3CPP9y5UMt8nXV5o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 984723128,
+          "mode": "list",
+          "cachedResultName": "Ad_Comment",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MyXzS17yGyonXAl8urWmElcgwEJ3CPP9y5UMt8nXV5o/edit#gid=984723128"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ad_id": "={{ $json.ad_id }}",
+            "comment_id": "={{ $json.comment_id }}",
+            "comment_message": "={{ $json.comment_message }}",
+            "theme": "={{ $json.theme }}",
+            "sentiment": "={{ $json.sentiment }}"
+          },
+          "matchingColumns": [
+            "ad_id"
+          ],
+          "schema": [
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "comment_id",
+              "displayName": "comment_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "comment_message",
+              "displayName": "comment_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "theme",
+              "displayName": "theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        800,
+        920
+      ],
+      "id": "f864485b-b53b-4076-a643-7a83725e48f3",
+      "name": "Google Sheets1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze the sentiment of this comment: \"{{ $json[\"comment_message\"] }}\" and it's theme \"{{ $json.theme }}\".\nReturn only one of these labels: \"Positive\", \"Negative\", or \"Neutral\".\nReturn format json:\n{\n\"ad_id\":{{ $json.ad_id }},\n\"comment_id\":{{ $json.comment_id}},\n\"comment_message\":{{ $json.comment_message }},\n\"theme\":{{ $json.theme }},\n\"sentiment\":\"...\",\n} "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        40,
+        920
+      ],
+      "id": "331e1196-2d46-4f4c-b658-10eebd4660fe",
+      "name": "OpenAI3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst formattedData = items.map((item) => {\n  try {\n    const cleanContent = item?.json?.message?.content.replace(\n      /```json\\n|```/g,\n      \"\",\n    );\n    const content = JSON.parse(cleanContent);\n    return {\n      ad_id: content.ad_id,\n      comment_id: content.comment_id,\n      comment_message: content.comment_message,\n      theme: content.theme,\n      sentiment: content.sentiment,\n    };\n  } catch (error) {\n    return {\n      error: `Invalid JSON: ${item?.json?.message?.content}`,\n      detail: error.message,\n    };\n  }\n});\nreturn formattedData;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        920
+      ],
+      "id": "3b6d52b6-f15e-4dd2-a412-62879504f23f",
+      "name": "Code8"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1MyXzS17yGyonXAl8urWmElcgwEJ3CPP9y5UMt8nXV5o",
+          "mode": "list",
+          "cachedResultName": "Test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MyXzS17yGyonXAl8urWmElcgwEJ3CPP9y5UMt8nXV5o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 843553224,
+          "mode": "list",
+          "cachedResultName": "Ads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MyXzS17yGyonXAl8urWmElcgwEJ3CPP9y5UMt8nXV5o/edit#gid=843553224"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ad_id": "={{ $json.ad_id }}",
+            "image_url": "={{ $json.image_url }}",
+            "video_url": "={{ $json.video_url }}",
+            "ad_copy": "={{ $json.ad_body }}"
+          },
+          "matchingColumns": [
+            "ad_id"
+          ],
+          "schema": [
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ad_copy",
+              "displayName": "ad_copy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "video_url",
+              "displayName": "video_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message_angle",
+              "displayName": "message_angle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "awareness_stage",
+              "displayName": "awareness_stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1340,
+        220
+      ],
+      "id": "16d7b2ff-ba38-4f10-acec-9dbeb8038ff0",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gOfqitCYJijrtXhG",
+          "name": "Google Sheets account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1MyXzS17yGyonXAl8urWmElcgwEJ3CPP9y5UMt8nXV5o",
+          "mode": "list",
+          "cachedResultName": "Test",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MyXzS17yGyonXAl8urWmElcgwEJ3CPP9y5UMt8nXV5o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 843553224,
+          "mode": "list",
+          "cachedResultName": "Ads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1MyXzS17yGyonXAl8urWmElcgwEJ3CPP9y5UMt8nXV5o/edit#gid=843553224"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ad_id": "={{ $json.message.content.ad_id }}",
+            "message_angle": "={{ $json.message.content.message_angle }}",
+            "awareness_stage": "={{ $json.message.content.awareness_stage }}"
+          },
+          "matchingColumns": [
+            "ad_id"
+          ],
+          "schema": [
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ad_copy",
+              "displayName": "ad_copy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "video_url",
+              "displayName": "video_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message_angle",
+              "displayName": "message_angle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "awareness_stage",
+              "displayName": "awareness_stage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "index",
+              "displayName": "index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "logprobs",
+              "displayName": "logprobs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "finish_reason",
+              "displayName": "finish_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -40,
+        20
+      ],
+      "id": "f51ad686-903a-46c5-94fa-2d7cbed7482b",
+      "name": "Google Sheets"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json.body.data;\n\nfunction extractAdData(data) {\n    return data.flatMap(ad => \n        ad.comments.data.map(comment => ({\n            json: {\n                ad_id: ad.id,\n                ad_body: ad.ad_creative.body,\n                image_url: ad.ad_creative.image_url,\n                video_url: ad.ad_creative.video_url,\n                comment_id: comment.id,\n                comment_message: comment.message,\n                like_count: comment.like_count\n            }\n        }))\n    );\n}\n\nreturn extractAdData(data);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2340,
+        700
+      ],
+      "id": "09edf208-48d9-48dc-ab5e-d4f792d06fca",
+      "name": "Get Data"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ 10 }}",
+        "options": {
+          "reset": "={{ false }}"
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -2100,
+        700
+      ],
+      "id": "954ee5d1-262c-415d-8ead-85da07648b9b",
+      "name": "Loop Over Iteems"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map((item) => item.json);\n\nconst uniqueAds = items.reduce((acc, item) => {\n  const existingAd = acc.find((ad) => ad.ad_id === item.ad_id);\n  if (!existingAd) {\n    acc.push({\n      ad_id: item.ad_id,\n      ad_body: item.ad_body,\n      image_url: item.image_url,\n      video_url: item.video_url,\n    });\n  }\n  return acc;\n}, []);\n\nreturn uniqueAds;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1840,
+        720
+      ],
+      "id": "736f643c-29c8-476f-9b81-4e59685d2103",
+      "name": "Ad creatives extractor"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst extractedData = items.map((item) => {\n  return {\n    ad_id: item?.json?.ad_id,\n    comment_id: item?.json?.comment_id,\n    comment_message: item?.json?.comment_message,\n  };\n});\nreturn extractedData;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1740,
+        1240
+      ],
+      "id": "5f0df85a-04b1-4612-b041-21031c2de59f",
+      "name": "Comments Extractor"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OpenAI3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items5": {
+      "main": [
+        [],
+        [
+          {
+            "node": "OpenAI2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI3": {
+      "main": [
+        [
+          {
+            "node": "Code8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code8": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Iteems",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Iteems": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Ad creatives extractor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Comments Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ad creatives extractor": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comments Extractor": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "b2c1b5cc-65c4-4e67-a699-ad84beead488",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-25T18:07:46.319Z",
+      "updatedAt": "2025-02-25T18:07:46.319Z",
+      "role": "workflow:owner",
+      "workflowId": "GN2bOggYdKZqUyjs",
+      "projectId": "VgkBsgW7KMLc7cPH",
+      "project": {
+        "createdAt": "2025-02-22T09:23:18.057Z",
+        "updatedAt": "2025-02-22T09:24:27.776Z",
+        "id": "VgkBsgW7KMLc7cPH",
+        "name": "Elisha Abriham <elishabu28@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,1370 @@
+{
+  "createdAt": "2025-03-14T07:41:44.512Z",
+  "updatedAt": "2025-03-21T13:27:04.555Z",
+  "id": "mlZiX98II6bomXCJ",
+  "name": "Linkedin Post",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -400,
+        -1080
+      ],
+      "id": "e5c65d69-e373-472f-b2e6-ea6e7c557ebe",
+      "name": "When chat message received",
+      "webhookId": "2887b76e-7570-4a77-b30c-bfae9d93ba45",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://google.com/complete/search?output=toolbar&gl=US&q={{ $json.chatInput }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -180,
+        -1080
+      ],
+      "id": "34b304ac-aa89-4c6e-bbc1-8e4fb5b318df",
+      "name": "HTTP Request",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        40,
+        -1080
+      ],
+      "id": "1baa2cc6-4c5d-4f30-80c1-4aa4c23190b6",
+      "name": "XML",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "toplevel.CompleteSuggestion",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -1080
+      ],
+      "id": "e230774f-b8c0-4482-b03f-b58706d0efcf",
+      "name": "Split Out",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1eb62db1-d1bd-4190-a69d-ddc244a96b87",
+              "name": "Keyword",
+              "value": "={{ $json.suggestion.data }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        -1080
+      ],
+      "id": "d7e2b5b4-c6ac-4bfb-a0bf-af3a31fc3add",
+      "name": "Edit Fields",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "Keyword"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        700,
+        -1080
+      ],
+      "id": "9a3a5ea0-fcee-4d8a-b15a-d4991c6e70a4",
+      "name": "Aggregate",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        920,
+        -1080
+      ],
+      "id": "aaf581f3-e51e-4c6b-9a9e-0da5e3a2baec",
+      "name": "Loop Over Items",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=For the keyword {{ $json.Keyword }} create a Linkedin Post. NO emojis, write in a natural tone. 8th grade reading level. Write informative. Use a captivating hook. And an image prompt ideas into detailed, hyper-realistic prompts optimized for image-generation models like Flux and MidJourney. Your task is to take a brief input and transform it into a rich, cinematic, immersive prompt for the lineked in post.\n\nfor example\n\nkeyword:python programming\npost:Are you curious about Python programming? It's an essential skill for many tech jobs today. Python is known for its simplicity and versatility, making it a great choice for beginners and pros alike. Whether you want to analyze data or develop apps, Python can help you accomplish your goals.\nimagePrompt:A close-up photo of a computer screen displaying Python code in a modern, bright office setting. Include elements like a coffee cup, a notebook, and a tech gadget in the background for an inviting workspace vibe.\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1440,
+        -160
+      ],
+      "id": "51cf3a92-a10a-44a8-8629-bac81af70f01",
+      "name": "Linkedin Post Generator",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1300,
+        -960
+      ],
+      "id": "fd5e7962-10d5-4e17-ade1-03785fe602be",
+      "name": "Wait",
+      "webhookId": "6a6b4016-cebd-4b98-96ea-0e5331528d0a",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        -1440
+      ],
+      "id": "ca5457f7-dc07-4bbd-a0f5-4f30cf4e158c",
+      "name": "Split Out1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1280,
+        920
+      ],
+      "id": "70e58811-bede-4b01-b6a0-69a400688ae6",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "new",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "production",
+              "lookupValue": "for production"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -1140,
+        920
+      ],
+      "id": "f7c72336-c033-4654-9d9f-8764a48ab509",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.idea }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Here’s a polished prompt for your AI agent:  \n\n---\n\n**Prompt:**  \nFor each keyword provided, create a LinkedIn post. **No emojis.** Write in a natural, conversational tone that’s easy to understand — around an 8th-grade reading level. The post should sound informative and insightful, not promotional.  \n\n**Structure:**  \n- Start with a **compelling hook** — something that grabs attention and makes the reader want to keep going.  \n- Follow with **valuable insights** or **practical advice** on the topic.  \n- Conclude with a **thought-provoking question** or a **call to action** to encourage engagement.  \n\n**Goal:**  \n- Position the writer as an expert without sounding boastful.  \n- Make the content worth sharing or saving for later.  \n- Aim for around **150-300 words** per post — enough to provide value, but concise enough to hold attention.  \n\n**Example Output:**  \n\n*Keyword: \"Remote Work Productivity\"*  \n\n**Hook:**  \nMost people think working remotely is all about flexibility — but what if that’s actually holding you back?  \n\n**Body:**  \nFlexibility is great, but too much of it can blur the line between work and life. Without structure, productivity drops, and burnout creeps in.  \nThe key? Balance freedom with routine.  \n- Start your day at the same time, even if you don’t have a commute.  \n- Define your \"off\" hours — and actually stick to them.  \n- Create a dedicated workspace (even a small corner counts).  \n\nRemote work isn’t about working anytime — it’s about working smart, so you can log off guilt-free.  \n\n**Call to action:**  \nWhat’s your go-to strategy to stay productive while working remotely?  \n\n---\n\nWould you like me to adapt this for a specific industry or audience too — like tech startups, freelancers, or team leaders?"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        -1000,
+        920
+      ],
+      "id": "b1ac43a0-5463-4359-807b-90df438d3b75",
+      "name": "Generate Title",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1020,
+        1100
+      ],
+      "id": "135bf59f-8354-407e-bde6-861c3adb5a90",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {
+          "numberOfItems": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserItemList",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        1080
+      ],
+      "id": "ebc6250f-8f6e-4bb4-bc7e-666280b4f535",
+      "name": "Item List Output Parser",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "## Input",
+        "height": 360,
+        "width": 640,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1300,
+        820
+      ],
+      "typeVersion": 1,
+      "id": "87cb61fd-49d6-412b-8e74-f5b999c50e95",
+      "name": "Sticky Note",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o1-mini",
+          "mode": "list",
+          "cachedResultName": "O1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an advanced prompt- generation AI specializing in  image prompt ideas into detailed, hyper-realistic prompts optimized for image-generation models like Flux and MidJourney. Your task is to take a brief input and transform it into a rich, cinematic, immersive prompt that strictly adheres to images, making the viewer feel and understand.\n\n\nThis is the short prompt idea you need to expand upon: {{ $json.response.text }}\nEvery prompt must use this to describe the environment of the\nimage: {{ $('Google Sheets').item.json.environment_prompt }}\n\n\n\nPrompt 1: \"Collaborative Work in Action\"\n\n1. In the foreground, show a team of professionals gathered around a whiteboard, one of them holding a marker, actively sketching out ideas and diagrams. Their hands are poised in the middle of a brainstorming session, with fingers tapping thoughtfully on the table, surrounded by notebooks and laptops.\n\n2. In the background, describe a modern, collaborative office space with large windows allowing natural light to pour in, highlighting a group of colleagues deeply engaged in discussion. Whiteboards are filled with concepts, flowcharts, and project deadlines. The atmosphere is lively, with the energy of innovation and teamwork in the air.\n\nPrompt 2: \"Building Something from Scratch\"\n\n1. In the foreground, show a close-up of a hand typing rapidly on a keyboard, fingers moving with focus and precision, as a coffee cup sits beside the laptop, lightly steaming. There are digital designs on the screen showing early-stage prototypes and project planning.\n\n2. In the background, describe a modern office with sleek desks, multiple monitors displaying lines of code and product designs. The space feels energized, with a minimalistic yet creative layout. Colleagues are collaborating around a table, discussing ideas and planning the next steps for the product’s development.\n\nPrompt 3: \"Leadership in Action\"\n\n1. In the foreground, show a pair of hands gripping a conference room table, steadying oneself as a leader speaks to a team. The fingers are engaged, drawing attention to important points on a presentation, while a phone lies nearby, indicating multitasking and focus.\n\n2. In the background, describe a professional meeting room with large glass windows overlooking a city skyline. The team is gathered around, listening attentively as the leader shares ideas. Whiteboards are filled with strategic goals, and laptops are open, displaying data and key performance metrics.\n\nPrompt 4: \"Celebrating Milestones\"\n\n1. In the foreground, show hands raising a glass, celebrating a successful project completion. The fingers are wrapped around a clear, clinking champagne glass, reflecting the glimmer of the evening light.\n\n2. In the background, describe an office with vibrant decorations celebrating a milestone, balloons in the air, and team members gathered together, exchanging high-fives and congratulatory gestures. There’s a sense of accomplishment and joy in the air, with project charts and success indicators visible on the walls."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -200,
+        580
+      ],
+      "id": "24640b44-b588-4ed6-81ad-d63698c670ca",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.piapi.ai/api/v1/task",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"model\": \"Qubico/flux1-dev\", \n  \"task_type\": \"txt2img\", \n  \"input\": { \n  \"prompt\": \"{{ $json.Image_prompt }}\", \n  \"width\": 540, \n  \"height\": 960\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2060,
+        -160
+      ],
+      "id": "1891b736-905b-47f1-9934-5f31d09c8106",
+      "name": "Text-To-Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2lVjEF3eGAi56Tnf",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.piapi.ai/api/v1/task/{{ $json.data.task_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"model\": \"Qubico/flux1-dev\", \n  \"task_type\": \"txt2img\", \n  \"input\": { \n  \"prompt\": \"{{ $json.message.content }} \", \n  \"width\": 540, \n  \"height\": 960\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2480,
+        -160
+      ],
+      "id": "5e5dba33-35f9-4297-92f3-dbd3d134c28b",
+      "name": "Get-Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2lVjEF3eGAi56Tnf",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2260,
+        -160
+      ],
+      "id": "0416959e-19fd-4384-9556-8430ce89b44d",
+      "name": "Wait1",
+      "webhookId": "50b95b5f-8f9f-4d1b-abce-04ce42971717"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message.content",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        920
+      ],
+      "id": "94a998f6-816c-4952-becf-5ada53392869",
+      "name": "Split Out3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1eb62db1-d1bd-4190-a69d-ddc244a96b87",
+              "name": "Keyword",
+              "value": "={{ $json['message.content'] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -20,
+        920
+      ],
+      "id": "fabf6ad2-0148-4c30-86b1-d9f5da22f970",
+      "name": "Edit Fields1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "Keyword"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        200,
+        920
+      ],
+      "id": "dc9b1c3b-8869-4bd7-86c2-46a2e06a054d",
+      "name": "Aggregate1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        420,
+        920
+      ],
+      "id": "a54d3aa1-c999-4a04-977e-c52e54084bf5",
+      "name": "Loop Over Items1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1eb62db1-d1bd-4190-a69d-ddc244a96b87",
+              "name": "Image",
+              "value": "={{ $json.imagePrompt }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2120,
+        -1360
+      ],
+      "id": "f594e2ce-234d-43d8-9722-568c2d384747",
+      "name": "Edit Fields2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2360,
+        -1360
+      ],
+      "id": "be8a285d-e4d1-4468-9f83-65ac7873942b",
+      "name": "Loop Over Items2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "imagePrompt",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        -1360
+      ],
+      "id": "f9077d1c-180f-4c0c-8074-1141397e9bf6",
+      "name": "Split Out2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1100,
+        -160
+      ],
+      "id": "c3982185-9390-439d-85fd-173e4d095219",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "new",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "production",
+              "lookupValue": "for production"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1280,
+        -160
+      ],
+      "id": "71029df4-ec99-4185-a4bf-904e26efc48b",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ",
+          "mode": "list",
+          "cachedResultName": "Linkedin Post",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "idea": "={{ $json.message.content.post }}",
+            "Image_prompt": "={{ $json.message.content.imagePrompt }}",
+            "Keyword": "={{ $('Google Sheets1').item.json.Keyword }}",
+            "production": "done"
+          },
+          "matchingColumns": [
+            "Keyword"
+          ],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "idea",
+              "displayName": "idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "production",
+              "displayName": "production",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image_prompt",
+              "displayName": "Image_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "publishing",
+              "displayName": "publishing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "final_output",
+              "displayName": "final_output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1800,
+        -160
+      ],
+      "id": "937fc480-0576-429b-8fff-3854a85329bf",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ",
+          "mode": "list",
+          "cachedResultName": "Linkedin Post",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keyword": "={{ $('Google Sheets1').item.json.Keyword }}",
+            "Image url": "={{ $json.data.output.image_url }}",
+            "publishing": "pending"
+          },
+          "matchingColumns": [
+            "Keyword"
+          ],
+          "schema": [
+            {
+              "id": "Keyword",
+              "displayName": "Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "idea",
+              "displayName": "idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "production",
+              "displayName": "production",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image_prompt",
+              "displayName": "Image_prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "publishing",
+              "displayName": "publishing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image url",
+              "displayName": "Image url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2680,
+        -160
+      ],
+      "id": "9beb7486-9b3e-44a0-8295-176692b07eef",
+      "name": "Google Sheets3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ",
+          "mode": "list",
+          "cachedResultName": "Linkedin Post",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "new",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VzgimSIRpoQWwYT91Aod2ad1Lpb_Sn7_U57Ek_fMiUQ/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "publishing",
+              "lookupValue": "for publishing"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3000,
+        220
+      ],
+      "id": "0c625170-8fab-404d-9003-a6601de9f59c",
+      "name": "Google Sheets4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        2800,
+        220
+      ],
+      "id": "a5ddfb0e-96e1-42e1-b4b4-4d209d53901e",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.idea }}",
+        "shareMediaCategory": "IMAGE",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        3560,
+        240
+      ],
+      "id": "3e7915ef-f5a6-475d-bda8-9c6d941a667c",
+      "name": "LinkedIn"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['Image url'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3200,
+        360
+      ],
+      "id": "6a7cf1ad-d563-4bfc-bd51-aabf3621a7f8",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        3400,
+        240
+      ],
+      "id": "d3c0a34f-382d-4c90-8cba-43ecfe7ddb61",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        1540,
+        60
+      ],
+      "id": "8615beae-aa76-4d08-a2df-174e87b65cc0",
+      "name": "SerpAPI",
+      "credentials": {
+        "serpApi": {
+          "id": "iX9KgQiv2ttp65mr",
+          "name": "SerpAPI account 3"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Linkedin Post Generator": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Generate Title",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Title": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Title",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate Title",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text-To-Image": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Get-Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Get-Image": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [],
+        []
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Linkedin Post Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Text-To-Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "LinkedIn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "Linkedin Post Generator",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e9a14a35-fd20-4b9d-9951-c619d871b364",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-03-14T07:41:44.512Z",
+      "updatedAt": "2025-03-14T07:41:44.512Z",
+      "role": "workflow:owner",
+      "workflowId": "mlZiX98II6bomXCJ",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

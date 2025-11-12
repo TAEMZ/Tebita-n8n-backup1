@@ -1,0 +1,881 @@
+{
+  "createdAt": "2025-06-19T09:32:42.560Z",
+  "updatedAt": "2025-06-26T10:42:39.037Z",
+  "id": "ufPTZ6E78j6I48HC",
+  "name": "asugoldenrams",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "tuJWiVqX14TqBHn0",
+          "mode": "list",
+          "cachedResultName": "influxermerch"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "direction": "next",
+            "_data": "routes/($locale).athletes._index",
+            "cursor": "={{ $json.athletes.pageInfo.endCursor }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "cursor",
+              "displayName": "cursor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "_data",
+              "displayName": "_data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        -40
+      ],
+      "id": "c85870cf-0495-4633-ae41-abbc6b32fafe",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "path": "96a73154-fe6a-4253-8a48-280e4d532855",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1540,
+        -20
+      ],
+      "id": "502591c7-7b41-466e-8180-0be308b8455d",
+      "name": "Webhook",
+      "webhookId": "96a73154-fe6a-4253-8a48-280e4d532855",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1540,
+        -280
+      ],
+      "id": "0e9268a0-fdc6-49b2-8e7a-fefa75013f3a",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"lists\": [\n    \"baseball\",\"mens-basketball\",\"football\",\"track-and-field\",\"womens-basketball\",\"womens-cross-country\", \"womens-soccer\",\"softball\",\"tennis\",\"womens-track-and-field\",\"womens-volleyball\"\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1240,
+        -280
+      ],
+      "id": "0cbfe46e-c95b-4081-b593-712ed98386bd",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "url": "=https://asugoldenrams.com/sports/{{ $json.lists }}/roster",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -540,
+        -280
+      ],
+      "id": "012785f0-80c5-4cc2-91ec-f223a875bab9",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "lists",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1020,
+        -280
+      ],
+      "id": "9b037434-4c52-42a8-8bd9-ecb6b914b435",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and extract roster values from HTML for all sports\nfor (const item of $input.all()) {\n  // Get the HTML content from the input item\n  const htmlContent = item.json.html || item.json.content || item.json.data;\n  \n  if (!htmlContent) {\n    // If no HTML content found, skip this item\n    item.json.rosterValues = [];\n    continue;\n  }\n  \n  // List of sports to match\n  const sports = [\n    \"baseball\",\n    \"mens-basketball\",\n    \"football\", \n    \"track-and-field\",\n    \"womens-basketball\",\n    \"womens-cross-country\",\n    \"womens-soccer\",\n    \"softball\",\n    \"tennis\",\n    \"womens-track-and-field\",\n    \"womens-volleyball\"\n  ];\n  \n  // Regular expression to match option tags with value attributes\n  const optionRegex = /<option[^>]*value=\"([^\"]*)\"[^>]*>/g;\n  \n  // Array to store extracted values\n  const rosterValues = [];\n  \n  // Extract all matches\n  let match;\n  while ((match = optionRegex.exec(htmlContent)) !== null) {\n    const value = match[1];\n    \n    // Check if the value contains any of our sports roster URLs\n    const isRosterUrl = sports.some(sport => \n      value.includes(`/sports/${sport}/roster/`)\n    );\n    \n    if (isRosterUrl) {\n      rosterValues.push(value);\n    }\n  }\n  \n  // Add the extracted values to the item and remove the original HTML data\n  item.json = {\n    rosterValues: [...new Set(rosterValues)]\n  };\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        -280
+      ],
+      "id": "4fbf1f48-6b8e-4081-a152-bd0c4847cf2e",
+      "name": "Code1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "=https://asugoldenrams.com/{{ $json.value }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        -280
+      ],
+      "id": "f613d673-c7e8-4eed-a5b7-8dda1765fdd7",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = items[0].json.data;\nconst rows = html.match(/<tr>(.*?)<\\/tr>/gs);\n\nconst players = [];\n\nif (rows) {\n  for (const row of rows) {\n    const getCell = (cls) => {\n      const match = row.match(new RegExp(`<td class=\".*?${cls}.*?\">(.*?)<\\\\/td>`, 's'));\n      return match ? match[1].replace(/<[^>]*>/g, '').trim() : null;\n    };\n\n    const nameMatch = row.match(/<td class=\".*?sidearm-table-player-name.*?\">.*?<a .*?>(.*?)<\\/a>/s);\n    const name = nameMatch ? nameMatch[1].trim() : null;\n\n    const imgMatch = row.match(/<img[^>]*data-src=['\"]([^'\"]+)['\"]/);\n    const image = imgMatch ? `https://asugoldenrams.com${imgMatch[1]}` : null;\n\n    const player = {\n      name,\n      position: getCell('rp_position_short'),\n      number: getCell('roster_jerseynum'),\n      height: getCell('height'),\n      weight: getCell('rp_weight'),\n      class: getCell('roster_class'),\n      hometown: getCell('player_hometown'),\n      school: getCell('player_previous_school'),\n      image,\n    };\n\n    // Remove null fields\n    const cleaned = Object.fromEntries(\n      Object.entries(player).filter(([_, value]) => value !== null)\n    );\n\n    players.push(cleaned);\n  }\n}\n\nreturn players.map(player => ({ json: player }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -280
+      ],
+      "id": "1f2670c3-2ee6-415d-b8f4-760122dd13b7",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "138B1tXLKWl6Qt4VK_ZFHCBOnZHY6zYuuD69C8WuARFs",
+          "mode": "list",
+          "cachedResultName": "asugoldenrams",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/138B1tXLKWl6Qt4VK_ZFHCBOnZHY6zYuuD69C8WuARFs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/138B1tXLKWl6Qt4VK_ZFHCBOnZHY6zYuuD69C8WuARFs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NAME": "={{ $json.name }}",
+            "SPORT": "={{ $json.sport }}",
+            "SCHOOL": "={{ $json.school }}",
+            "HOMETOWN": "={{ $json.hometown }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "NAME",
+              "displayName": "NAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SPORT",
+              "displayName": "SPORT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SCHOOL",
+              "displayName": "SCHOOL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HOMETOWN",
+              "displayName": "HOMETOWN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        740,
+        -1740
+      ],
+      "id": "cd0a0897-f0ca-4ed2-82e1-bb5e528e1f26",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MYJ51fHpcG8U7E9j",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -280
+      ],
+      "id": "ee1d00ad-e0be-41fb-873a-e001b307a96b",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4",
+          "mode": "list",
+          "cachedResultName": "Linkes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "path": "={{ $json.rosterValues }}"
+          },
+          "matchingColumns": [
+            "path"
+          ],
+          "schema": [
+            {
+              "id": "path",
+              "displayName": "path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -20,
+        -280
+      ],
+      "id": "df25a923-4df8-484c-b161-a8c9d24fd496",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MYJ51fHpcG8U7E9j",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "6b2b24db-72b1-469d-af70-bdedf94e8d1d",
+      "name": "Split In Batches1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -280
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -20
+      ],
+      "id": "0f523d81-075e-4d2b-a26a-6db603cf8aa8",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -600,
+        -1380
+      ],
+      "id": "533369fb-beb8-4604-a5e3-6c1d38853168",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4",
+          "mode": "list",
+          "cachedResultName": "Linkes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4/edit#gid=0"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -380,
+        -1380
+      ],
+      "id": "e2d85ddc-d837-4b4a-88f1-4175d643ca1d",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MYJ51fHpcG8U7E9j",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -1380
+      ],
+      "id": "8b5a4aae-a3c0-46e3-ad60-b746b827572c",
+      "name": "Limit2"
+    },
+    {
+      "parameters": {
+        "url": "=https://asugoldenrams.com/{{ $json.path }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        -1380
+      ],
+      "id": "84eca865-74e4-4e62-bed7-c840ea5e3d2a",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and extract player data from HTML\nfor (const item of $input.all()) {\n  const html = item.json.data || item.json.html || item.json.content;\n  \n  if (!html) {\n    continue;\n  }\n  \n  // Extract sport from the HTML content\n  let sport = null;\n  \n  // Method 1: Look for sport in the page title/heading\n  const titleMatch = html.match(/<h2[^>]*>(\\d+)\\s+(\\w+(?:\\s+\\w+)*)\\s+Roster<\\/h2>/i);\n  if (titleMatch) {\n    sport = titleMatch[2].toLowerCase().replace(/\\s+/g, '-');\n  }\n  \n  // Method 2: Look for sport in URL patterns\n  if (!sport) {\n    const urlMatch = html.match(/\\/sports\\/([^\\/]+)\\/roster/);\n    if (urlMatch) {\n      sport = urlMatch[1];\n    }\n  }\n  \n  // Method 3: Look for sport in navigation or breadcrumbs\n  if (!sport) {\n    const navMatch = html.match(/\"shortname\":\"([^\"]+)\"/);\n    if (navMatch) {\n      sport = navMatch[1];\n    }\n  }\n  \n  const rows = html.match(/<tr>(.*?)<\\/tr>/gs);\n  const players = [];\n  \n  if (rows) {\n    for (const row of rows) {\n      // Only process rows that contain player data (have sidearm-table-player-name class)\n      if (!row.includes('sidearm-table-player-name')) {\n        continue;\n      }\n      \n      const getCell = (cls) => {\n        const match = row.match(new RegExp(`<td class=\".*?${cls}.*?\"[^>]*>(.*?)<\\\\/td>`, 's'));\n        return match ? match[1].replace(/<[^>]*>/g, '').trim() : null;\n      };\n      \n      // Extract player name\n      const nameMatch = row.match(/<td class=\".*?sidearm-table-player-name.*?\">.*?<a .*?>(.*?)<\\/a>/s);\n      const name = nameMatch ? nameMatch[1].trim() : null;\n      \n      // Extract image URL\n      const imgMatch = row.match(/<img[^>]*data-src=['\"]([^'\"]+)['\"]/);\n      const image = imgMatch ? `https://asugoldenrams.com${imgMatch[1]}` : null;\n      \n      // Only create player object if we have a name (indicates valid player row)\n      if (name) {\n        const player = {\n          name,\n          sport,\n          position: getCell('rp_position_short'),\n          number: getCell('roster_jerseynum'),\n          height: getCell('height'),\n          weight: getCell('rp_weight'),\n          class: getCell('roster_class'),\n          hometown: getCell('player_hometown'),\n          school: getCell('player_previous_school'),\n          image,\n        };\n        \n        // Remove null/empty fields\n        const cleaned = Object.fromEntries(\n          Object.entries(player).filter(([_, value]) => value !== null && value !== '')\n        );\n        \n        // Only add if we have meaningful data (more than just name)\n        if (Object.keys(cleaned).length > 1) {\n          players.push(cleaned);\n        }\n      }\n    }\n  }\n  \n  // Replace the item's json with the extracted players array\n  item.json = { players };\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        -1820
+      ],
+      "id": "ca628634-58b3-414f-a8a3-8c807380551e",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4",
+          "mode": "list",
+          "cachedResultName": "Linkes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4/edit#gid=0"
+        },
+        "startIndex": "={{ $('Limit2').item.json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        600,
+        -1320
+      ],
+      "id": "2aa91141-e026-4c74-a14b-2bbc8bddfa8b",
+      "name": "Google Sheets3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MYJ51fHpcG8U7E9j",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "rosterValues",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        -420
+      ],
+      "id": "9c3bbf9d-3ab0-48ed-a60d-18c783e227eb",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "players",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -1640
+      ],
+      "id": "4942f11a-4caf-442d-8161-df6e7fed8475",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ufPTZ6E78j6I48HC",
+          "mode": "list",
+          "cachedResultName": "asugoldenrams"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "cursor",
+              "displayName": "cursor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "_data",
+              "displayName": "_data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -1320
+      ],
+      "id": "8b5a97e5-3162-4814-bdfb-455f3266f1f1",
+      "name": "Execute Workflow1"
+    },
+    {
+      "parameters": {
+        "path": "2dfe7db1-0844-4f21-b6b1-1c5e717f295c",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        -280
+      ],
+      "id": "c3b0743a-0c45-4fc0-b55d-fb965a8c3af8",
+      "name": "Webhook1",
+      "webhookId": "2dfe7db1-0844-4f21-b6b1-1c5e717f295c"
+    },
+    {
+      "parameters": {
+        "path": "0a5aed03-323b-4cc5-9b39-4ab69ef20bf5",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -680,
+        -1080
+      ],
+      "id": "b2967378-5d7a-46ae-a4da-ac37eb9806f1",
+      "name": "Webhook2",
+      "webhookId": "0a5aed03-323b-4cc5-9b39-4ab69ef20bf5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $json[\"data\"] || \"\";\n\nconst output = [];\n\n// Extract the sport and year from the header\nconst headerMatch = html.match(/<h2[^>]*>(\\d{4}) ([^<]+?) Roster<\\/h2>/);\nconst year = headerMatch ? headerMatch[1] : \"UnknownYear\";\nconst sport = headerMatch ? headerMatch[2].trim() : \"UnknownSport\";\n\n// Extract all player blocks\nconst playerBlocks = html.match(/<li class=\"sidearm-roster-player\"[\\s\\S]*?<\\/li>/g) || [];\n\nfor (const block of playerBlocks) {\n    const nameMatch = block.match(/aria-label=\"([^\"]+?) - View Full Bio\"/);\n    const yearMatch = block.match(/<span class=\"sidearm-roster-player-academic-year[^>]*?\">([^<]+)<\\/span>/);\n    const prevSchoolMatch = block.match(/<span class=\"sidearm-roster-player-previous-school\">([^<]+)<\\/span>/);\n    const highschoolMatch = block.match(/<span class=\"sidearm-roster-player-highschool\">([^<]+)<\\/span>/);\n    const hometownMatch = block.match(/<span class=\"sidearm-roster-player-hometown\">([^<]+)<\\/span>/);\n\n    const name = nameMatch ? nameMatch[1].trim() : null;\n    const academicYear = yearMatch ? yearMatch[1].trim() : null;\n    const school = prevSchoolMatch ? prevSchoolMatch[1].trim() : (highschoolMatch ? highschoolMatch[1].trim() : null);\n    const hometown = hometownMatch ? hometownMatch[1].trim() : null;\n\n    if (name) {\n        const player = {\n            name,\n            sport,\n            rosterYear: parseInt(year),\n            academicYear,\n            school,\n            hometown,\n        };\n\n        // Remove null/empty fields\n        const cleaned = Object.fromEntries(\n            Object.entries(player).filter(([_, value]) => value !== null && value !== \"\")\n        );\n\n        // Only include if we have more than just the name\n        if (Object.keys(cleaned).length > 1) {\n            output.push(cleaned);\n        }\n    }\n}\n\n// Return flat list of players\nreturn [{ json: { players: output } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        -1380
+      ],
+      "id": "4e6497ab-5eb3-499a-9026-2f4dad36e3b0",
+      "name": "Code4"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Limit2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        []
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2c58ec17-e8ea-4ce4-a958-acaac26f021a",
+  "triggerCount": 2,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-06-19T09:32:42.560Z",
+      "updatedAt": "2025-06-19T09:32:42.560Z",
+      "role": "workflow:owner",
+      "workflowId": "ufPTZ6E78j6I48HC",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

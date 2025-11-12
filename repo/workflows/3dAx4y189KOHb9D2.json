@@ -1,0 +1,1297 @@
+{
+  "createdAt": "2025-08-20T06:56:24.648Z",
+  "updatedAt": "2025-08-20T10:32:06.027Z",
+  "id": "3dAx4y189KOHb9D2",
+  "name": "Clipping",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "08a68587-189d-48fd-8274-9d05cf52e2fd",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "content": "## Step 1: Get Longform",
+        "height": 112,
+        "width": 624,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        0
+      ],
+      "id": "20dad929-a904-4ddf-8b1a-eb8294a9a076",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.klap.app/v2/tasks/video-to-shorts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"source_video_url\": \"{{ $json.longform_links }}\",\n  \"language\": \"en\",\n  \"target_clip_count\": 2,\n  \"max_clip_count\": 2,\n  \"editing_options\": {\n    \"captions\": true,\n    \"reframe\": true,\n    \"emojis\": true,\n    \"remove_silences\": true,\n    \"intro_title\": false\n  },\n  \"dimensions\": {\n    \"width\": 1080,\n    \"height\": 1920\n  },\n  \"min_duration\": 15,\n  \"max_duration\": 60,\n  \"target_duration\": 30\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        160
+      ],
+      "id": "6ce8c3dc-2c7b-4145-9157-a9911ef753ab",
+      "name": "Analyze Longform",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "MoOzBggpmmvQVB88",
+          "name": "klap"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        160
+      ],
+      "id": "5a92efad-75a6-4270-85d7-4d84fff2bd63",
+      "name": "Wait",
+      "webhookId": "442f9c22-2bf5-4153-a57a-da46dbc255c6"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg",
+          "mode": "list",
+          "cachedResultName": "Clip",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "production_status",
+              "lookupValue": "for production"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "76adf8d0-6998-436f-84fd-1cd8f635e8e2",
+      "name": "Get Longform",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "rlYFSFYWd7x1OVdw",
+          "name": "kefe2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.klap.app/v2/tasks/{{$json.id}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        432,
+        160
+      ],
+      "id": "1b6cb6b2-5cbd-4e4d-b2e6-fbe16beffa8e",
+      "name": "Check status",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "MoOzBggpmmvQVB88",
+          "name": "klap"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c175a82a-23d9-402b-8984-2ca5db508c2e",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        640,
+        160
+      ],
+      "id": "3b59edca-499a-4f51-b73c-f4d8ff553a14",
+      "name": "Ready?"
+    },
+    {
+      "parameters": {
+        "content": "## Step 2: Analyze Longform",
+        "height": 96,
+        "width": 512,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        160
+      ],
+      "id": "4e95f5db-ebfc-4b77-94e2-ac64e27a9c31",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.klap.app/v2/projects/{{  $json.folder_id}}/{{ $json.id }}/exports",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"present_id\":\"123\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        304
+      ],
+      "id": "ed9ad1ae-c6ab-4069-8a33-4518f3a8ae62",
+      "name": "Export Shorts",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "MoOzBggpmmvQVB88",
+          "name": "klap"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        304
+      ],
+      "id": "79809421-c533-4808-b471-0f942ad4c7bd",
+      "name": "Wait1",
+      "webhookId": "786775d3-9ba5-40a4-aa40-fdf08b1fa95d"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.klap.app/v2/projects/{{  $json.folder_id}}/{{ $json.id }}/exports/{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        320
+      ],
+      "id": "02e7bf7c-2c14-4bc4-8c63-1064de976b5a",
+      "name": "Get Shorts",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "MoOzBggpmmvQVB88",
+          "name": "klap"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b1141c56-7f42-4b24-bfb1-77106a897ffe",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        320
+      ],
+      "id": "0a8687c6-059e-4f1a-8330-262d15a70326",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "## Step 3: Produce Shorts",
+        "height": 96,
+        "width": 400,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        304
+      ],
+      "id": "fceaaf22-ccff-4c56-b796-4d375fb09970",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.klap.app/v2/projects/{{$json.output_id}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        832,
+        144
+      ],
+      "id": "a3541f3a-95d4-4da4-a611-c9c5fe5cf46c",
+      "name": "Get Shorts Details",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "MoOzBggpmmvQVB88",
+          "name": "klap"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://upload.com",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        464
+      ],
+      "id": "d19f8bc0-1d68-4e8b-b3ae-f3efd08753c8",
+      "name": "Load Shorts"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://tiktok.com",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        576
+      ],
+      "id": "79e8e5ce-713b-403f-98d1-82b00a88bdf6",
+      "name": "TIKTOK"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://youtube.com",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        448
+      ],
+      "id": "834fca97-6b3d-4015-8a93-cd80bfa3f304",
+      "name": "YOUTUBE"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://instagram.com",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        704
+      ],
+      "id": "5d013c93-04a2-48c2-b4d4-5c54f35dbe02",
+      "name": "INSTAGRAM"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://linkedin.com",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        832
+      ],
+      "id": "651c4ad5-2b65-4a4f-a097-5ed365caa1a9",
+      "name": "LINKEDIN"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg",
+          "mode": "list",
+          "cachedResultName": "Clip",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "production_status": "done",
+            "id": "={{ $('Get Longform').first().json.id }}",
+            "date_produced": "={{ new Date().toISOString().split('T')[0] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "longform_links",
+              "displayName": "longform_links",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "production_status",
+              "displayName": "production_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_produced",
+              "displayName": "date_produced",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        320
+      ],
+      "id": "56cabb14-cf6b-4b0b-b978-9a5365e6fe38",
+      "name": "Update Longform",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "rlYFSFYWd7x1OVdw",
+          "name": "kefe2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg",
+          "mode": "list",
+          "cachedResultName": "Clip",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 398712933,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg/edit#gid=398712933"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "shortform_links": "={{ $('Get Shorts').item.json.src_url }}",
+            "tiktok_caption": "={{ $('Get Shorts Details').item.json.publication_captions.tiktok }}",
+            "youtube_caption": "={{ $('Get Shorts Details').item.json.publication_captions.youtube }}",
+            "instagram_caption": "={{ $('Get Shorts Details').item.json.publication_captions.instagram }}",
+            "linkedin_caption": "={{ $('Get Shorts Details').item.json.publication_captions.linkedin }}",
+            "publishing_status": "for publishing",
+            "date_published": "={{ new Date().toISOString().split('T')[0] }}",
+            "id": "==ROW()-1"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "shortform_links",
+              "displayName": "shortform_links",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tiktok_caption",
+              "displayName": "tiktok_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "instagram_caption",
+              "displayName": "instagram_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "youtube_caption",
+              "displayName": "youtube_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "linkedin_caption",
+              "displayName": "linkedin_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "publishing_status",
+              "displayName": "publishing_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_published",
+              "displayName": "date_published",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        464
+      ],
+      "id": "db407390-088d-4f99-baf0-f36b09bf4ff2",
+      "name": "Insert Shorts info",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "rlYFSFYWd7x1OVdw",
+          "name": "kefe2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg",
+          "mode": "list",
+          "cachedResultName": "Clip",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 398712933,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/181ZabKw_FjPVr7_3FxeSnLX_NDQCEJs8tMb_aHRg2wg/edit#gid=398712933"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "shortform_links": "={{ $('Insert Shorts info').item.json.shortform_links }}",
+            "publishing_status": "done",
+            "date_published": "={{ new Date().toISOString().split('T')[0] }}"
+          },
+          "matchingColumns": [
+            "shortform_links"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "shortform_links",
+              "displayName": "shortform_links",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tiktok_caption",
+              "displayName": "tiktok_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "instagram_caption",
+              "displayName": "instagram_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "youtube_caption",
+              "displayName": "youtube_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "linkedin_caption",
+              "displayName": "linkedin_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "publishing_status",
+              "displayName": "publishing_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_published",
+              "displayName": "date_published",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1040,
+        960
+      ],
+      "id": "a1f63aa9-72b1-4924-a124-da43f7448b18",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "rlYFSFYWd7x1OVdw",
+          "name": "kefe2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Step 3:Publishing",
+        "height": 96,
+        "width": 336,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        448
+      ],
+      "id": "fb15a12b-3d2d-4801-ae6a-6ed46e9b749c",
+      "name": "Sticky Note3"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Longform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Longform": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Check status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Longform": {
+      "main": [
+        [
+          {
+            "node": "Analyze Longform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check status": {
+      "main": [
+        [
+          {
+            "node": "Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ready?": {
+      "main": [
+        [
+          {
+            "node": "Get Shorts Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Export Shorts": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Get Shorts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Shorts": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Update Longform",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Shorts Details": {
+      "main": [
+        [
+          {
+            "node": "Export Shorts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Shorts": {
+      "main": [
+        [
+          {
+            "node": "TIKTOK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "INSTAGRAM",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "YOUTUBE",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LINKEDIN",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Longform": {
+      "main": [
+        [
+          {
+            "node": "Insert Shorts info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Shorts info": {
+      "main": [
+        [
+          {
+            "node": "Load Shorts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {}
+      }
+    ],
+    "Wait": [
+      {
+        "json": {
+          "id": "Ltbb1aXgOX4RgOD1",
+          "type": "video-to-shorts",
+          "status": "processing",
+          "error_code": null,
+          "created_at": "2025-08-20T08:03:17.022Z",
+          "output_type": "folder",
+          "output_id": "vQkI2oMh"
+        }
+      }
+    ],
+    "Get Longform": [
+      {
+        "json": {
+          "row_number": 2,
+          "id": 1,
+          "longform_links": "https://youtu.be/4N9MCa4hCsA?si=CmwB1zcgP-lOINXX",
+          "production_status": "for production",
+          "date_produced": ""
+        }
+      }
+    ],
+    "Check status": [
+      {
+        "json": {
+          "id": "Ltbb1aXgOX4RgOD1",
+          "type": "video-to-shorts",
+          "status": "ready",
+          "error_code": null,
+          "created_at": "2025-08-20T08:03:17.022Z",
+          "output_type": "folder",
+          "output_id": "vQkI2oMh"
+        }
+      }
+    ],
+    "Ready?": [
+      {
+        "json": {
+          "id": "Ltbb1aXgOX4RgOD1",
+          "type": "video-to-shorts",
+          "status": "ready",
+          "error_code": null,
+          "created_at": "2025-08-20T08:03:17.022Z",
+          "output_type": "folder",
+          "output_id": "vQkI2oMh"
+        }
+      }
+    ],
+    "Wait1": [
+      {
+        "json": {
+          "id": "472dbb6b-8282-4947-a1b4-57a6ad925208",
+          "status": "processing",
+          "src_url": null,
+          "estimated_ready_at": "2025-08-20T08:31:48.658Z",
+          "project_id": "Rln5FqzdWVyf",
+          "created_at": "2025-08-20T08:31:24.658Z",
+          "name": "The Future of AI in Filmmaking: Collaborating with Human Creators",
+          "author_id": "c214df06-19b5-4962-a6e1-8a1820942bd2",
+          "folder_id": "vQkI2oMh",
+          "descriptions": null
+        }
+      },
+      {
+        "json": {
+          "id": "3ba96cef-d2d3-4242-8500-f3535564d098",
+          "status": "processing",
+          "src_url": null,
+          "estimated_ready_at": "2025-08-20T08:32:22.680Z",
+          "project_id": "dlk12OqFVnhC",
+          "created_at": "2025-08-20T08:31:24.680Z",
+          "name": "The Evolution of AI: A Discovery vs. Invention Debate",
+          "author_id": "c214df06-19b5-4962-a6e1-8a1820942bd2",
+          "folder_id": "vQkI2oMh",
+          "descriptions": null
+        }
+      }
+    ],
+    "Get Shorts Details": [
+      {
+        "json": {
+          "id": "Rln5FqzdWVyf",
+          "author_id": "c214df06-19b5-4962-a6e1-8a1820942bd2",
+          "folder_id": "vQkI2oMh",
+          "name": "The Future of AI in Filmmaking: Collaborating with Human Creators",
+          "created_at": "2025-08-20T08:20:26.201+00:00",
+          "updated_at": "2025-08-20T08:21:27.661177+00:00",
+          "virality_score": 85,
+          "virality_score_explanation": "The video discusses a trending topic—AI in filmmaking—which is highly relevant and intriguing to a wide audience. The collaboration between AI and human creators adds a unique angle that can spark discussions and shares. The short duration makes it easily consumable, but it could benefit from more visual elements or examples to enhance engagement.",
+          "publication_captions": {
+            "tiktok": "🤖🎬 AI + humans = next-level filmmaking! What do you think? Could this be the future? 👀 #Filmmaking #AI",
+            "youtube": "🤖🎬 Can AI and humans create movie magic together? Let’s find out! 👀 #Filmmaking #AI",
+            "linkedin": "🤖🎬 Can AI & humans create movie magic together? Let's find out! 👀 #FutureOfFilm #AI",
+            "instagram": "🤖🎬 Can AI & humans team up for epic films? What do you think? Drop your thoughts! 👇 #Filmmaking #AI"
+          },
+          "transcript_text": "I think these models will be capable of producing really compelling videos. They'll be able to do it in concert with human directors, human actors, and so forth. I think that Aronofsky film does have, it has a combination of like, you know, real life sort of acting combined with AI generation in, in a pretty cool way."
+        }
+      },
+      {
+        "json": {
+          "id": "dlk12OqFVnhC",
+          "author_id": "c214df06-19b5-4962-a6e1-8a1820942bd2",
+          "folder_id": "vQkI2oMh",
+          "name": "The Evolution of AI: A Discovery vs. Invention Debate",
+          "created_at": "2025-08-20T08:20:32.277+00:00",
+          "updated_at": "2025-08-20T08:21:32.875133+00:00",
+          "virality_score": 85,
+          "virality_score_explanation": "The video tackles a thought-provoking topic about AI, which is highly relevant and sparks curiosity. The conversational tone invites viewers to engage with the debate, and the use of rhetorical questions encourages interaction. However, the pacing could be improved to maintain viewer attention throughout the entire duration.",
+          "publication_captions": {
+            "tiktok": "🤔 Is AI a discovery or an invention? Let’s dive into this debate! 💡 What do you think? #AI #DiscoveryVsInvention",
+            "youtube": "Is AI a cosmic discovery or our greatest invention? 🤔💡 Let's debate! #AI #DiscoveryVsInvention",
+            "linkedin": "🤖 Is AI a discovery or an invention? 🤔 Dive in and share your thoughts! #AI #Debate",
+            "instagram": "Is AI a discovery or an invention? 🤔 Let's dive deep! 💡 What do you think? #AI #Debate"
+          },
+          "transcript_text": "do you believe that AI is fundamentally more of a discovery than an invention? Do you feel like this is some emergent property of the universe and we're just stumbling upon it? Or is this like the ultimate test of human creation? Well, I mean, I guess both of those things that you said are distinct. from what the web might have been. I mean, yeah, I think it's a discovery in the sense like we simply do not know what is the limit to intelligence. There's no law that says, you know, can you be 100 times smarter than Einstein? Can you be a billion times smarter? Can you be a Google times smarter? You know, there's no, I think we have just no idea what the laws governing that are. And So, yeah, I guess you could call it a discovery of sorts."
+        }
+      }
+    ],
+    "Export Shorts": [
+      {
+        "json": {
+          "id": "7c75a72a-f429-4aa8-922d-2367c8e3d2f5",
+          "status": "processing",
+          "src_url": null,
+          "estimated_ready_at": "2025-08-20T09:15:03.052Z",
+          "project_id": "Rln5FqzdWVyf",
+          "created_at": "2025-08-20T09:14:39.052Z",
+          "name": "The Future of AI in Filmmaking: Collaborating with Human Creators",
+          "author_id": "c214df06-19b5-4962-a6e1-8a1820942bd2",
+          "folder_id": "vQkI2oMh",
+          "descriptions": null
+        }
+      },
+      {
+        "json": {
+          "id": "6652f879-de0c-4772-b158-71f240f2a0c6",
+          "status": "processing",
+          "src_url": null,
+          "estimated_ready_at": "2025-08-20T09:15:37.044Z",
+          "project_id": "dlk12OqFVnhC",
+          "created_at": "2025-08-20T09:14:39.044Z",
+          "name": "The Evolution of AI: A Discovery vs. Invention Debate",
+          "author_id": "c214df06-19b5-4962-a6e1-8a1820942bd2",
+          "folder_id": "vQkI2oMh",
+          "descriptions": null
+        }
+      }
+    ],
+    "Get Shorts": [
+      {
+        "json": {
+          "id": "472dbb6b-8282-4947-a1b4-57a6ad925208",
+          "status": "ready",
+          "src_url": "https://storage.googleapis.com/klap-renders/3AAlIRvORH4ehmsF.mp4",
+          "estimated_ready_at": "2025-08-20T08:31:48.658Z",
+          "project_id": "Rln5FqzdWVyf",
+          "created_at": "2025-08-20T08:31:24.658Z",
+          "finished_at": "2025-08-20T08:31:47.784Z",
+          "name": "The Future of AI in Filmmaking: Collaborating with Human Creators",
+          "author_id": "c214df06-19b5-4962-a6e1-8a1820942bd2",
+          "folder_id": "vQkI2oMh",
+          "descriptions": null
+        }
+      },
+      {
+        "json": {
+          "id": "3ba96cef-d2d3-4242-8500-f3535564d098",
+          "status": "ready",
+          "src_url": "https://storage.googleapis.com/klap-renders/oJD6ghvE3A7G4Mim.mp4",
+          "estimated_ready_at": "2025-08-20T08:32:22.680Z",
+          "project_id": "dlk12OqFVnhC",
+          "created_at": "2025-08-20T08:31:24.680Z",
+          "finished_at": "2025-08-20T08:32:18.818Z",
+          "name": "The Evolution of AI: A Discovery vs. Invention Debate",
+          "author_id": "c214df06-19b5-4962-a6e1-8a1820942bd2",
+          "folder_id": "vQkI2oMh",
+          "descriptions": null
+        }
+      }
+    ],
+    "If": [
+      {
+        "json": {
+          "id": "472dbb6b-8282-4947-a1b4-57a6ad925208",
+          "status": "ready",
+          "src_url": "https://storage.googleapis.com/klap-renders/3AAlIRvORH4ehmsF.mp4",
+          "estimated_ready_at": "2025-08-20T08:31:48.658Z",
+          "project_id": "Rln5FqzdWVyf",
+          "created_at": "2025-08-20T08:31:24.658Z",
+          "finished_at": "2025-08-20T08:31:47.784Z",
+          "name": "The Future of AI in Filmmaking: Collaborating with Human Creators",
+          "author_id": "c214df06-19b5-4962-a6e1-8a1820942bd2",
+          "folder_id": "vQkI2oMh",
+          "descriptions": null
+        }
+      },
+      {
+        "json": {
+          "id": "3ba96cef-d2d3-4242-8500-f3535564d098",
+          "status": "ready",
+          "src_url": "https://storage.googleapis.com/klap-renders/oJD6ghvE3A7G4Mim.mp4",
+          "estimated_ready_at": "2025-08-20T08:32:22.680Z",
+          "project_id": "dlk12OqFVnhC",
+          "created_at": "2025-08-20T08:31:24.680Z",
+          "finished_at": "2025-08-20T08:32:18.818Z",
+          "name": "The Evolution of AI: A Discovery vs. Invention Debate",
+          "author_id": "c214df06-19b5-4962-a6e1-8a1820942bd2",
+          "folder_id": "vQkI2oMh",
+          "descriptions": null
+        }
+      }
+    ],
+    "Load Shorts": [
+      {
+        "json": {
+          "data": "<!doctype html><html itemscope=\"\" itemtype=\"http://schema.org/WebPage\" lang=\"da\"><head><meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\"><meta content=\"/images/branding/googleg/1x/googleg_standard_color_128dp.png\" itemprop=\"image\"><title>Google</title><script nonce=\"oeNclwptpSXTFZtxd0xmSw\">(function(){var _g={kEI:'BZKlaIq7DOKRxc8Pl5qc-Ac',kEXPI:'0,202854,2,4132107,201864,142932,247320,42724,5230281,11,11389,5988648,30823995,25228681,117307,13349,7612,79286,6748,23880,9139,4598,328,6226,1116,53074,9975,15049,49,9054,6531,58708,10905,2,1,37334,39,5932,353,2268,1832,14780,3118,8682,1784,5774,8975,18636,4719,2549,9256,6251,35,942,8016,7945,8135,3973,5683,3604,16010,1762,19280,678,3547,3,5746,3,5895,1186,1857,1761,203,1018,1,3463,2,213,3975,7,480,1491,1032,1579,2254,5,6574,1412,1337,3018,2747,2,4,1,320,4120,980,670,13017,3445,590,3986,2560,4518,1611,160,17,1872,290,1151,129,590,4,1378,136,3044,26,282,201,339,519,2844,403,148,2,124,101,1,22,1098,14,6,191,2,4,266,509,4,142,2,2,353,65,688,127,43,3358,24,793,9,461,241,113,476,1868,1139,4,358,1618,2,9,1,2038,1203,2,1047,647,2,672,152,3,277,1015,526,78,509,1448,1115,259,311,1168,150,37,2448,121,447,19,3156,25,760,10,27,712,1603,799,3,202,319,377,354,71,202,941,229,2,459,937,185,1225,168,966,242,326,1284,889,3,262,172,846,1537,18,959,565,196,240,1060,1150,765,11,254,241,7,67,574,110,32,3,1458,202,545,715,635,497,3,202,602,605,78,104,492,529,4,819,469,233,23,571,581,1017,390,2142,610,457,217,33,136,541,246,749,158,264,722,873,183,2,3,26,522,1215,257,33,161,40,9,86,103,10,384,27,381,626,5,268,764,1,228,2,166,280,1864,43,843,2,157,23,842,199,44,66,1950,1189,302,503,172,2,605,2018,569,10,20756110,375834,4,40239,5,2992,4,2700,260,3,1307,1343,2164,3677,2,1562,3,2162,280,3,798,3,1126,101,3843,144,1127,56,1437,164,1188,159,106,189,159,10349859,579',kBL:'YGxD',kOPI:89978449};(function(){var a;((a=window.google)==null?0:a.stvsc)?google.kEI=_g.kEI:window.google=_g;}).call(this);})();(function(){google.sn='webhp';google.kHL='da';})();(function(){\nvar g=this||self;function k(){return window.google&&window.google.kOPI||null};var l,m=[];function n(a){for(var b;a&&(!a.getAttribute||!(b=a.getAttribute(\"eid\")));)a=a.parentNode;return b||l}function p(a){for(var b=null;a&&(!a.getAttribute||!(b=a.getAttribute(\"leid\")));)a=a.parentNode;return b}function q(a){/^http:/i.test(a)&&window.location.protocol===\"https:\"&&(google.ml&&google.ml(Error(\"a\"),!1,{src:a,glmm:1}),a=\"\");return a}\nfunction r(a,b,d,c,h){var e=\"\";b.search(\"&ei=\")===-1&&(e=\"&ei=\"+n(c),b.search(\"&lei=\")===-1&&(c=p(c))&&(e+=\"&lei=\"+c));var f=b.search(\"&cshid=\")===-1&&a!==\"slh\";c=\"&zx=\"+Date.now().toString();g._cshid&&f&&(c+=\"&cshid=\"+g._cshid);(d=d())&&(c+=\"&opi=\"+d);return\"/\"+(h||\"gen_204\")+\"?atyp=i&ct=\"+String(a)+\"&cad=\"+(b+e+c)};l=google.kEI;google.getEI=n;google.getLEI=p;google.ml=function(){return null};google.log=function(a,b,d,c,h,e){e=e===void 0?k:e;d||(d=r(a,b,e,c,h));if(d=q(d)){a=new Image;var f=m.length;m[f]=a;a.onerror=a.onload=a.onabort=function(){delete m[f]};a.src=d}};google.logUrl=function(a,b){b=b===void 0?k:b;return r(\"\",a,b)};}).call(this);(function(){google.y={};google.sy={};function e(a,b,c){if(a)var d=a.id;else{do d=Math.random();while(c[d])}c[d]=[a,b]}var f;(f=google).x||(f.x=function(a,b){e(a,b,google.y)});var g;(g=google).sx||(g.sx=function(a,b){e(a,b,google.sy)});google.lm=[];var h;(h=google).plm||(h.plm=function(a){google.lm.push.apply(google.lm,a)});google.lq=[];var k;(k=google).load||(k.load=function(a,b,c){google.lq.push([[a],b,c])});var l;(l=google).loadAll||(l.loadAll=function(a,b){google.lq.push([a,b])});google.bx=!1;var m;(m=google).lx||(m.lx=function(){});var n=[],p;(p=google).fce||(p.fce=function(a,b,c,d){n.push([a,b,c,d])});google.qce=n;google.adl=[];}).call(this);google.f={};(function(){\ndocument.documentElement.addEventListener(\"submit\",function(b){var a;if(a=b.target){var c=a.getAttribute(\"data-submitfalse\");a=c===\"1\"||c===\"q\"&&!a.elements.q.value?!0:!1}else a=!1;a&&(b.preventDefault(),b.stopPropagation())},!0);document.documentElement.addEventListener(\"click\",function(b){var a;a:{for(a=b.target;a&&a!==document.documentElement;a=a.parentElement)if(a.tagName===\"A\"){a=a.getAttribute(\"data-nohref\")===\"1\";break a}a=!1}a&&b.preventDefault()},!0);}).call(this);</script><style>#gbar,#guser{font-size:13px;padding-top:1px !important;}#gbar{height:22px}#guser{padding-bottom:7px !important;text-align:right}.gbh,.gbd{border-top:1px solid #c9d7f1;font-size:1px}.gbh{height:0;position:absolute;top:24px;width:100%}@media all{.gb1{height:22px;margin-right:.5em;vertical-align:top}#gbar{float:left}}a.gb1,a.gb4{text-decoration:underline !important}a.gb1,a.gb4{color:#00c !important}.gbi .gb4{color:#dd8e27 !important}.gbf .gb4{color:#900 !important}\n</style><style>body,td,a,p,.h{font-family:sans-serif}body{margin:0;overflow-y:scroll}#gog{padding:3px 8px 0}td{line-height:.8em}.gac_m td{line-height:17px}form{margin-bottom:20px}.h{color:#1967d2}em{font-weight:bold;font-style:normal}.lst{height:25px;width:496px}.gsfi,.lst{font:18px sans-serif}.gsfs{font:17px sans-serif}.ds{display:inline-box;display:inline-block;margin:3px 0 4px;margin-left:4px}input{font-family:inherit}body{background:#fff;color:#1f1f1f}a{color:#681da8;text-decoration:none}a:hover,a:active{text-decoration:underline}.fl a{color:#1967d2}a:visited{color:#681da8}.sblc{padding-top:5px}.sblc a{display:block;margin:2px 0;margin-left:13px;font-size:11px}.lsbb{background:#f8f9fa;border:solid 1px;border-color:#dadce0 #70757a #70757a #dadce0;height:30px}.lsbb{display:block}#WqQANb a{display:inline-block;margin:0 12px}.lsb{background:url(/images/nav_logo229.png) 0 -261px repeat-x;color:#1f1f1f;border:none;cursor:pointer;height:30px;margin:0;outline:0;font:15px sans-serif;vertical-align:top}.lsb:active{background:#dadce0}.lst:focus{outline:none}.Ucigb{width:458px}</style><script nonce=\"oeNclwptpSXTFZtxd0xmSw\">(function(){window.google.erd={jsr:1,bv:2274,de:true,dpf:'YzvYrUIxI1tDnw-LhDDYjYm2EWrWqBDyC64AoxB1veg'};\nvar g=this||self;var k,l=(k=g.mei)!=null?k:1,m,p=(m=g.diel)!=null?m:0,q,r=(q=g.sdo)!=null?q:!0,t=0,u,w=google.erd,x=w.jsr;google.ml=function(a,b,d,n,e){e=e===void 0?2:e;b&&(u=a&&a.message);d===void 0&&(d={});d.cad=\"ple_\"+google.ple+\".aple_\"+google.aple;if(google.dl)return google.dl(a,e,d,!0),null;b=d;if(x<0){window.console&&console.error(a,b);if(x===-2)throw a;b=!1}else b=!a||!a.message||a.message===\"Error loading script\"||t>=l&&!n?!1:!0;if(!b)return null;t++;d=d||{};b=encodeURIComponent;var c=\"/gen_204?atyp=i&ei=\"+b(google.kEI);google.kEXPI&&(c+=\"&jexpid=\"+b(google.kEXPI));c+=\"&srcpg=\"+b(google.sn)+\"&jsr=\"+b(w.jsr)+\n\"&bver=\"+b(w.bv);w.dpf&&(c+=\"&dpf=\"+b(w.dpf));var f=a.lineNumber;f!==void 0&&(c+=\"&line=\"+f);var h=a.fileName;h&&(h.indexOf(\"-extension:/\")>0&&(e=3),c+=\"&script=\"+b(h),f&&h===window.location.href&&(f=document.documentElement.outerHTML.split(\"\\n\")[f],c+=\"&cad=\"+b(f?f.substring(0,300):\"No script found.\")));google.ple&&google.ple===1&&(e=2);c+=\"&jsel=\"+e;for(var v in d)c+=\"&\",c+=b(v),c+=\"=\",c+=b(d[v]);c=c+\"&emsg=\"+b(a.name+\": \"+a.message);c=c+\"&jsst=\"+b(a.stack||\"N/A\");c.length>=12288&&(c=c.substring(0,12288));a=c;n||google.log(0,\"\",a);return a};window.onerror=function(a,b,d,n,e){u!==a&&(a=e instanceof Error?e:Error(a),d===void 0||\"lineNumber\"in a||(a.lineNumber=d),b===void 0||\"fileName\"in a||(a.fileName=b),google.ml(a,!1,void 0,!1,a.name===\"SyntaxError\"||a.message.substring(0,11)===\"SyntaxError\"||a.message.indexOf(\"Script error\")!==-1?3:p));u=null;r&&t>=l&&(window.onerror=null)};})();</script></head><body bgcolor=\"#fff\"><script nonce=\"oeNclwptpSXTFZtxd0xmSw\">(function(){var src='/images/nav_logo229.png';var iesg=false;document.body.onload = function(){window.n && window.n();if (document.images){new Image().src=src;}\nif (!iesg){document.f&&document.f.q.focus();document.gbqf&&document.gbqf.q.focus();}\n}\n})();</script><div id=\"mngb\"><div id=gbar><nobr><b class=gb1>S�gning</b> <a class=gb1 href=\"https://www.google.com/imghp?hl=da&tab=wi\">Billeder</a> <a class=gb1 href=\"http://maps.google.dk/maps?hl=da&tab=wl\">Maps</a> <a class=gb1 href=\"https://play.google.com/?hl=da&tab=w8\">Play</a> <a class=gb1 href=\"https://www.youtube.com/?tab=w1\">YouTube</a> <a class=gb1 href=\"https://news.google.com/?tab=wn\">Nyheder</a> <a class=gb1 href=\"https://mail.google.com/mail/?tab=wm\">Gmail</a> <a class=gb1 href=\"https://drive.google.com/?tab=wo\">Drev</a> <a class=gb1 style=\"text-decoration:none\" href=\"https://www.google.dk/intl/da/about/products?tab=wh\"><u>Mere</u> &raquo;</a></nobr></div><div id=guser width=100%><nobr><span id=gbn class=gbi></span><span id=gbf class=gbf></span><span id=gbe></span><a href=\"http://www.google.dk/history/optout?hl=da\" class=gb4>Webhistorik</a> | <a  href=\"/preferences?hl=da\" class=gb4>Indstillinger</a> | <a target=_top id=gb_70 href=\"https://accounts.google.com/ServiceLogin?hl=da&passive=true&continue=http://www.google.com/&ec=GAZAAQ\" class=gb4>Log ind</a></nobr></div><div class=gbh style=left:0></div><div class=gbh style=right:0></div></div><center><br clear=\"all\" id=\"lgpd\"><div id=\"XjhHGf\"><img alt=\"Google\" height=\"92\" src=\"/images/branding/googlelogo/1x/googlelogo_white_background_color_272x92dp.png\" style=\"padding:28px 0 14px\" width=\"272\" id=\"hplogo\"><br><br></div><form action=\"/search\" name=\"f\"><table cellpadding=\"0\" cellspacing=\"0\"><tr valign=\"top\"><td width=\"25%\">&nbsp;</td><td align=\"center\" nowrap=\"\"><input name=\"ie\" value=\"ISO-8859-1\" type=\"hidden\"><input value=\"da\" name=\"hl\" type=\"hidden\"><input name=\"source\" type=\"hidden\" value=\"hp\"><input name=\"biw\" type=\"hidden\"><input name=\"bih\" type=\"hidden\"><div class=\"ds\" style=\"height:32px;margin:4px 0\"><div style=\"position:relative;zoom:1\"><input class=\"lst Ucigb\" style=\"margin:0;padding:5px 8px 0 6px;vertical-align:top;color:#1f1f1f;padding-right:38px\" autocomplete=\"off\" value=\"\" title=\"Google-s�gning\" maxlength=\"2048\" name=\"q\" size=\"57\"><img src=\"/textinputassistant/tia.png\" style=\"position:absolute;cursor:pointer;right:5px;top:4px;z-index:300\" data-script-url=\"/textinputassistant/13/da_tia.js\" id=\"tsuid_BZKlaIq7DOKRxc8Pl5qc-Ac_1\" alt=\"\" height=\"23\" width=\"27\"><script nonce=\"oeNclwptpSXTFZtxd0xmSw\">(function(){var id='tsuid_BZKlaIq7DOKRxc8Pl5qc-Ac_1';document.getElementById(id).onclick = function(){var s = document.createElement('script');s.src = this.getAttribute('data-script-url');document.body.appendChild(s);};})();</script></div></div><br style=\"line-height:0\"><span class=\"ds\"><span class=\"lsbb\"><input class=\"lsb\" value=\"Google-s�gning\" name=\"btnG\" type=\"submit\"></span></span><span class=\"ds\"><span class=\"lsbb\"><input class=\"lsb\" id=\"tsuid_BZKlaIq7DOKRxc8Pl5qc-Ac_2\" value=\"Jeg pr�ver lykken\" name=\"btnI\" type=\"submit\"><script nonce=\"oeNclwptpSXTFZtxd0xmSw\">(function(){var id='tsuid_BZKlaIq7DOKRxc8Pl5qc-Ac_2';document.getElementById(id).onclick = function(){if (this.form.q.value){this.checked = 1;if (this.form.iflsig)this.form.iflsig.disabled = false;}\nelse top.location='/doodles/';};})();</script><input value=\"AOw8s4IAAAAAaKWgFTEQdIu-DVcVey7-KDOCFENYak6M\" name=\"iflsig\" type=\"hidden\"></span></span></td><td class=\"fl sblc\" align=\"left\" nowrap=\"\" width=\"25%\"><a href=\"/advanced_search?hl=da&amp;authuser=0\">Avanceret s�gning</a></td></tr></table><input id=\"gbv\" name=\"gbv\" type=\"hidden\" value=\"1\"><script nonce=\"oeNclwptpSXTFZtxd0xmSw\">(function(){var a,b=\"1\";if(document&&document.getElementById)if(typeof XMLHttpRequest!=\"undefined\")b=\"2\";else if(typeof ActiveXObject!=\"undefined\"){var c,d,e=[\"MSXML2.XMLHTTP.6.0\",\"MSXML2.XMLHTTP.3.0\",\"MSXML2.XMLHTTP\",\"Microsoft.XMLHTTP\"];for(c=0;d=e[c++];)try{new ActiveXObject(d),b=\"2\"}catch(h){}}a=b;if(a==\"2\"&&location.search.indexOf(\"&gbv=2\")==-1){var f=google.gbvu,g=document.getElementById(\"gbv\");g&&(g.value=a);f&&window.setTimeout(function(){location.href=f},0)};}).call(this);</script></form><div style=\"font-size:83%;min-height:3.5em\"><br><div id=\"gws-output-pages-elements-homepage_additional_languages__als\"><style>#gws-output-pages-elements-homepage_additional_languages__als{font-size:small;margin-bottom:24px}#SIvCob{color:#545454;display:inline-block;line-height:28px;}#SIvCob a{}.H6sW5{display:inline-block;margin:0 2px;white-space:nowrap}.z4hgWe{display:inline-block;margin:0 2px}</style><div id=\"SIvCob\">Google er tilg�ngelig p�:  <a href=\"http://www.google.com/setprefs?sig=0_YSBC3pon58bCdLhAosNVfbN2s6Q%3D&amp;hl=fo&amp;source=homepage&amp;sa=X&amp;ved=0ahUKEwjK0d-6hpmPAxXiSPEDHRcNB38Q2ZgBCAY\">F�royskt</a>  </div></div></div><span id=\"footer\"><div style=\"font-size:10pt\"><div style=\"margin:19px auto;text-align:center\" id=\"WqQANb\"><a href=\"/intl/da/ads/\">Annoncering</a><a href=\"http://www.google.dk/intl/da/services/\">Virksomhedsl�sninger</a><a href=\"/intl/da/about.html\">Alt om Google</a><a href=\"http://www.google.com/setprefdomain?prefdom=DK&amp;prev=http://www.google.dk/&amp;sig=68a6e385K_PQX3Y5VHn5Hkeyw6LPj0Xo0HDHw%3D\">Google.dk</a></div></div><p style=\"font-size:8pt;color:#636363\">&copy; 2025 - <a href=\"/intl/da/policies/privacy/\">Privatliv</a> - <a href=\"/intl/da/policies/terms/\">Vilk�r</a></p></span></center><script nonce=\"oeNclwptpSXTFZtxd0xmSw\">(function(){window.google.cdo={height:757,width:1440};(function(){var a=window.innerWidth,b=window.innerHeight;if(!a||!b){var c=window.document,d=c.compatMode==\"CSS1Compat\"?c.documentElement:c.body;a=d.clientWidth;b=d.clientHeight}if(a&&b&&(a!=google.cdo.width||b!=google.cdo.height)){var e=google,f=e.log,g=\"/client_204?&atyp=i&biw=\"+a+\"&bih=\"+b+\"&ei=\"+google.kEI,h=\"\",k=window.google&&window.google.kOPI||null;k&&(h+=\"&opi=\"+k);f.call(e,\"\",\"\",g+h)};}).call(this);})();(function(){google.xjs={basecomb:'/xjs/_/js/k\\x3dxjs.hp.en.1ueFkAWGfbk.es5.O/ck\\x3dxjs.hp.qDu1HKdtnpU.L.X.O/am\\x3dAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAEgUAAAAAAAAAAAAAAgAAAADAlAAcAAAgABAgAAAAAAQAwAAAAAAASAAABQAAAAMR3BAAQiEUAAPAC/d\\x3d1/ed\\x3d1/dg\\x3d0/ujg\\x3d1/rs\\x3dACT90oEWEd3duiS0g8moY2iDOoxSWGG90g',basecss:'/xjs/_/ss/k\\x3dxjs.hp.qDu1HKdtnpU.L.X.O/am\\x3dAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAEAUAAAAAAAAAAAAAAgAAAADAFAAAAAAgABAgAAAAAAQAwAAAAAAASAAABQAAAAAAAAAAACA/rs\\x3dACT90oHlSD5nJTZYT6nhkxWhqpcRV0pM0g',basejs:'/xjs/_/js/k\\x3dxjs.hp.en.1ueFkAWGfbk.es5.O/am\\x3dAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAAAgAAAAAAgAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMR3BAAQgEUAAPAC/dg\\x3d0/rs\\x3dACT90oE36c124BDIzhcK_oRT9BSz-f4dmQ',excm:[]};})();(function(){var u='/xjs/_/js/k\\x3dxjs.hp.en.1ueFkAWGfbk.es5.O/am\\x3dAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAAAgAAAAAAgAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMR3BAAQgEUAAPAC/d\\x3d1/ed\\x3d1/dg\\x3d3/rs\\x3dACT90oE36c124BDIzhcK_oRT9BSz-f4dmQ/m\\x3dsb_he,d';var st=1;var amd=1000;var mmd=0;var pod=true;var pop=true;var povp=false;var fp='';\nvar e=this||self;function f(){var b,a,d;if(a=b=(a=window.google)==null?void 0:(d=a.ia)==null?void 0:d.r.B2Jtyd)a=b.m,a=a===1||a===5||a===6;return a&&b.cbfd!=null&&b.cbvi!=null?b:void 0};function g(){var b=[u];if(!google.dp){for(var a=0;a<b.length;a++){var d=b[a],c=document.createElement(\"link\");c.as=\"script\";c.href=d;c.rel=\"preload\";document.body.appendChild(c)}google.dp=!0}};google.ps===void 0&&(google.ps=[]);function h(){var b=u,a=function(){};google.lx=google.stvsc?a:function(){k(b);google.lx=a};google.bx||google.lx()}function l(b,a){a&&(b.src=a);fp&&google.caft&&google.caft(function(){b.fetchPriority=fp});var d=b.onload;b.onload=function(c){d&&d(c);google.ps=google.ps.filter(function(G){return b!==G})};google.ps.push(b);document.body.appendChild(b)}google.as=l;function k(b){google.timers&&google.timers.load&&google.tick&&google.tick(\"load\",\"xjsls\");var a=document.createElement(\"script\");a.onerror=function(){google.ple=1};a.onload=function(){google.ple=0};google.xjsus=void 0;l(a,b);google.aple=-1;google.dp=!0};function m(b){var a=b.getAttribute(\"jscontroller\");return(a===\"UBXHI\"||a===\"R3fhkb\"||a===\"TSZEqd\")&&b.hasAttribute(\"data-src\")}function n(){for(var b=document.getElementsByTagName(\"img\"),a=0,d=b.length;a<d;a++){var c=b[a];if(c.hasAttribute(\"data-lzy_\")&&Number(c.getAttribute(\"data-atf\"))&1&&!m(c))return!0}return!1}for(var p=document.getElementsByTagName(\"img\"),q=0,r=p.length;q<r;++q){var t=p[q];Number(t.getAttribute(\"data-atf\"))&1&&m(t)&&(t.src=t.getAttribute(\"data-src\"))};var w,x,y,z,A,B,C,D,E,F;function H(){google.xjsu=u;e._F_jsUrl=u;A=function(){h()};w=!1;x=(st===1||st===3)&&!!google.caft&&!n();y=f();z=(st===2||st===3)&&!!y&&!n();B=pod;C=pop;D=povp;E=pop&&document.prerendering||povp&&document.hidden;F=D?\"visibilitychange\":\"prerenderingchange\"}function I(){w||x||z||E||(A(),w=!0)}\nsetTimeout(function(){google&&google.tick&&google.timers&&google.timers.load&&google.tick(\"load\",\"xjspls\");H();if(x||z||E){if(x){var b=function(){x=!1;I()};google.caft(b);window.setTimeout(b,amd)}z&&(b=function(){z=!1;I()},y.cbvi.push(b),window.setTimeout(b,mmd));if(E){var a=function(){(D?document.hidden:document.prerendering)||(E=!1,I(),document.removeEventListener(F,a))};document.addEventListener(F,a,{passive:!0})}if(B||C||D)w||g()}else A()},0);})();window._ = window._ || {};window._DumpException = _._DumpException = function(e){throw e;};window._s = window._s || {};_s._DumpException = _._DumpException;window._qs = window._qs || {};_qs._DumpException = _._DumpException;(function(){var t=[0,16,0,0,0,0,67901504,0,4096,33554432,318849024,2867209,67110912,32,4129,12,1179648,17302528,1010827264,67109149,17800,3008];window._F_toggles = window._xjs_toggles = t;})();window._F_installCss = window._F_installCss || function(css){};(function(){google.jl={bfl:0,dw:false,eli:false,ine:false,ubm:false,uwp:true,vs:false};})();(function(){var pmc='{\\x22d\\x22:{},\\x22sb_he\\x22:{\\x22client\\x22:\\x22heirloom-hp\\x22,\\x22dh\\x22:true,\\x22ds\\x22:\\x22\\x22,\\x22host\\x22:\\x22google.com\\x22,\\x22jsonp\\x22:true,\\x22msgs\\x22:{\\x22cibl\\x22:\\x22Ryd s\\\\u00f8gning\\x22,\\x22dym\\x22:\\x22Mente du:\\x22,\\x22lcky\\x22:\\x22Jeg pr\\\\u00f8ver lykken\\x22,\\x22lml\\x22:\\x22F\\\\u00e5 flere oplysninger\\x22,\\x22psrc\\x22:\\x22Denne s\\\\u00f8gning blev fjernet fra din \\\\u003Ca href\\x3d\\\\\\x22/history\\\\\\x22\\\\u003EWebhistorik\\\\u003C/a\\\\u003E\\x22,\\x22psrl\\x22:\\x22Fjern\\x22,\\x22sbit\\x22:\\x22S\\\\u00f8g efter billede\\x22,\\x22srch\\x22:\\x22Google-s\\\\u00f8gning\\x22},\\x22ovr\\x22:{},\\x22pq\\x22:\\x22\\x22,\\x22rfs\\x22:[],\\x22stok\\x22:\\x22ad3sbrIczwOASy-7XHgKG5ni0tM\\x22}}';google.pmc=JSON.parse(pmc);})();</script></body></html>"
+        }
+      },
+      {
+        "json": {
+          "data": "<!doctype html><html itemscope=\"\" itemtype=\"http://schema.org/WebPage\" lang=\"da\"><head><meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\"><meta content=\"/images/branding/googleg/1x/googleg_standard_color_128dp.png\" itemprop=\"image\"><title>Google</title><script nonce=\"gFQmWOsD9i79liohEfrWOQ\">(function(){var _g={kEI:'BZKlaJGGDuiIxc8Pg8vlwQ4',kEXPI:'0,202854,2,4051301,34679,30022,360901,247319,23157,19568,5241681,622,36812021,25228681,138268,79282,6752,23880,7033,2105,4599,328,6226,50575,3615,9975,15048,50,15585,58708,48242,5971,353,18880,11800,1784,5773,27612,4719,11805,6251,35,942,2478,5355,2,181,7946,8134,3973,5683,3605,7327,10444,17999,2,1,1278,1887,2,1608,728,3,6566,2,5076,1187,3615,3,1220,1,3459,2,4192,7,480,1491,1032,1579,2249,3591,1728,3,4011,1037,1981,1915,832,2,4,1,320,209,3905,986,670,5452,16,181,5,6633,730,4035,445,2032,2,1507,7040,3987,1158,123,590,4,1379,135,3044,27,284,536,521,2839,404,113,2,39,2,121,101,1,1120,14,6,191,2,4,266,1011,66,688,127,43,1645,1713,24,1263,830,178,10,1680,1139,4,358,1618,2,9,1,302,1736,2252,1466,287,1015,601,512,1345,1,102,1115,19,239,1479,155,34,1985,1008,19,3177,29,767,740,1601,792,3,382,145,737,70,13,186,934,144,1489,88,1485,972,242,764,16,1,829,770,132,3,249,172,845,819,711,986,564,197,164,1064,1224,12,2,736,11,269,238,7,67,100,584,33,2,1347,112,201,547,114,598,647,1305,46,547,182,492,529,4,762,60,118,297,51,67,167,21,79,208,285,575,652,427,334,1384,1368,250,214,218,18,140,544,244,2,96,1,6,1,654,314,99,254,228,63,5,173,872,183,2,3,26,19,503,69,897,249,452,48,88,16,85,394,1034,5,303,224,734,2,167,279,356,1102,165,241,43,330,99,1637,44,66,110,687,967,850,22,354,32,128,160,131,556,122,2,602,2018,449,20756240,375834,4,40239,5,2992,4,2700,106,154,3,1307,7184,2,1562,3,2442,3,798,3,1126,101,1030,4084,57,182,1259,158,1210,96,256,240,1212,3620502,4892782,161011,2303161',kBL:'YGxD',kOPI:89978449};(function(){var a;((a=window.google)==null?0:a.stvsc)?google.kEI=_g.kEI:window.google=_g;}).call(this);})();(function(){google.sn='webhp';google.kHL='da';})();(function(){\nvar g=this||self;function k(){return window.google&&window.google.kOPI||null};var l,m=[];function n(a){for(var b;a&&(!a.getAttribute||!(b=a.getAttribute(\"eid\")));)a=a.parentNode;return b||l}function p(a){for(var b=null;a&&(!a.getAttribute||!(b=a.getAttribute(\"leid\")));)a=a.parentNode;return b}function q(a){/^http:/i.test(a)&&window.location.protocol===\"https:\"&&(google.ml&&google.ml(Error(\"a\"),!1,{src:a,glmm:1}),a=\"\");return a}\nfunction r(a,b,d,c,h){var e=\"\";b.search(\"&ei=\")===-1&&(e=\"&ei=\"+n(c),b.search(\"&lei=\")===-1&&(c=p(c))&&(e+=\"&lei=\"+c));var f=b.search(\"&cshid=\")===-1&&a!==\"slh\";c=\"&zx=\"+Date.now().toString();g._cshid&&f&&(c+=\"&cshid=\"+g._cshid);(d=d())&&(c+=\"&opi=\"+d);return\"/\"+(h||\"gen_204\")+\"?atyp=i&ct=\"+String(a)+\"&cad=\"+(b+e+c)};l=google.kEI;google.getEI=n;google.getLEI=p;google.ml=function(){return null};google.log=function(a,b,d,c,h,e){e=e===void 0?k:e;d||(d=r(a,b,e,c,h));if(d=q(d)){a=new Image;var f=m.length;m[f]=a;a.onerror=a.onload=a.onabort=function(){delete m[f]};a.src=d}};google.logUrl=function(a,b){b=b===void 0?k:b;return r(\"\",a,b)};}).call(this);(function(){google.y={};google.sy={};function e(a,b,c){if(a)var d=a.id;else{do d=Math.random();while(c[d])}c[d]=[a,b]}var f;(f=google).x||(f.x=function(a,b){e(a,b,google.y)});var g;(g=google).sx||(g.sx=function(a,b){e(a,b,google.sy)});google.lm=[];var h;(h=google).plm||(h.plm=function(a){google.lm.push.apply(google.lm,a)});google.lq=[];var k;(k=google).load||(k.load=function(a,b,c){google.lq.push([[a],b,c])});var l;(l=google).loadAll||(l.loadAll=function(a,b){google.lq.push([a,b])});google.bx=!1;var m;(m=google).lx||(m.lx=function(){});var n=[],p;(p=google).fce||(p.fce=function(a,b,c,d){n.push([a,b,c,d])});google.qce=n;google.adl=[];}).call(this);google.f={};(function(){\ndocument.documentElement.addEventListener(\"submit\",function(b){var a;if(a=b.target){var c=a.getAttribute(\"data-submitfalse\");a=c===\"1\"||c===\"q\"&&!a.elements.q.value?!0:!1}else a=!1;a&&(b.preventDefault(),b.stopPropagation())},!0);document.documentElement.addEventListener(\"click\",function(b){var a;a:{for(a=b.target;a&&a!==document.documentElement;a=a.parentElement)if(a.tagName===\"A\"){a=a.getAttribute(\"data-nohref\")===\"1\";break a}a=!1}a&&b.preventDefault()},!0);}).call(this);</script><style>#gbar,#guser{font-size:13px;padding-top:1px !important;}#gbar{height:22px}#guser{padding-bottom:7px !important;text-align:right}.gbh,.gbd{border-top:1px solid #c9d7f1;font-size:1px}.gbh{height:0;position:absolute;top:24px;width:100%}@media all{.gb1{height:22px;margin-right:.5em;vertical-align:top}#gbar{float:left}}a.gb1,a.gb4{text-decoration:underline !important}a.gb1,a.gb4{color:#00c !important}.gbi .gb4{color:#dd8e27 !important}.gbf .gb4{color:#900 !important}\n</style><style>body,td,a,p,.h{font-family:sans-serif}body{margin:0;overflow-y:scroll}#gog{padding:3px 8px 0}td{line-height:.8em}.gac_m td{line-height:17px}form{margin-bottom:20px}.h{color:#1967d2}em{font-weight:bold;font-style:normal}.lst{height:25px;width:496px}.gsfi,.lst{font:18px sans-serif}.gsfs{font:17px sans-serif}.ds{display:inline-box;display:inline-block;margin:3px 0 4px;margin-left:4px}input{font-family:inherit}body{background:#fff;color:#1f1f1f}a{color:#681da8;text-decoration:none}a:hover,a:active{text-decoration:underline}.fl a{color:#1967d2}a:visited{color:#681da8}.sblc{padding-top:5px}.sblc a{display:block;margin:2px 0;margin-left:13px;font-size:11px}.lsbb{background:#f8f9fa;border:solid 1px;border-color:#dadce0 #70757a #70757a #dadce0;height:30px}.lsbb{display:block}#WqQANb a{display:inline-block;margin:0 12px}.lsb{background:url(/images/nav_logo229.png) 0 -261px repeat-x;color:#1f1f1f;border:none;cursor:pointer;height:30px;margin:0;outline:0;font:15px sans-serif;vertical-align:top}.lsb:active{background:#dadce0}.lst:focus{outline:none}.Ucigb{width:458px}</style><script nonce=\"gFQmWOsD9i79liohEfrWOQ\">(function(){window.google.erd={jsr:1,bv:2274,de:true,dpf:'YzvYrUIxI1tDnw-LhDDYjYm2EWrWqBDyC64AoxB1veg'};\nvar g=this||self;var k,l=(k=g.mei)!=null?k:1,m,p=(m=g.diel)!=null?m:0,q,r=(q=g.sdo)!=null?q:!0,t=0,u,w=google.erd,x=w.jsr;google.ml=function(a,b,d,n,e){e=e===void 0?2:e;b&&(u=a&&a.message);d===void 0&&(d={});d.cad=\"ple_\"+google.ple+\".aple_\"+google.aple;if(google.dl)return google.dl(a,e,d,!0),null;b=d;if(x<0){window.console&&console.error(a,b);if(x===-2)throw a;b=!1}else b=!a||!a.message||a.message===\"Error loading script\"||t>=l&&!n?!1:!0;if(!b)return null;t++;d=d||{};b=encodeURIComponent;var c=\"/gen_204?atyp=i&ei=\"+b(google.kEI);google.kEXPI&&(c+=\"&jexpid=\"+b(google.kEXPI));c+=\"&srcpg=\"+b(google.sn)+\"&jsr=\"+b(w.jsr)+\n\"&bver=\"+b(w.bv);w.dpf&&(c+=\"&dpf=\"+b(w.dpf));var f=a.lineNumber;f!==void 0&&(c+=\"&line=\"+f);var h=a.fileName;h&&(h.indexOf(\"-extension:/\")>0&&(e=3),c+=\"&script=\"+b(h),f&&h===window.location.href&&(f=document.documentElement.outerHTML.split(\"\\n\")[f],c+=\"&cad=\"+b(f?f.substring(0,300):\"No script found.\")));google.ple&&google.ple===1&&(e=2);c+=\"&jsel=\"+e;for(var v in d)c+=\"&\",c+=b(v),c+=\"=\",c+=b(d[v]);c=c+\"&emsg=\"+b(a.name+\": \"+a.message);c=c+\"&jsst=\"+b(a.stack||\"N/A\");c.length>=12288&&(c=c.substring(0,12288));a=c;n||google.log(0,\"\",a);return a};window.onerror=function(a,b,d,n,e){u!==a&&(a=e instanceof Error?e:Error(a),d===void 0||\"lineNumber\"in a||(a.lineNumber=d),b===void 0||\"fileName\"in a||(a.fileName=b),google.ml(a,!1,void 0,!1,a.name===\"SyntaxError\"||a.message.substring(0,11)===\"SyntaxError\"||a.message.indexOf(\"Script error\")!==-1?3:p));u=null;r&&t>=l&&(window.onerror=null)};})();</script></head><body bgcolor=\"#fff\"><script nonce=\"gFQmWOsD9i79liohEfrWOQ\">(function(){var src='/images/nav_logo229.png';var iesg=false;document.body.onload = function(){window.n && window.n();if (document.images){new Image().src=src;}\nif (!iesg){document.f&&document.f.q.focus();document.gbqf&&document.gbqf.q.focus();}\n}\n})();</script><div id=\"mngb\"><div id=gbar><nobr><b class=gb1>S�gning</b> <a class=gb1 href=\"https://www.google.com/imghp?hl=da&tab=wi\">Billeder</a> <a class=gb1 href=\"http://maps.google.dk/maps?hl=da&tab=wl\">Maps</a> <a class=gb1 href=\"https://play.google.com/?hl=da&tab=w8\">Play</a> <a class=gb1 href=\"https://www.youtube.com/?tab=w1\">YouTube</a> <a class=gb1 href=\"https://news.google.com/?tab=wn\">Nyheder</a> <a class=gb1 href=\"https://mail.google.com/mail/?tab=wm\">Gmail</a> <a class=gb1 href=\"https://drive.google.com/?tab=wo\">Drev</a> <a class=gb1 style=\"text-decoration:none\" href=\"https://www.google.dk/intl/da/about/products?tab=wh\"><u>Mere</u> &raquo;</a></nobr></div><div id=guser width=100%><nobr><span id=gbn class=gbi></span><span id=gbf class=gbf></span><span id=gbe></span><a href=\"http://www.google.dk/history/optout?hl=da\" class=gb4>Webhistorik</a> | <a  href=\"/preferences?hl=da\" class=gb4>Indstillinger</a> | <a target=_top id=gb_70 href=\"https://accounts.google.com/ServiceLogin?hl=da&passive=true&continue=http://www.google.com/&ec=GAZAAQ\" class=gb4>Log ind</a></nobr></div><div class=gbh style=left:0></div><div class=gbh style=right:0></div></div><center><br clear=\"all\" id=\"lgpd\"><div id=\"XjhHGf\"><img alt=\"Google\" height=\"92\" src=\"/images/branding/googlelogo/1x/googlelogo_white_background_color_272x92dp.png\" style=\"padding:28px 0 14px\" width=\"272\" id=\"hplogo\"><br><br></div><form action=\"/search\" name=\"f\"><table cellpadding=\"0\" cellspacing=\"0\"><tr valign=\"top\"><td width=\"25%\">&nbsp;</td><td align=\"center\" nowrap=\"\"><input name=\"ie\" value=\"ISO-8859-1\" type=\"hidden\"><input value=\"da\" name=\"hl\" type=\"hidden\"><input name=\"source\" type=\"hidden\" value=\"hp\"><input name=\"biw\" type=\"hidden\"><input name=\"bih\" type=\"hidden\"><div class=\"ds\" style=\"height:32px;margin:4px 0\"><div style=\"position:relative;zoom:1\"><input class=\"lst Ucigb\" style=\"margin:0;padding:5px 8px 0 6px;vertical-align:top;color:#1f1f1f;padding-right:38px\" autocomplete=\"off\" value=\"\" title=\"Google-s�gning\" maxlength=\"2048\" name=\"q\" size=\"57\"><img src=\"/textinputassistant/tia.png\" style=\"position:absolute;cursor:pointer;right:5px;top:4px;z-index:300\" data-script-url=\"/textinputassistant/13/da_tia.js\" id=\"tsuid_BZKlaJGGDuiIxc8Pg8vlwQ4_1\" alt=\"\" height=\"23\" width=\"27\"><script nonce=\"gFQmWOsD9i79liohEfrWOQ\">(function(){var id='tsuid_BZKlaJGGDuiIxc8Pg8vlwQ4_1';document.getElementById(id).onclick = function(){var s = document.createElement('script');s.src = this.getAttribute('data-script-url');document.body.appendChild(s);};})();</script></div></div><br style=\"line-height:0\"><span class=\"ds\"><span class=\"lsbb\"><input class=\"lsb\" value=\"Google-s�gning\" name=\"btnG\" type=\"submit\"></span></span><span class=\"ds\"><span class=\"lsbb\"><input class=\"lsb\" id=\"tsuid_BZKlaJGGDuiIxc8Pg8vlwQ4_2\" value=\"Jeg pr�ver lykken\" name=\"btnI\" type=\"submit\"><script nonce=\"gFQmWOsD9i79liohEfrWOQ\">(function(){var id='tsuid_BZKlaJGGDuiIxc8Pg8vlwQ4_2';document.getElementById(id).onclick = function(){if (this.form.q.value){this.checked = 1;if (this.form.iflsig)this.form.iflsig.disabled = false;}\nelse top.location='/doodles/';};})();</script><input value=\"AOw8s4IAAAAAaKWgFTEQdIu-DVcVey7-KDOCFENYak6M\" name=\"iflsig\" type=\"hidden\"></span></span></td><td class=\"fl sblc\" align=\"left\" nowrap=\"\" width=\"25%\"><a href=\"/advanced_search?hl=da&amp;authuser=0\">Avanceret s�gning</a></td></tr></table><input id=\"gbv\" name=\"gbv\" type=\"hidden\" value=\"1\"><script nonce=\"gFQmWOsD9i79liohEfrWOQ\">(function(){var a,b=\"1\";if(document&&document.getElementById)if(typeof XMLHttpRequest!=\"undefined\")b=\"2\";else if(typeof ActiveXObject!=\"undefined\"){var c,d,e=[\"MSXML2.XMLHTTP.6.0\",\"MSXML2.XMLHTTP.3.0\",\"MSXML2.XMLHTTP\",\"Microsoft.XMLHTTP\"];for(c=0;d=e[c++];)try{new ActiveXObject(d),b=\"2\"}catch(h){}}a=b;if(a==\"2\"&&location.search.indexOf(\"&gbv=2\")==-1){var f=google.gbvu,g=document.getElementById(\"gbv\");g&&(g.value=a);f&&window.setTimeout(function(){location.href=f},0)};}).call(this);</script></form><div style=\"font-size:83%;min-height:3.5em\"><br><div id=\"gws-output-pages-elements-homepage_additional_languages__als\"><style>#gws-output-pages-elements-homepage_additional_languages__als{font-size:small;margin-bottom:24px}#SIvCob{color:#545454;display:inline-block;line-height:28px;}#SIvCob a{}.H6sW5{display:inline-block;margin:0 2px;white-space:nowrap}.z4hgWe{display:inline-block;margin:0 2px}</style><div id=\"SIvCob\">Google er tilg�ngelig p�:  <a href=\"http://www.google.com/setprefs?sig=0_YSBC3pon58bCdLhAosNVfbN2s6Q%3D&amp;hl=fo&amp;source=homepage&amp;sa=X&amp;ved=0ahUKEwjRnOG6hpmPAxVoRPEDHYNlOegQ2ZgBCAY\">F�royskt</a>  </div></div></div><span id=\"footer\"><div style=\"font-size:10pt\"><div style=\"margin:19px auto;text-align:center\" id=\"WqQANb\"><a href=\"/intl/da/ads/\">Annoncering</a><a href=\"http://www.google.dk/intl/da/services/\">Virksomhedsl�sninger</a><a href=\"/intl/da/about.html\">Alt om Google</a><a href=\"http://www.google.com/setprefdomain?prefdom=DK&amp;prev=http://www.google.dk/&amp;sig=68a6e385K_PQX3Y5VHn5Hkeyw6LPj0Xo0HDHw%3D\">Google.dk</a></div></div><p style=\"font-size:8pt;color:#636363\">&copy; 2025 - <a href=\"/intl/da/policies/privacy/\">Privatliv</a> - <a href=\"/intl/da/policies/terms/\">Vilk�r</a></p></span></center><script nonce=\"gFQmWOsD9i79liohEfrWOQ\">(function(){window.google.cdo={height:757,width:1440};(function(){var a=window.innerWidth,b=window.innerHeight;if(!a||!b){var c=window.document,d=c.compatMode==\"CSS1Compat\"?c.documentElement:c.body;a=d.clientWidth;b=d.clientHeight}if(a&&b&&(a!=google.cdo.width||b!=google.cdo.height)){var e=google,f=e.log,g=\"/client_204?&atyp=i&biw=\"+a+\"&bih=\"+b+\"&ei=\"+google.kEI,h=\"\",k=window.google&&window.google.kOPI||null;k&&(h+=\"&opi=\"+k);f.call(e,\"\",\"\",g+h)};}).call(this);})();(function(){google.xjs={basecomb:'/xjs/_/js/k\\x3dxjs.hp.en.1ueFkAWGfbk.es5.O/ck\\x3dxjs.hp.qDu1HKdtnpU.L.X.O/am\\x3dAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAEgUAAAAAAAAAAAAAAgAAAADAlAAcAAAgABAgAAAAAAQAgAAAAAAASAAABQAAAAMR3BAAQiEUAAPAC/d\\x3d1/ed\\x3d1/dg\\x3d0/ujg\\x3d1/rs\\x3dACT90oGyDcH1X2RPYgCkAa0fRR0tbYthMQ',basecss:'/xjs/_/ss/k\\x3dxjs.hp.qDu1HKdtnpU.L.X.O/am\\x3dAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAEAUAAAAAAAAAAAAAAgAAAADAFAAAAAAgABAgAAAAAAQAgAAAAAAASAAABQAAAAAAAAAAACA/rs\\x3dACT90oF3WfAKKeC2dr4dfzjIr0INlmOwzw',basejs:'/xjs/_/js/k\\x3dxjs.hp.en.1ueFkAWGfbk.es5.O/am\\x3dAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAAAgAAAAAAgAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMR3BAAQgEUAAPAC/dg\\x3d0/rs\\x3dACT90oE36c124BDIzhcK_oRT9BSz-f4dmQ',excm:[]};})();(function(){var u='/xjs/_/js/k\\x3dxjs.hp.en.1ueFkAWGfbk.es5.O/am\\x3dAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEgAAAAAAAAAAAAAAAgAAAAAAgAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMR3BAAQgEUAAPAC/d\\x3d1/ed\\x3d1/dg\\x3d3/rs\\x3dACT90oE36c124BDIzhcK_oRT9BSz-f4dmQ/m\\x3dsb_he,d';var st=1;var amd=1000;var mmd=0;var pod=true;var pop=true;var povp=false;var fp='';\nvar e=this||self;function f(){var b,a,d;if(a=b=(a=window.google)==null?void 0:(d=a.ia)==null?void 0:d.r.B2Jtyd)a=b.m,a=a===1||a===5||a===6;return a&&b.cbfd!=null&&b.cbvi!=null?b:void 0};function g(){var b=[u];if(!google.dp){for(var a=0;a<b.length;a++){var d=b[a],c=document.createElement(\"link\");c.as=\"script\";c.href=d;c.rel=\"preload\";document.body.appendChild(c)}google.dp=!0}};google.ps===void 0&&(google.ps=[]);function h(){var b=u,a=function(){};google.lx=google.stvsc?a:function(){k(b);google.lx=a};google.bx||google.lx()}function l(b,a){a&&(b.src=a);fp&&google.caft&&google.caft(function(){b.fetchPriority=fp});var d=b.onload;b.onload=function(c){d&&d(c);google.ps=google.ps.filter(function(G){return b!==G})};google.ps.push(b);document.body.appendChild(b)}google.as=l;function k(b){google.timers&&google.timers.load&&google.tick&&google.tick(\"load\",\"xjsls\");var a=document.createElement(\"script\");a.onerror=function(){google.ple=1};a.onload=function(){google.ple=0};google.xjsus=void 0;l(a,b);google.aple=-1;google.dp=!0};function m(b){var a=b.getAttribute(\"jscontroller\");return(a===\"UBXHI\"||a===\"R3fhkb\"||a===\"TSZEqd\")&&b.hasAttribute(\"data-src\")}function n(){for(var b=document.getElementsByTagName(\"img\"),a=0,d=b.length;a<d;a++){var c=b[a];if(c.hasAttribute(\"data-lzy_\")&&Number(c.getAttribute(\"data-atf\"))&1&&!m(c))return!0}return!1}for(var p=document.getElementsByTagName(\"img\"),q=0,r=p.length;q<r;++q){var t=p[q];Number(t.getAttribute(\"data-atf\"))&1&&m(t)&&(t.src=t.getAttribute(\"data-src\"))};var w,x,y,z,A,B,C,D,E,F;function H(){google.xjsu=u;e._F_jsUrl=u;A=function(){h()};w=!1;x=(st===1||st===3)&&!!google.caft&&!n();y=f();z=(st===2||st===3)&&!!y&&!n();B=pod;C=pop;D=povp;E=pop&&document.prerendering||povp&&document.hidden;F=D?\"visibilitychange\":\"prerenderingchange\"}function I(){w||x||z||E||(A(),w=!0)}\nsetTimeout(function(){google&&google.tick&&google.timers&&google.timers.load&&google.tick(\"load\",\"xjspls\");H();if(x||z||E){if(x){var b=function(){x=!1;I()};google.caft(b);window.setTimeout(b,amd)}z&&(b=function(){z=!1;I()},y.cbvi.push(b),window.setTimeout(b,mmd));if(E){var a=function(){(D?document.hidden:document.prerendering)||(E=!1,I(),document.removeEventListener(F,a))};document.addEventListener(F,a,{passive:!0})}if(B||C||D)w||g()}else A()},0);})();window._ = window._ || {};window._DumpException = _._DumpException = function(e){throw e;};window._s = window._s || {};_s._DumpException = _._DumpException;window._qs = window._qs || {};_qs._DumpException = _._DumpException;(function(){var t=[0,16,0,0,0,0,85727296,0,4096,33554432,318849024,2867209,67110912,32,4129,8,1179648,17302528,1010827264,67109149,17800,3008];window._F_toggles = window._xjs_toggles = t;})();window._F_installCss = window._F_installCss || function(css){};(function(){google.jl={bfl:0,dw:false,eli:false,ine:false,ubm:false,uwp:true,vs:false};})();(function(){var pmc='{\\x22csies\\x22:{},\\x22d\\x22:{},\\x22sb_he\\x22:{\\x22client\\x22:\\x22heirloom-hp\\x22,\\x22dh\\x22:true,\\x22ds\\x22:\\x22\\x22,\\x22host\\x22:\\x22google.com\\x22,\\x22jsonp\\x22:true,\\x22msgs\\x22:{\\x22cibl\\x22:\\x22Ryd s\\\\u00f8gning\\x22,\\x22dym\\x22:\\x22Mente du:\\x22,\\x22lcky\\x22:\\x22Jeg pr\\\\u00f8ver lykken\\x22,\\x22lml\\x22:\\x22F\\\\u00e5 flere oplysninger\\x22,\\x22psrc\\x22:\\x22Denne s\\\\u00f8gning blev fjernet fra din \\\\u003Ca href\\x3d\\\\\\x22/history\\\\\\x22\\\\u003EWebhistorik\\\\u003C/a\\\\u003E\\x22,\\x22psrl\\x22:\\x22Fjern\\x22,\\x22sbit\\x22:\\x22S\\\\u00f8g efter billede\\x22,\\x22srch\\x22:\\x22Google-s\\\\u00f8gning\\x22},\\x22ovr\\x22:{},\\x22pq\\x22:\\x22\\x22,\\x22rfs\\x22:[],\\x22stok\\x22:\\x22ad3sbrIczwOASy-7XHgKG5ni0tM\\x22}}';google.pmc=JSON.parse(pmc);})();</script></body></html>"
+        }
+      }
+    ],
+    "Update Longform": [
+      {
+        "json": {
+          "production_status": "done",
+          "id": 1,
+          "date_produced": "2025-08-20"
+        }
+      },
+      {
+        "json": {
+          "production_status": "done",
+          "id": 1,
+          "date_produced": "2025-08-20"
+        }
+      }
+    ],
+    "Insert Shorts info": [
+      {
+        "json": {
+          "shortform_links": "https://storage.googleapis.com/klap-renders/3AAlIRvORH4ehmsF.mp4",
+          "tiktok_caption": "🤖🎬 AI + humans = next-level filmmaking! What do you think? Could this be the future? 👀 #Filmmaking #AI",
+          "youtube_caption": "🤖🎬 Can AI and humans create movie magic together? Let’s find out! 👀 #Filmmaking #AI",
+          "instagram_caption": "🤖🎬 Can AI & humans team up for epic films? What do you think? Drop your thoughts! 👇 #Filmmaking #AI",
+          "linkedin_caption": "🤖🎬 Can AI & humans create movie magic together? Let's find out! 👀 #FutureOfFilm #AI",
+          "publishing_status": "for publishing",
+          "date_published": "2025-08-20",
+          "id": "=ROW()-1"
+        }
+      },
+      {
+        "json": {
+          "shortform_links": "https://storage.googleapis.com/klap-renders/oJD6ghvE3A7G4Mim.mp4",
+          "tiktok_caption": "🤔 Is AI a discovery or an invention? Let’s dive into this debate! 💡 What do you think? #AI #DiscoveryVsInvention",
+          "youtube_caption": "Is AI a cosmic discovery or our greatest invention? 🤔💡 Let's debate! #AI #DiscoveryVsInvention",
+          "instagram_caption": "Is AI a discovery or an invention? 🤔 Let's dive deep! 💡 What do you think? #AI #Debate",
+          "linkedin_caption": "🤖 Is AI a discovery or an invention? 🤔 Dive in and share your thoughts! #AI #Debate",
+          "publishing_status": "for publishing",
+          "date_published": "2025-08-20",
+          "id": "=ROW()-1"
+        }
+      }
+    ],
+    "Update row in sheet": [
+      {
+        "json": {
+          "shortform_links": "https://storage.googleapis.com/klap-renders/3AAlIRvORH4ehmsF.mp4",
+          "publishing_status": "done",
+          "date_published": "2025-08-20"
+        }
+      },
+      {
+        "json": {
+          "shortform_links": "https://storage.googleapis.com/klap-renders/oJD6ghvE3A7G4Mim.mp4",
+          "publishing_status": "done",
+          "date_published": "2025-08-20"
+        }
+      }
+    ],
+    "Analyze Longform": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "Second item",
+          "code": 2
+        }
+      }
+    ]
+  },
+  "versionId": "388d7ca7-1f26-4328-9bd7-10a4a3a1c406",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-08-20T06:56:24.648Z",
+      "updatedAt": "2025-08-20T06:56:24.648Z",
+      "role": "workflow:owner",
+      "workflowId": "3dAx4y189KOHb9D2",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

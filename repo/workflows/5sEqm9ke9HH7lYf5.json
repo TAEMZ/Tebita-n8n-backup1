@@ -1,0 +1,2166 @@
+{
+  "createdAt": "2025-02-11T10:17:24.670Z",
+  "updatedAt": "2025-03-07T13:48:30.944Z",
+  "id": "5sEqm9ke9HH7lYf5",
+  "name": "B-AI",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        0
+      ],
+      "id": "b8174454-2b79-4d70-9309-664fd9adb303",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.name }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "8a873077-c808-4c44-b393-f4d1b648f527",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1220,
+        280
+      ],
+      "id": "e220f390-17d7-4251-a691-9a7e374a946e",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to get emails from the inbox",
+        "operation": "getAll",
+        "limit": 5,
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -720,
+        560
+      ],
+      "id": "23de8258-b74e-49b6-84ff-25876635936b",
+      "name": "Get Emails",
+      "webhookId": "0dcfa88e-b700-4b5d-bc2f-81dfb528dedc"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to send emails",
+        "sendTo": "={{ $fromAI('contacts_email') }}",
+        "subject": "={{ $fromAI('subject') }}",
+        "message": "={{ $fromAI('email_body') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -980,
+        560
+      ],
+      "id": "92fa58a8-c27b-4c71-aee1-e7b8334adb24",
+      "name": "Send Email",
+      "webhookId": "be0b769e-f1e4-4a81-91fe-e905cc5f00fc"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to mark emails as read",
+        "operation": "markAsRead",
+        "messageId": "={{ $fromAI('message_id') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -600,
+        500
+      ],
+      "id": "ac523cbf-8fbf-47ca-9de6-6c0f69106f66",
+      "name": "Mark Emails as Read",
+      "webhookId": "05c49b3d-88bc-44ce-aa51-e9ff35799982"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to Reply to an email",
+        "operation": "reply",
+        "messageId": "={{ $fromAI('message_id') }}",
+        "message": "={{ $fromAI('email_body') }}",
+        "options": {
+          "appendAttribution": false,
+          "ccList": "={{ $fromAI('cc') }}",
+          "senderName": "Ken Kai"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -840,
+        580
+      ],
+      "id": "98e65a75-88d3-48a6-918a-06ffd7e8c58e",
+      "name": "Reply to Emails",
+      "webhookId": "bed8f26e-b2bf-47e2-a71e-972caf6431d1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=### Role:\n\nYou are an email assistant agent, and you perform actions based on queries given to you.\n\n### Task:\n\nYou will be sending, replying and fetching emails based on queries and requirements the user has given you.\n\n### Instructions:\n\nSending an email:\n\n1. Fetch the persons contact information which the user has requested\n2. Send an email based on the users requirements, use a friendly tone\n3. On completion, respond with what you have done concisely.\n\nReplying to an email:\n\n1. Fetch the email based on the users query\n2. Reply to the email based on the users requirements, use a friendly tone\n3. On completion, respond with what you have done concisely.\n\nMark as read:\n\n1. When requested, mark emails as read\n\nCurrent time & date: {{ $now }}\n\n### Example:\n\n```\nSending or replying to an email:\n\nHey Ken,\n\nJust wanted to confirm the Facebook Ads budget for the next quarter. Are we still using the same budget as per the previous quarter?\n\nCheers,\n\nKen\n```\n\n### Constraints:\n\n- No email should be sent unless the contacts email is available. \n- If there is no email available for the contact, reply with \"There doesn't appear to be an email for this contact, let me know how you would like to continue\"\n- Report errors in simple words if they occur.\n\n### Output:\n\n- Ensure all emails have a greeting\n- Ensure all emails are signed off as \"Ken Kai\"\n- Format emails professionally, with line breaks and spacing\n- Output in HTML"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -940,
+        280
+      ],
+      "id": "9be74dd6-cab8-4d99-9a31-d8149e0a7960",
+      "name": "Email Agent"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to get the email address of the person",
+        "base": {
+          "__rl": true,
+          "value": "appt81JoiPabR4HPM",
+          "mode": "list",
+          "cachedResultName": "Jenny",
+          "cachedResultUrl": "https://airtable.com/appt81JoiPabR4HPM"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblU5SjQW2nVMdfnn",
+          "mode": "list",
+          "cachedResultName": "Contacts",
+          "cachedResultUrl": "https://airtable.com/appt81JoiPabR4HPM/tblU5SjQW2nVMdfnn"
+        },
+        "id": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -500,
+        440
+      ],
+      "id": "da9a6acf-2fe4-454a-9fae-bc933a999de9",
+      "name": "Get Contact Information"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1220,
+        500
+      ],
+      "id": "41bfd6db-109e-4f30-b1e5-4109a3fe7b91",
+      "name": "ChatGPT"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.query }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1100,
+        540
+      ],
+      "id": "e6d2faa9-df86-4219-92c1-fee8cbd781fc",
+      "name": "Memory"
+    },
+    {
+      "parameters": {
+        "content": "## Email Agent Prompt\n\n1. Adjust the prompt based on your own name and signature, etc.",
+        "height": 240,
+        "width": 340,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -420,
+        140
+      ],
+      "typeVersion": 1,
+      "id": "b197686c-14a4-4b3b-b69d-36d0f79b09b0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "91e2ebcb-e76b-4dd4-81ca-c578fd69c08c",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "abfe46be-3bad-4ee3-8cfe-0e7619bb0325",
+              "name": "statistics.subscriberCount",
+              "value": "={{ $('Get Channel').item.json.statistics.subscriberCount }}",
+              "type": "string"
+            },
+            {
+              "id": "78376fcf-e34a-428b-a0e7-12b2f51869b4",
+              "name": "id.videoId",
+              "value": "={{ $json.id.videoId }}",
+              "type": "string"
+            },
+            {
+              "id": "3712edfd-a9c5-4042-aa1b-0e0f5739e402",
+              "name": "snippet.channelTitle",
+              "value": "={{ $json.snippet.channelTitle }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        1500
+      ],
+      "id": "796184a1-522b-4c9c-8d7b-7ab53763cef5",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1720
+      ],
+      "id": "589c5ef4-0359-488f-ab70-6f639e8f6132",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini-2024-07-18",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini-2024-07-18"
+        },
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        540,
+        1960
+      ],
+      "id": "724be3de-cc02-4ade-88a4-43817131f1d3",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "channelId": "UCTs8tCOY2h31UOKT-BhAoYw",
+        "part": [
+          "*",
+          "statistics",
+          "contentDetails",
+          "snippet"
+        ]
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1500
+      ],
+      "id": "c2efe700-5acf-478c-9a08-a71dc4c0e2ef",
+      "name": "Get Channel"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "filters": {
+          "channelId": "={{ $json.id }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        200,
+        1500
+      ],
+      "id": "78012060-4e18-4663-ac70-23b084780f43",
+      "name": "Get Videos"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/videos?",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "add your api key"
+            },
+            {
+              "name": "part",
+              "value": "contentDetails, snippet, statistics"
+            },
+            {
+              "name": "id",
+              "value": "={{ $json.id.videoId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -200,
+        1720
+      ],
+      "id": "efd1abb3-0e4e-4b0b-9d50-8a6e6cc638a0",
+      "name": "Get Video Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad1fb8a3-ebcc-495b-96de-e7478f9d3fcd",
+              "name": "snippet.title",
+              "value": "={{ $json.snippet.title }}",
+              "type": "string"
+            },
+            {
+              "id": "eaf96af6-fd4a-45ab-9ccd-80e01d99f2a1",
+              "name": "snippet.publishedAt",
+              "value": "={{ $json.snippet.publishedAt }}",
+              "type": "string"
+            },
+            {
+              "id": "b4a812ac-0ff6-4f7a-af7f-1332a5a058a0",
+              "name": "statistics.viewCount",
+              "value": "={{ $json.statistics.viewCount }}",
+              "type": "string"
+            },
+            {
+              "id": "300775b3-2efe-4560-9005-74fab30d53b0",
+              "name": "statistics.likeCount",
+              "value": "={{ $json.statistics.likeCount }}",
+              "type": "string"
+            },
+            {
+              "id": "a22ff403-4920-4aff-a480-f1093ba9b234",
+              "name": "statistics.commentCount",
+              "value": "={{ $json.statistics.commentCount }}",
+              "type": "string"
+            },
+            {
+              "id": "8a0dffe9-1f84-4674-bda6-fda175ad931c",
+              "name": "statistics.subscriberCount",
+              "value": "={{ $('Edit Fields').item.json.statistics.subscriberCount }}",
+              "type": "string"
+            },
+            {
+              "id": "d409876e-6336-4876-94cb-04a5780e7deb",
+              "name": "snippet.title",
+              "value": "={{ $('Get Channel').item.json.snippet.title }}",
+              "type": "string"
+            },
+            {
+              "id": "03086a20-5ff8-4338-a756-d2e3697f47ba",
+              "name": "snippet.title",
+              "value": "={{ $json.snippet.title }}",
+              "type": "string"
+            },
+            {
+              "id": "51b4fb4b-740f-4625-ad4d-8879717c994b",
+              "name": "snippet.localized.title",
+              "value": "={{ $('Get Channel').item.json.snippet.localized.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        1720
+      ],
+      "id": "d7e417a1-c677-43ae-9dbf-20d648f5ec00",
+      "name": "Get Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get channel info from first item\nconst channelName = $input.first().json.snippet.localized.title;\nconst subscriberCount = $input.first().json.statistics.subscriberCount;\n\n// Create videos array first\nconst videos = $input.all().map(item => ({\n    title: item.json.snippet.title,\n    views: item.json.statistics.viewCount,\n    likes: item.json.statistics.likeCount,\n    comments: item.json.statistics.commentCount\n}));\n\n// Create final output object with everything nested under \"Stats\"\nconst output = {\n    Stats: {\n        channelInfo: {\n            name: channelName,\n            subscribers: subscriberCount\n        },\n        videos: videos\n    }\n};\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        1720
+      ],
+      "id": "ca20b4c7-a77a-46f0-8b89-75a2b6c783c9",
+      "name": "Adjust Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Stats }}",
+        "options": {
+          "systemMessage": "=You're an expert in YouTube strategy, fetching and analyzing analytics. There are 2 examples below that you MUST follow based on queries you receive.\n\nThese queries will either be along the lines of \"Get my latest video statistics\" or \"Get my YouTube Summary\".\n\nHere is the query: {{ $('When Executed by Another Workflow').first().json.query }}\n\nFollow the examples below and output based on the examples below:\n\n##Example 1:\n\nWhen requested for a \"Video Statistics\", return the following and nothing further:\n\n\"Your Channel: Ken Kai | AI Automations\n\nSubscribers: *total subscribers*\n\n1)\n\n{{ $json.Stats.videos[0].title }}\n{{ $json.Stats.videos[0].views }}\n{{ $json.Stats.videos[0].likes }}\n{{ $json.Stats.videos[0].comments }}\n\n2)\n\nTitle of video 2.. \nViews of video 2..\nLikes of video 2..\nComments of video 2..\n\nRecommendations: The engagement is very healthy, consider trying x for y result.\"\n\n##Example 2:\n\nWhen requested for a \"YouTube Summary\", return the following and nothing further:\n\n\"Subscribers: *total*\nViews: *combined total of all the videos views*\nLikes: *combined total of all the videos likes*\nComments: *combined total of all the videos comments*\"\n\n\n##Important:\n\n- Follow the examples above precisely depending on what is queried from the user.\n- Return the result as raw JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        600,
+        1720
+      ],
+      "id": "43ea0d9f-cb1d-4706-8f98-0330415658ac",
+      "name": "Analyze Data Agent"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const rawOutput = $json[\"output\"];\nconst parsedOutput = JSON.parse(rawOutput);\nreturn parsedOutput;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        1720
+      ],
+      "id": "063fe7c9-8947-4e77-a2c5-9433bcb5e790",
+      "name": "Raw JSON"
+    },
+    {
+      "parameters": {
+        "content": "## Credentials:\n\n1. Add your YouTube credentials as well as your Google API key to the \"Get Video data\" node.\n\n2. Connect the ChatGPT credentials as well\n\n3. Adjust the prompt if you would prefer different results",
+        "height": 300,
+        "width": 500,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -220,
+        1080
+      ],
+      "typeVersion": 1,
+      "id": "382845a7-877f-48ea-b5b2-3cfe8f87ade6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json[\"Title of post\"] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Your role is to check if the titles of a Reddit post are relevant to the initial users query.\n\nThis is the title of the post: \"{{ $json[\"Title of post\"] }}\"\nAnd this is the original users query: \"{{ $('When Executed by Another Workflow').first().json.query }}\n\nIf it is not relevant, respond with \"No\"\nIf it is relevant, respond with \"Yes\"\n\nOnly one word answers are required."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        -480,
+        2360
+      ],
+      "id": "0e9307d3-933e-4d3a-a720-45bb1ef3346e",
+      "name": "Relevance Check"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "927b31ff-b7dc-4cab-9fad-292c40457ff5",
+              "leftValue": "={{ $json.text }}",
+              "rightValue": "Yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -100,
+        2360
+      ],
+      "id": "2bd1b3b1-34fa-4fac-bf37-38ad200179bb",
+      "name": "Relevant"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $('5+ Upvotes').all();\nreturn [\n  {\n    json: {\n      posts: items.map(item => ({\n        title: item.json[\"Title of post\"],\n        upvotes: item.json[\"Upvotes\"],\n        url: item.json[\"url\"]\n      }))\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        2360
+      ],
+      "id": "e253771d-d1f2-443c-aaec-a0665266528e",
+      "name": "Store Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8c33e418-1ddf-412c-99ca-9cac3abf36a2",
+              "leftValue": "={{ $json.Upvotes }}",
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -720,
+        2360
+      ],
+      "id": "7c8f41bc-79a8-4f51-a33f-47b3fd4fadb2",
+      "name": "5+ Upvotes"
+    },
+    {
+      "parameters": {
+        "url": "https://reddit-scraper2.p.rapidapi.com/search_posts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.query }}"
+            },
+            {
+              "name": "sort",
+              "value": "RELEVANCE"
+            },
+            {
+              "name": "nsfw",
+              "value": "0"
+            },
+            {
+              "name": "time",
+              "value": "month"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rapidapi-host",
+              "value": "reddit-scraper2.p.rapidapi.com"
+            },
+            {
+              "name": "x-rapidapi-key",
+              "value": "add your rapidapi reddit scraper key"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        2040
+      ],
+      "id": "118b69de-f2ee-4ac2-ba9f-f03c3fabb6d2",
+      "name": "Scrape Reddit"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        2080
+      ],
+      "id": "2de9f57b-afea-4899-bcd4-0735402aad78",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -500,
+        2560
+      ],
+      "id": "0a60eaee-a2a1-4bb0-bbf4-de7bc5446fd9",
+      "name": "OpenAI Chat Model1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "29ca4a12-2036-4608-bdb1-f1cc189754c0",
+              "name": "Title of post",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "162a87e6-ea8c-4cc8-9e2b-02217b10528a",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "7d675f4b-a982-46e2-890c-b3a952e94825",
+              "name": "Upvotes",
+              "value": "={{ $json.score }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        60,
+        2080
+      ],
+      "id": "1eb87aa1-4ad7-4a32-ad65-2dfcaeab2425",
+      "name": "Get Fields1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').first().json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2200,
+        960
+      ],
+      "id": "36b3c317-393b-4301-a717-e8bfb9bdd0b1",
+      "name": "Telegram",
+      "webhookId": "cc27061c-a51d-4e02-b5de-472506b4d887"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "*"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -3600,
+        920
+      ],
+      "id": "0efba5ca-3a64-4292-834c-a8758463de37",
+      "name": "Telegram Trigger",
+      "webhookId": "c5e8d289-b102-4737-bcb7-91f4c80b018e"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -2820,
+        780
+      ],
+      "id": "b5d3a7f1-d952-4ba2-acb9-23a87b19c156",
+      "name": "OpenAI"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "voice",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b17b5d14-0a3b-4bf9-ab6c-8759394aee48",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3180,
+        920
+      ],
+      "id": "542f0950-3084-4433-99ca-292064280360",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -3000,
+        780
+      ],
+      "id": "04259e3e-60c3-464f-90a0-30afb8380187",
+      "name": "Telegram1",
+      "webhookId": "2c2964db-fbe1-4547-9944-f97ca4dd1d70"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        -2680,
+        1420
+      ],
+      "id": "3e7932ee-6924-4bf4-953e-94c6e5b178a4",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool when queried for a \"Daily Summary\"",
+        "base": {
+          "__rl": true,
+          "value": "appt81JoiPabR4HPM",
+          "mode": "list",
+          "cachedResultName": "Jenny",
+          "cachedResultUrl": "https://airtable.com/appt81JoiPabR4HPM"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblhgb6iWwMMFPdZV",
+          "mode": "list",
+          "cachedResultName": "Daily Summary",
+          "cachedResultUrl": "https://airtable.com/appt81JoiPabR4HPM/tblhgb6iWwMMFPdZV"
+        },
+        "id": "rec5tMGA13SX1tjd6",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -1840,
+        1320
+      ],
+      "id": "b4f8363b-178b-4abe-ba93-f24c0671121b",
+      "name": "Daily Summary"
+    },
+    {
+      "parameters": {
+        "name": "Website",
+        "description": "Call this tool for website, traffic, blog related queries.",
+        "workflowId": {
+          "__rl": true,
+          "value": "7qOUHsuhg3eoEbSv",
+          "mode": "list",
+          "cachedResultName": "Access Website"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -3040,
+        1360
+      ],
+      "id": "24996ebf-2cc2-4cc9-8a8f-2e2e5a86ecda",
+      "name": "Website"
+    },
+    {
+      "parameters": {
+        "name": "Airtable",
+        "description": "Call this tool for queries related to tasks, subscriptions, ideas and for laters.",
+        "workflowId": {
+          "__rl": true,
+          "value": "ItbiWtzpGbYVuaSB",
+          "mode": "list",
+          "cachedResultName": "Jenny Access Airtable"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -2920,
+        1380
+      ],
+      "id": "4e1fa86d-be2d-483c-8e1d-617c18c41331",
+      "name": "Ideas, Subscriptions, Tasks, For Laters"
+    },
+    {
+      "parameters": {
+        "name": "Reddit",
+        "description": "Call this tool for Reddit related queries",
+        "workflowId": {
+          "__rl": true,
+          "value": "9Uj1XiuWmpa2DrOT",
+          "mode": "list",
+          "cachedResultName": "Connect Reddit"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -2320,
+        1440
+      ],
+      "id": "8d3f3f5e-3d1f-4434-9241-d44f1d5ba7ee",
+      "name": "Reddit"
+    },
+    {
+      "parameters": {
+        "name": "Emails",
+        "description": "Call this tool for email related queries, sending emails, fetching emails",
+        "workflowId": {
+          "__rl": true,
+          "value": "n01t0AoOJOkkcova",
+          "mode": "list",
+          "cachedResultName": "Access Emails"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -2200,
+        1400
+      ],
+      "id": "55b0aef5-7675-49a8-a030-ec4144bb1377",
+      "name": "Emails"
+    },
+    {
+      "parameters": {
+        "name": "Contacts",
+        "description": "Call this tool for queries related to contacts",
+        "workflowId": {
+          "__rl": true,
+          "value": "P2aor9kw2aQzJs3M",
+          "mode": "list",
+          "cachedResultName": "Access Contacts"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -1960,
+        1360
+      ],
+      "id": "9d2b5aad-0609-438f-9d16-cee627515481",
+      "name": "Contacts"
+    },
+    {
+      "parameters": {
+        "name": "YouTube",
+        "description": "Call this tool for YouTube related queries",
+        "workflowId": {
+          "__rl": true,
+          "value": "p1D4QrF7z552rk9u",
+          "mode": "list",
+          "cachedResultName": "Access Youtube Channel"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -2080,
+        1380
+      ],
+      "id": "696afc10-3977-4905-bdd7-3cefa7b48314",
+      "name": "YouTube"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to get the latest news",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "query",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            },
+            {
+              "name": "topic",
+              "valueProvider": "fieldValue",
+              "value": "news"
+            },
+            {
+              "name": "api_key",
+              "valueProvider": "fieldValue",
+              "value": "your api key"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -2560,
+        1460
+      ],
+      "id": "49c83672-941d-4c77-80f3-e0eb77e2e424",
+      "name": "News Articles"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to get research topics",
+        "method": "POST",
+        "url": "https://api.tavily.com/search",
+        "sendBody": true,
+        "parametersBody": {
+          "values": [
+            {
+              "name": "query",
+              "valueProvider": "fieldValue",
+              "value": "{placeholder}"
+            },
+            {
+              "name": "topic",
+              "valueProvider": "fieldValue",
+              "value": "general"
+            },
+            {
+              "name": "api_key",
+              "valueProvider": "fieldValue",
+              "value": "your api key"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        -2400,
+        1540
+      ],
+      "id": "0cf630d3-27ab-4a07-92f1-ef4bcf44a841",
+      "name": "Research Topics"
+    },
+    {
+      "parameters": {
+        "name": "Weather",
+        "description": "Call this tool for weather related queries",
+        "workflowId": {
+          "__rl": true,
+          "value": "IzkkENyJa69TJrfe",
+          "mode": "list",
+          "cachedResultName": "Weather API"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -2800,
+        1400
+      ],
+      "id": "7afddd93-9ea9-4204-92a7-e05426269d3a",
+      "name": "Weather"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get a list of tools, their functionality and example queries sent from the user to understand what tool to route queries to.",
+        "base": {
+          "__rl": true,
+          "value": "appt81JoiPabR4HPM",
+          "mode": "list",
+          "cachedResultName": "Jenny",
+          "cachedResultUrl": "https://airtable.com/appt81JoiPabR4HPM"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblwyvi1VHNezqwPc",
+          "mode": "list",
+          "cachedResultName": "Tools and Queries",
+          "cachedResultUrl": "https://airtable.com/appt81JoiPabR4HPM/tblwyvi1VHNezqwPc"
+        },
+        "id": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -1720,
+        1300
+      ],
+      "id": "8e544cc2-b1c6-485c-9b2c-c39b77e6d3a5",
+      "name": "Commands"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Text: {{ $json.message.text }} \nVoice: {{ $json.text }} ",
+        "options": {
+          "systemMessage": "=### Role:\n\nYou are my Intelligent Personal Assistant, your name is Jenny.\n\n### Task:\n\nYour primary function is to route my queries without alteration to the appropriate tool. \n\n### Instructions:\n\n1. Extract the Query:\n\n- Check the following JSON fields in this exact priority order, and use the first available field:\n\n{{ $json.message.text }}\n{{ $json.text }}\n\n2. Route Without Modification:\n\n- Forward the exact, unmodified original query to the relevant tool.\n\n\n### Important:\n\n- Access \"Commands\" if you're unsure where to route a query.\n- When using \"Reddit\", remove the \"Search Reddit\", while keeping the query intact.\n- When using \"Airtable\", ensure the text \"idea\" or \"subscription\" or \"for later\" or \"task\" remains intact within the query.\n- Todays time and date is {{ $now }}\n- When queried with \"Daily Summary\", access the tool \"Daily Summary\" and search Record ID: rec5tMGA13SX1tjd6\n- Do not attempt to create, delete, or send emails, reminders, tasks, ideas, subscriptions and for laters.\n\n\n### Output:\n\n- Responses which include times and dates should use 12 hour time format and this date format (eg. 5th of February, 2025)\n- Format responses for Telegram using Markdown(Legacy)\n- Use emojis within responses, be friendly and fun.\n- If a tool fails to give results, respond with the output received.\n- If a tool fails to respond, respond with \"There appears to be an issue with this tool.\"\n- Ensure all responses are formatted neatly, with proper use of line breaks between each section. Do not output tables.\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -2620,
+        920
+      ],
+      "id": "ea99bce9-e814-417e-b217-895510998495",
+      "name": "Jenny 2.0"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fef76fb8-7518-4bcd-8107-9ddca403149b",
+              "leftValue": "={{ $json.message.chat.id }}",
+              "rightValue": {},
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3400,
+        920
+      ],
+      "id": "fcf55916-74d8-4578-b0e8-7fc1f517497b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "name": "Reminders",
+        "description": "Call this tool for any queries related to creating reminders, fetching reminders and also deleting reminders",
+        "workflowId": {
+          "__rl": true,
+          "value": "AoEeeGMNmBIwcX63",
+          "mode": "list",
+          "cachedResultName": "Reminders"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        1280
+      ],
+      "id": "78cf2c44-32c7-413e-8a00-fd689aa595e5",
+      "name": "Reminders"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Delete reminders which have already been sent",
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "appt81JoiPabR4HPM",
+          "mode": "list",
+          "cachedResultName": "Jenny",
+          "cachedResultUrl": "https://airtable.com/appt81JoiPabR4HPM"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblKQd6H6t9pyBrIQ",
+          "mode": "list",
+          "cachedResultName": "Reminders",
+          "cachedResultUrl": "https://airtable.com/appt81JoiPabR4HPM/tblKQd6H6t9pyBrIQ"
+        },
+        "id": "="
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -2400,
+        2380
+      ],
+      "id": "735cc399-9aac-48b7-94ec-a1421d80a18b",
+      "name": "Delete Reminders"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get the reminders, time and date",
+        "base": {
+          "__rl": true,
+          "value": "appt81JoiPabR4HPM",
+          "mode": "list",
+          "cachedResultName": "Jenny",
+          "cachedResultUrl": "https://airtable.com/appt81JoiPabR4HPM"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblKQd6H6t9pyBrIQ",
+          "mode": "list",
+          "cachedResultName": "Reminders",
+          "cachedResultUrl": "https://airtable.com/appt81JoiPabR4HPM/tblKQd6H6t9pyBrIQ"
+        },
+        "id": "=",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -2520,
+        2420
+      ],
+      "id": "93ab20ed-50d6-4987-9f02-59a54f80ed44",
+      "name": "Get Reminders"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2640,
+        2380
+      ],
+      "id": "8fda67aa-7c06-483b-a8f9-8eed2f115d92",
+      "name": "ChatGPT-2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"query\": \"Delete yesterdays reminders\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2920,
+        2080
+      ],
+      "id": "c4dee9ac-7435-4134-ac99-07e6854a27fb",
+      "name": "Query for delete"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"query\": \"Send todays reminders\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2920,
+        2240
+      ],
+      "id": "615bdbcd-6334-4ea3-a1a1-4905f2a90f8a",
+      "name": "Query for fetch"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtMinute": 59
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3120,
+        2080
+      ],
+      "id": "7a2cc81f-82b7-4fe7-a530-69fcc2cb9bbe",
+      "name": "7 am, everyday"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3120,
+        2240
+      ],
+      "id": "e2a7a951-6b85-47e6-9c09-a8fe771bc5b5",
+      "name": "8 am, everyday"
+    },
+    {
+      "parameters": {
+        "chatId": "7628576993",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2240,
+        2160
+      ],
+      "id": "c1647772-e29d-4f12-9540-c09f9398fafc",
+      "name": "Output Reminders",
+      "webhookId": "36e3c6bb-e8ca-4ae8-8759-11bdc3c992e3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "=You are an intelligent personal assistant in handling reminders for your creator.\n\nTodays time and date: {{ $now }}\n\n### Task:\n\nYou will assist your creator in sending reminders with the date and time associated with them for the current day.\n\n### Instructions:\n\nSending reminders:\n\n1. Upon receiving query \"Get todays reminders\", fetch the reminders from the table for todays date\n2. Send the reminders for todays date\n3. If no reminders are available for the day, simply respond with \"Your schedule looks clean today. Let me know if I can create any reminders for you!\"\n\nDeleting reminders:\n\n1. Upon receiving query \"Delete yesterdays reminders\", fetch the reminders from the table for yesterdays date\n2. Delete these reminders\n3. Respond with \"I have deleted yesterdays reminders. Let me know if you need anything else!\"\n4. If there are no reminders available for deletion, simply respond with \"You have no reminders available for deletion, we're all good!\"\n\n### Important:\n\n- Use emojis within responses, be friendly and fun.\n- Responses which include times and dates should use 12 hour time format and dates (eg. 5th of February, 2025)\n- Format responses for Telegram, use Markdown(Legacy) for responses"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -2600,
+        2160
+      ],
+      "id": "a14e50e6-1a44-407f-a642-2b4a14eaabac",
+      "name": "Reminder Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger') }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -3160,
+        1340
+      ],
+      "id": "42b81429-a0ef-499c-9def-035085f804a8",
+      "name": "Memory1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini-2024-07-18",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini-2024-07-18"
+        },
+        "options": {
+          "responseFormat": "text"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -3280,
+        1320
+      ],
+      "id": "0a2ca3d5-4765-425e-b72a-9810e5f77c5b",
+      "name": "ChatGPT1"
+    },
+    {
+      "parameters": {
+        "content": "## Reminder Agent\n\nAirtable:\n1. Ensure your credentials are connected\n2. Create the tables as per each node\n\nTelegram trigger:\n1. Make sure you've setup your bot\n2. Add the credentials\n\nIf node:\n1. Use your chat ID here. This is so other people cannot access your bot, only you can\n\nNews and Research:\n1. Add your Tavily API in here\n(https://www.tavily.com)\n\nChatGPT and Whisper:\n1. Connect your credentials. I use gpt-4o mini.",
+        "height": 480,
+        "width": 520,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4180,
+        800
+      ],
+      "typeVersion": 1,
+      "id": "1a4c4592-dba8-4b20-8e18-a774c70fb6ab",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Reminder Agent\n\nAirtable:\n1. Ensure your credentials are connected\n2. Create the tables as per each node\n\nSchedule triggers:\n1. Set the times you want these to trigger for both\n\nTelegram send message:\n1. Ensure you use your Chat ID within the field",
+        "height": 280,
+        "width": 400,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1960,
+        2120
+      ],
+      "typeVersion": 1,
+      "id": "b74d7215-09e1-4156-8488-5e18ee30aeba",
+      "name": "Sticky Note6"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Emails": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Emails as Read": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to Emails": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Information": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ChatGPT": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get Video Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Get Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyze Data Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Channel": {
+      "main": [
+        [
+          {
+            "node": "Get Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Videos": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Video Data": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Fields": {
+      "main": [
+        [
+          {
+            "node": "Adjust Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adjust Fields": {
+      "main": [
+        [
+          {
+            "node": "Analyze Data Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Data Agent": {
+      "main": [
+        [
+          {
+            "node": "Raw JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relevance Check": {
+      "main": [
+        [
+          {
+            "node": "Relevant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Relevant": {
+      "main": [
+        [
+          {
+            "node": "Store Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5+ Upvotes": {
+      "main": [
+        [
+          {
+            "node": "Relevance Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Reddit": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Get Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Relevance Check",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Fields1": {
+      "main": [
+        [
+          {
+            "node": "5+ Upvotes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Summary": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ideas, Subscriptions, Tasks, For Laters": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Emails": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contacts": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "News Articles": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research Topics": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weather": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commands": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jenny 2.0": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reminders": {
+      "ai_tool": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Reminders": {
+      "ai_tool": [
+        [
+          {
+            "node": "Reminder Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Reminders": {
+      "ai_tool": [
+        [
+          {
+            "node": "Reminder Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ChatGPT-2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Reminder Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query for delete": {
+      "main": [
+        [
+          {
+            "node": "Reminder Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query for fetch": {
+      "main": [
+        [
+          {
+            "node": "Reminder Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "7 am, everyday": {
+      "main": [
+        [
+          {
+            "node": "Query for delete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "8 am, everyday": {
+      "main": [
+        [
+          {
+            "node": "Query for fetch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reminder Agent": {
+      "main": [
+        [
+          {
+            "node": "Output Reminders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ChatGPT1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Jenny 2.0",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When clicking ‘Test workflow’": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "https://www.youtube.com/watch?v=nD5jCh9TzGY&list=RDtXZPtzZz2RI&index=42",
+          "code": 2
+        }
+      }
+    ]
+  },
+  "versionId": "edd2d59a-a94e-4794-b934-46e7143f100b",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-11T10:17:24.670Z",
+      "updatedAt": "2025-02-11T10:17:24.670Z",
+      "role": "workflow:owner",
+      "workflowId": "5sEqm9ke9HH7lYf5",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

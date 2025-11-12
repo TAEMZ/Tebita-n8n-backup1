@@ -1,0 +1,1570 @@
+{
+  "createdAt": "2025-09-02T09:03:30.825Z",
+  "updatedAt": "2025-10-14T11:23:38.602Z",
+  "id": "V4JijNE0qx45ESY1",
+  "name": "Linkedin Comment generation",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        832
+      ],
+      "id": "6d6a0aff-257e-4ca4-aee4-e99c04348887",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content.type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "33507ab0-cb68-4ae3-93d5-ccd26723af01"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f4b3ff82-1d33-4bac-ae4e-eaa84ec8ae5e",
+                    "leftValue": "={{ $json.content.type }}",
+                    "rightValue": "=image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "738e8e20-cb3b-4689-8d52-4c400d905989",
+                    "leftValue": "={{ $json.content.type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "aef1ccb0-0d85-456b-932a-3fa7f82f5618",
+                    "leftValue": "={{ $json.content.type }}",
+                    "rightValue": "document",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "dfcb6509-4752-419f-a683-4663700cc7d0",
+                    "leftValue": "={{ $json.content.type }}",
+                    "rightValue": "article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -80,
+        928
+      ],
+      "id": "062e7870-534a-4da7-8147-75c7113c707e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "describe the image",
+        "imageUrls": "={{ $json['Media URL'] }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        240,
+        816
+      ],
+      "id": "f137b087-03b4-415c-be34-0aba97e1eb5d",
+      "name": "Analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1088,
+        912
+      ],
+      "id": "edac7496-bdbe-438a-957b-0f1b788b516a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        224,
+        576
+      ],
+      "id": "e7f82cbf-5678-4731-82f2-a5ae649925bc",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        848,
+        336
+      ],
+      "id": "8e360254-b09d-4e10-9ee5-5453f40e8724",
+      "name": "Transcribe a recording",
+      "alwaysOutputData": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appcyfrUYMKl7NjPw",
+          "mode": "list",
+          "cachedResultName": "Post Tracker",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl8Xa7qODX5KS0kR",
+          "mode": "list",
+          "cachedResultName": "Comment Persona Profiles",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw/tbl8Xa7qODX5KS0kR"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        2048,
+        1168
+      ],
+      "id": "b1d50eb5-b0ce-47de-a11f-5edcc765a645",
+      "name": "Search records in Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -848,
+        976
+      ],
+      "id": "ff83b51d-1e80-4fb4-8dfc-47367711c15e",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.content.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        128,
+        336
+      ],
+      "id": "c8bd0c85-a02e-45e1-81e7-3a692373d0a3",
+      "name": "Download video",
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appcyfrUYMKl7NjPw",
+          "mode": "list",
+          "cachedResultName": "Post Tracker",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWRPweaw7hJBqVK",
+          "mode": "list",
+          "cachedResultName": "Posts",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw/tblWRPweaw7hJBqVK"
+        },
+        "filterByFormula": "({is Comment Generated} = 'no')",
+        "returnAll": false,
+        "limit": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -624,
+        976
+      ],
+      "id": "5f7074bd-8b72-4d2d-80e5-ac2a09e6f2de",
+      "name": "get posts",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * This script processes items from a data source like Airtable.\n * It cleans up the data by:\n * 1. Parsing stringified JSON fields ('Author', 'Content', 'Stats', 'Hashtags') into actual objects.\n * 2. Converting all keys with spaces or dashes into a standard camelCase format (e.g., \"Post URL\" becomes \"postUrl\").\n * 3. Specifically formatting the keys within the parsed 'Stats' object to camelCase.\n * This makes the data much easier and more reliable to work with in subsequent n8n nodes.\n */\n\n// Helper function to convert any string to camelCase.\n// Example: \"Post URL\" -> \"postUrl\", \"total\\_reactions\" -> \"totalReactions\"\nconst toCamelCase = (str) => {\n  // Replace a potential backslash followed by a space, underscore, or dash\n  // and a letter with the uppercase version of that letter.\n  const spacedCamel = str.replace(/\\\\?[\\s_-]+(\\w)/g, (_, c) => c.toUpperCase());\n  return spacedCamel.charAt(0).toLowerCase() + spacedCamel.slice(1);\n};\n\n// An array of keys that are expected to contain stringified JSON.\nconst keysToParse = ['Author', 'Content', 'Stats', 'Hashtags'];\nconst formattedItems = [];\n\n// Loop through each item provided by the previous n8n node.\nfor (const item of $items()) {\n  const cleanedJson = {};\n\n  // Loop through every key-value pair in the current item's JSON data.\n  for (const [key, value] of Object.entries(item.json)) {\n    const newKey = toCamelCase(key);\n    let newValue = value; // Default to the original value.\n\n    // If the key is in our list of keys to parse AND the value is a non-empty string...\n    if (keysToParse.includes(key) && typeof value === 'string' && value.trim() !== '') {\n      try {\n        // ...attempt to parse the string into a real JavaScript object.\n        newValue = JSON.parse(value);\n\n        // Specifically format the keys within the 'Stats' object after parsing.\n        if (key === 'Stats' && typeof newValue === 'object' && newValue !== null && !Array.isArray(newValue)) {\n          const formattedStats = {};\n          for (const [statsKey, statsValue] of Object.entries(newValue)) {\n            formattedStats[toCamelCase(statsKey)] = statsValue;\n          }\n          newValue = formattedStats; // Replace with the object that has camelCased keys\n        }\n      } catch (error) {\n        // If parsing fails, log a warning and keep the original string value.\n        // This prevents the entire workflow from failing on one bad piece of data.\n        console.warn(`Could not parse JSON for key \"${key}\" in item with id \"${item.json.id}\". Keeping original value.`);\n        newValue = value;\n      }\n    }\n    \n    // Add the cleaned key and its corresponding value to our new object.\n    cleanedJson[newKey] = newValue;\n  }\n  \n  // Add the fully cleaned object to our results array, wrapped in n8n's expected format.\n  formattedItems.push({ json: cleanedJson });\n}\n\n// Return the array of cleaned items for the next node in the workflow.\nreturn formattedItems;\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        976
+      ],
+      "id": "46a53bf2-8113-455d-8427-2a45a9a3fec2",
+      "name": "Format posts"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => ({\n  binary: { data: item.binary.data }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        336
+      ],
+      "id": "b0cba132-48c4-4bb0-ae1f-cbc5c698b900",
+      "name": "prepare for conversion",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://45.32.189.71:8073/extract-audio/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "multipart/form-data"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "video_file",
+              "inputDataFieldName": "=data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        336
+      ],
+      "id": "fc9fa248-cc7c-4e0a-b102-f7d374702237",
+      "name": "convert vid to aud",
+      "retryOnFail": true,
+      "maxTries": 4,
+      "waitBetweenTries": 1000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all items coming into this node (from the GPT node)\nconst gptItems = $input.all();\n\n// Get all items from the 'Switch' node by its name\nconst switchItems = $('Switch').all();\n\n// Extract just the 'text' from each GPT item's JSON payload.\n// We are NOT filtering out empty strings to maintain a 1-to-1 match.\nconst gptDescriptions = gptItems\n  .map(item => item.json.text);\n\n// Check if the number of items from both sources match.\nif (switchItems.length !== gptDescriptions.length) {\n  throw new Error(`Item count mismatch: Switch node has ${switchItems.length} items, but GPT node has ${gptDescriptions.length}. Cannot map 1-to-1.`);\n}\n\n// Loop through the Switch items and add the corresponding GPT description\n// from the same position (index) in the gptDescriptions array.\nreturn switchItems.map((item, index) => {\n  return {\n    json: {\n      ...item.json, // Keep original data from the Switch item\n      gpt_description: gptDescriptions[index] // Add the single GPT description (can be empty)\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        576
+      ],
+      "id": "4bbd9e88-31e2-4e0a-8db5-26ceedc682e4",
+      "name": "format1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all GPT outputs into an array\nconst gptOutputs = $input.all().map(item => item.json.content);\n\n// Loop through all Switch posts and use the index to pair them\nreturn $('Switch').all().map((item, index) => {\n  const switchPost = item.json;\n\n  return {\n    json: {\n      ...switchPost,                      // keep original Switch post data\n      gpt_description: gptOutputs[index] // attach the SINGLE corresponding GPT output\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        768
+      ],
+      "id": "5d414632-d163-4c20-bb8c-ffcd4ab32ea5",
+      "name": "format2"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        928
+      ],
+      "id": "6d34be23-a4ca-44ab-996a-552b9156c500",
+      "name": "format3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all GPT outputs into an array\nconst gptOutputs = $input.all().map(item => item.json.content);\n\n// Loop through all Switch posts and use the index to pair them\nreturn $('Switch').all().map((item, index) => {\n  const switchPost = item.json;\n\n  return {\n    json: {\n      ...switchPost,                      // keep original Switch post data\n      gpt_description: gptOutputs[index] // attach the SINGLE corresponding GPT output\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        1120
+      ],
+      "id": "d2dd8316-6a0f-4481-81f1-e7026f705d59",
+      "name": "format4"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.content.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        1104
+      ],
+      "id": "700e32d8-27a9-4e4d-aae8-ac2035497c66",
+      "name": "download docs",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze the following {{ JSON.stringify($json.toJsonString()) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        448,
+        1104
+      ],
+      "id": "d33a47a1-846f-49d4-99d3-ec377d858a3d",
+      "name": "analyze docs",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an AI that reads a social media post object and produces a detailed explanation suitable for another AI to generate a relevant comment. \n\nInput: A JSON object representing a LinkedIn post, which are:\n- Post text {{ $json.text }}\n- posted_at {{ $json.postedAt }}\n- hashtags{{ JSON.stringify($json.hashtags) }}\n- content{{ JSON.stringify($json.content) }}\n- gptDescription of the content(if available) {{ $json.gpt_description || null }}\n\nTask:\n1. Read all information in the post object.\n2. Summarize the post in a way that clearly explains:\n   - What the post is about (topic, context, main message)\n   - The tone of the post (informative, celebratory, reflective, casual, etc.)\n   - Key points or claims made in the post\n   - Any notable hashtags, emojis, or media described in gptDescription\n   - Any subtle context the comment-generating AI should know (like target audience, mood, or implied questions)\n3. Structure the output so another AI can use it to generate a comment relevant to the post.\n\nOutput format:\n{\n  \"summary\": \"<detailed explanation of the post>\",\n  \"tone\": \"<tone of the post>\",\n  \"keyPoints\": [\"<point1>\", \"<point2>\", ...],\n  \"hashtags\": [\"<hashtag1>\", \"<hashtag2>\", ...],\n  \"emojis\": [\"<emoji1>\", \"<emoji2>\", ...]\n  \"post_id\": {{ $json.postId }}\n\n}\n\nDo not generate a comment — only provide the structured explanation.\n\n\nExample output:\n{\n  \"summary\": \"Jane Doe is announcing a new AI tool for workflow automation. The post is celebratory and emphasizes productivity and innovation. The main message is to highlight the tool's benefits for teams.\",\n  \"tone\": \"celebratory, professional, enthusiastic\",\n  \"keyPoints\": [\"Announcing new AI tool\", \"Automates workflows\", \"Helps teams save time\"],\n  \"hashtags\": [\"#AI\", \"#Automation\"],\n  \"emojis\": [\"🚀\"],\n  \"post_id\": {{ $json.postId }}\n}\n\nNow, analyze this post and return the structured explanation"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1312,
+        960
+      ],
+      "id": "87ff42cb-772a-4905-a180-604b4d369dbc",
+      "name": "summarize post",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Your Goal: Write one authentic, human-sounding LinkedIn comment for a post, speaking as an individual from our company, make sure to check if the post is for example for hiring new people, don't comment on that, just return cannot comment(reason: hiring post).\n\nYour Input: You'll receive a summary of a LinkedIn post. You should act as if you've already read our company's brand profile.\n\nYour Task: Based on the post summary, write a single comment (usually 1–3 sentences) that is:\n\n    Personal & Conversational: Use a casual, professional tone. Write from your own perspective using \"I\" and \"my.\" Contractions (\"I've,\" \"it's\") are great.\n\n    Valuable: Go beyond \"Great post!\" Share a quick insight from your experience, ask a thoughtful question, or offer a personal reflection.\n\n    Varied: Don't always use the same formula. Sometimes agree, sometimes add a new perspective, and sometimes just react. Keep it fresh.\n\n    Authentic: Emojis are fine if they feel natural. The goal is to sound like one person sharing their genuine thoughts. Never use heart emojis\n\n    Non-Salesy: No promotions, ever. The goal is to build relationships, not sell.\n\nExample Comments (as \"I\")\n\nHere are a few examples of how this prompt would work in practice, written from an individual's point of view.\n\nFor a post about the risks of AI hallucinations in enterprise software:\n\n    This is such a critical point. In my work, I've found that the best way to build trust is to design systems where AI assists humans, not just replaces them. A human in the loop makes all the difference.\nthe output should look like this\n{\n  {\n    \"comment\":\"<generated comment\"\n    \"post_id\":\"<the post id of the post from the input>\"\n  }\n  {\n    \"comment\":\"<generated comment\"\n    \"post_id\":\"<the post id of the post from the input>\"\n  }\n{\n    \"comment\":\"<generated comment\"\n    \"post_id\":\"<the post id of the post from the input>\"\n  }\n}\nFor a post where a founder shares a story about a difficult pivot:\n\n    What a great story about resilience. It's easy to talk about listening to customers, but I think actually doing it when it means throwing away months of work takes real courage. Mad respect. 🙏\n\nFor a technical post arguing for simpler, \"boring\" technology choices:\n\n    I love this perspective. My experience has shown me that the temptation to use a shiny new tool is real, but a boring, reliable technology that my whole team understands is almost always the right call.\n\nFor a post encouraging managers to protect their team's focus time:\n\n    Totally agree. My team has \"no-meeting Wednesdays\" and it's been a game-changer for my own deep work. It's amazing what just one long block of uninterrupted time can do for productivity. 🚀\nhere are the posts {{ JSON.stringify($json.post1) || null}}{{ JSON.stringify($json.post2) || null }}{{ JSON.stringify($json.post3) || null}}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1888,
+        960
+      ],
+      "id": "14297cc9-64e2-438b-bcf9-8ef6f7c37a6b",
+      "name": "Generate comments"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "Claude Sonnet 4"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        1888,
+        1168
+      ],
+      "id": "fc4df287-5316-40dd-a45f-8b29dfe4581a",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "9d0axFFJIukeXMpn",
+          "name": "Yo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Collects all `content` fields from the items\n * and assigns them to keys post1, post2, post3, ...\n */\n\nconst output = {};\n\nfor (const [i, item] of $items().entries()) {\n  if (item.json && item.json.message && item.json.message.content) {\n    output[`post${i + 1}`] = item.json.message.content;\n  }\n}\n\n// Return one object with post1, post2, post3, etc.\nreturn [\n  {\n    json: output\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        960
+      ],
+      "id": "ae48f706-7af5-4e80-9fdc-f0539e09d708",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "html": "={{$input.all()}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        336,
+        1328
+      ],
+      "id": "7c430511-c1b1-48f5-839a-43465dfc6379",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=write a brief description about the content of the markdown input: {{JSON.stringify($input.all())}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        528,
+        1328
+      ],
+      "id": "0f0c538b-0fda-467e-ad1d-dbfc833f634b",
+      "name": "analyze docs1",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all GPT outputs into an array\nconst gptOutputs = $input.all().map(item => item.json.content);\n\n// Loop through all Switch posts and use the index to pair them\nreturn $('Switch').all().map((item, index) => {\n  const switchPost = item.json;\n\n  return {\n    json: {\n      ...switchPost,                      // keep original Switch post data\n      gpt_description: gptOutputs[index] // attach the SINGLE corresponding GPT output\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        1312
+      ],
+      "id": "be9ebc59-4c1d-47af-aa3b-749887a48097",
+      "name": "format"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.content.article.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        144,
+        1328
+      ],
+      "id": "fcf4c356-ceec-46ea-b18b-e325af9dc5e0",
+      "name": "get article"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        1200
+      ],
+      "id": "3b78b3ab-24b6-4f81-abad-ebd2d4fcdc28",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the raw output text\nconst rawOutput = $json.output || \"\";\n\n// Match all ```json ... ``` blocks\nconst regex = /```json([\\s\\S]*?)```/g;\n\nlet results = [];\nlet match;\n\nwhile ((match = regex.exec(rawOutput)) !== null) {\n  let block = match[1].trim();\n\n  // --- 1️⃣ Fix double-brace style: { { ... }, { ... } }  ----\n  if (/^\\{\\s*\\{[\\s\\S]*\\}\\s*\\}$/.test(block)) {\n    block = \"[\" + block.replace(/^\\{\\s*/, \"\").replace(/\\s*\\}$/, \"\") + \"]\";\n  }\n\n  // --- 2️⃣ Handle multiple standalone objects {..}{..}{..} ---\n  if (!block.startsWith(\"[\") && /\\}\\s*\\{/.test(block)) {\n    block = \"[\" + block.replace(/\\}\\s*\\{/g, \"},{\") + \"]\";\n  }\n\n  try {\n    const parsed = JSON.parse(block);\n\n    if (Array.isArray(parsed)) {\n      parsed.forEach(obj => {\n        if (obj.comments && Array.isArray(obj.comments)) {\n          // flatten comments array into separate objects\n          obj.comments.forEach(c => results.push(c));\n        } else {\n          results.push(obj);\n        }\n      });\n    } else {\n      if (parsed.comments && Array.isArray(parsed.comments)) {\n        parsed.comments.forEach(c => results.push(c));\n      } else {\n        results.push(parsed);\n      }\n    }\n\n  } catch (e) {\n    try {\n      const wrapped = JSON.parse(`[${block}]`);\n      wrapped.forEach(obj => results.push(obj));\n    } catch (_) {\n      // skip invalid chunks\n    }\n  }\n}\n\n// ✅ Return each object as its own JSON item\nreturn results.map(obj => ({ json: obj }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        960
+      ],
+      "id": "10aa7922-ae06-42e8-a4f2-068cfd9c8485",
+      "name": "format generated comments"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d3e7163d-9802-4f0b-b1d8-53bdf5630036",
+              "leftValue": "={{ $json.comment }}",
+              "rightValue": "cannot comment (reason: ",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2448,
+        960
+      ],
+      "id": "3d90ab9b-b155-4481-8e24-035bd1a159e8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appcyfrUYMKl7NjPw",
+          "mode": "list",
+          "cachedResultName": "Post Tracker",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWRPweaw7hJBqVK",
+          "mode": "list",
+          "cachedResultName": "Posts",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw/tblWRPweaw7hJBqVK"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post id": "={{ $json.post_id }}",
+            "Generated Comment": "={{ $json.comment }}",
+            "is Comment Generated": "yes"
+          },
+          "matchingColumns": [
+            "Post id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Author",
+              "displayName": "Author",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post URL",
+              "displayName": "Post URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Stats",
+              "displayName": "Stats",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Text",
+              "displayName": "Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Generated Comment",
+              "displayName": "Generated Comment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Is Connect Sent",
+              "displayName": "Is Connect Sent",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "is Comment Generated",
+              "displayName": "is Comment Generated",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "is Comment Posted",
+              "displayName": "is Comment Posted",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Posted At",
+              "displayName": "Posted At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post id",
+              "displayName": "Post id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2688,
+        896
+      ],
+      "id": "b6bf4146-a54a-40ed-a458-1353774f07c1",
+      "name": "Add generated comment",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appcyfrUYMKl7NjPw",
+          "mode": "list",
+          "cachedResultName": "Post Tracker",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWRPweaw7hJBqVK",
+          "mode": "list",
+          "cachedResultName": "Posts",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw/tblWRPweaw7hJBqVK"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post id": "={{ $json.post_id }}",
+            "Generated Comment": "={{ $json.comment }}",
+            "is Comment Generated": "Can't comment"
+          },
+          "matchingColumns": [
+            "Post id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Author",
+              "displayName": "Author",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post URL",
+              "displayName": "Post URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Stats",
+              "displayName": "Stats",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Text",
+              "displayName": "Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Generated Comment",
+              "displayName": "Generated Comment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Is Connect Sent",
+              "displayName": "Is Connect Sent",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "is Comment Generated",
+              "displayName": "is Comment Generated",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "is Comment Posted",
+              "displayName": "is Comment Posted",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Posted At",
+              "displayName": "Posted At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post id",
+              "displayName": "Post id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2688,
+        1088
+      ],
+      "id": "687f1fba-ae67-45a7-b724-ffc6ad3d2859",
+      "name": "Don't add generated comment",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "format3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "download docs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "format2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "format1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "summarize post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records in Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "Generate comments",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "get posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download video": {
+      "main": [
+        [
+          {
+            "node": "prepare for conversion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get posts": {
+      "main": [
+        [
+          {
+            "node": "Format posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format posts": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prepare for conversion": {
+      "main": [
+        [
+          {
+            "node": "convert vid to aud",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert vid to aud": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "format3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "format4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "download docs": {
+      "main": [
+        [
+          {
+            "node": "analyze docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analyze docs": {
+      "main": [
+        [
+          {
+            "node": "format4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "summarize post": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate comments": {
+      "main": [
+        [
+          {
+            "node": "format generated comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate comments",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Generate comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "analyze docs1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analyze docs1": {
+      "main": [
+        [
+          {
+            "node": "format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "get article": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "format generated comments": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Add generated comment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Don't add generated comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Don't add generated comment": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "z5dK4hrIczUamG3b"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "id": "rectvgXzd3Zz6aTWY",
+          "createdTime": "2025-10-01T14:00:42.000Z",
+          "fields": {
+            "Author": "{\"profile_url\":\"https://www.linkedin.com/in/crvenk?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAAAG0OMB5vIjXv_Etz5vGn5biikvN80XgCE\"}",
+            "Post URL": "\"https://www.linkedin.com/posts/crvenk_automation-n8n-aiagents-activity-7379100300047138816-R0vC?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAF9IIWYBfk8tm7cq3Q1lzxUeyB3FfCfhwEs\"",
+            "Text": "\"🚀 2,000+ Ready-to-Use n8n Automations & AI Agents (Free Download) \\n\\nWhy spend weeks building workflows when someone already organised thousands of them clean, tested, and ready to plug in? \\n\\nInside this goldmine: \\n\\n✅ 2,053 workflows with clear names (no more “workflow_2051.json”) \\n✅ 365+ app integrations (Slack, Gmail, Airtable, HubSpot, and more) \\n✅ 29,000+ nodes mapped and categorised \\n✅ Organized folders by category: Marketing, Sales, Social, AI, Data, Communication, etc. \\n\\nThis isn’t a random dump. It’s like walking into a workshop where every tool is labeled, sharpened, and ready to use. \\n\\n⚡ Imagine: \\n\\nSocial media automation in minutes \\nCRM workflows you can deploy instantly \\nAI agents you can run out-of-the-box \\n\\nIt’s like a giant automation toolbox, organised, labeled, and ready to deploy. \\n\\n💡 Instead of reinventing the wheel, you can start from proven workflows, tweak them, and go live faster. \\n\\nWant the link to the full repo? \\n\\n👉 Comment “AGENTS” and I’ll send it your way\\n\\n#Automation #n8n #AIagents #AIautomation #Productivity #Workflows #NoCode #MarketingAutomation #SalesAutomation #DataAutomation #TechTools #FutureOfWork\"",
+            "Posted At": "2025-10-01T01:30:08.000Z",
+            "Hashtags": "[\"Automation\",\"n8n\",\"AIagents\",\"AIautomation\",\"Productivity\",\"Workflows\",\"NoCode\",\"MarketingAutomation\",\"SalesAutomation\",\"DataAutomation\",\"TechTools\",\"FutureOfWork\"]",
+            "Content": "{\"type\":\"video\",\"url\":\"https://dms.licdn.com/playlist/vid/v2/D5605AQHAYow4Aj48uQ/mp4-720p-30fp-crf28/B56ZmaOlDQG0Bk-/0/1759229152380?e=1759935600&v=beta&t=K6JfBYe1ZgatBLrhgrucDPFoEF9y4mkG_ZDIK5APGZI\",\"thumbnail_url\":\"https://media.licdn.com/dms/image/v2/D5605AQHAYow4Aj48uQ/videocover-high/B56ZmaOlDQG0B8-/0/1759229151579?e=1759935600&v=beta&t=nYs9jWnVk5gIjalGg_SME6IBnPorHVSr4oFyhYABw3E\",\"duration_ms\":14333}",
+            "Is Connect Sent": "no",
+            "Post id": "urn:li:ugcPost:7378741808555544576",
+            "Stats": "{\"total\\_reactions\":17,\"comments\":20,\"shares\":1,\"reactions\":[{\"type\":\"LIKE\",\"count\":17}]}\n",
+            "is Comment Generated": "no",
+            "is Comment Posted": "no"
+          }
+        }
+      }
+    ],
+    "get posts": [
+      {
+        "json": {
+          "id": "recpAllx7Ny5BG0RZ",
+          "createdTime": "2025-10-01T06:00:46.000Z",
+          "Author": "{\"profile_url\":\"https://www.linkedin.com/in/alexd?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAAABZ7nQBhbDs2hmZ-iM3FYsN3PLj_llfkyI\"}",
+          "Post URL": "\"https://www.linkedin.com/posts/alexd_techtalk-industrychallenges-luksolutions-activity-7378887666638954496-wPe7?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAF7rweMBBI1agT60AEKaaMZFb80-_SZR8rc\"",
+          "Text": "\"AI isn’t just about automation. It’s about growth. Most people think AI is about saving time. The real shift? AI that learns with you.\\n\\nWhen AI adapts, everything changes:\\n\\nIt doesn’t just solve today’s problems.\\nIt grows with your business.\\nIt makes smarter decisions tomorrow than it did yesterday.\\nThat’s the difference between tools that finish tasks… and systems that fuel progress.\\n\\nEfficiency is nice. Evolution is better. Businesses that grasp this won’t just keep up—they’ll pull ahead.\\n\\n#TechTalk #IndustryChallenges #LukSolutions #Innovation\"",
+          "Posted At": "2025-09-30T11:25:12.000Z",
+          "Hashtags": "[\"TechTalk\",\"IndustryChallenges\",\"LukSolutions\",\"Innovation\"]",
+          "Content": "{\"type\":\"image\",\"url\":\"https://media.licdn.com/dms/image/v2/D4E10AQHs3ptt9fNk7g/image-shrink_1280/B4EZmcTN3eIUAQ-/0/1759263911329?e=1759906800&v=beta&t=ORW1lS_gjQDLdTHrNdxcTtyLNj30wA_TFmj5dDIz7pU\",\"images\":[{\"url\":\"https://media.licdn.com/dms/image/v2/D4E10AQHs3ptt9fNk7g/image-shrink_1280/B4EZmcTN3eIUAQ-/0/1759263911329?e=1759906800&v=beta&t=ORW1lS_gjQDLdTHrNdxcTtyLNj30wA_TFmj5dDIz7pU\",\"width\":800,\"height\":800},{\"url\":\"https://media.licdn.com/dms/image/v2/D4E10AQHs3ptt9fNk7g/image-shrink_800/B4EZmcTN3eIUAg-/0/1759263911337?e=1759906800&v=beta&t=WecHMTT0L-pCeIaEcu-K0SRFLygq3J4B8Sksjpz8bqU\",\"width\":800,\"height\":800}]}",
+          "Is Connect Sent": "no",
+          "Post id": "urn:li:activity:7378887666638954496",
+          "Stats": "{\"total\\_reactions\":117,\"comments\":81,\"shares\":0,\"reactions\":[{\"type\":\"LIKE\",\"count\":97},{\"type\":\"EMPATHY\",\"count\":11},{\"type\":\"PRAISE\",\"count\":5},{\"type\":\"INTEREST\",\"count\":4}]}\n",
+          "is Comment Generated": "no",
+          "is Comment Posted": "no"
+        }
+      },
+      {
+        "json": {
+          "id": "recqFgHY0p9ixmDFS",
+          "createdTime": "2025-10-01T06:00:45.000Z",
+          "Author": "{\"profile_url\":\"https://www.linkedin.com/school/tutort/posts\"}",
+          "Post URL": "\"https://www.linkedin.com/posts/tutort_ai-unicorns-activity-7378994576264671232-NNLo?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAF7rweMBBI1agT60AEKaaMZFb80-_SZR8rc\"",
+          "Text": "\"🚀 AI Unicorns are redefining the startup landscape🧑‍💻\\n\\nArtificial Intelligence isn’t just transforming industries - it’s creating some of the world’s most valuable startups. From generative AI to automation and data intelligence, these unicorns are driving innovation at an unprecedented pace.\\nThe rise of AI-first companies shows that the future belongs to those who can combine technology, creativity, and vision. Investors are betting big on startups that solve real problems using AI- improving productivity, decision-making, and customer experiences👨\\n\\nBut beyond the valuations lies a deeper message: sustainable success in AI requires purpose, ethics, and continuous innovation. The real winners will be the ones who use AI to empower people, not replace them⌛\\n\\nThe AI revolution is here — and it’s just getting started👇\\n\\n#ArtificialIntelligence #Startups #Innovation #AIRevolution #Unicorns #FutureOfTech #Leadership #Tutortacademy\"",
+          "Posted At": "2025-09-30T18:30:02.000Z",
+          "Hashtags": "[\"ArtificialIntelligence\",\"Startups\",\"Innovation\",\"AIRevolution\",\"Unicorns\",\"FutureOfTech\",\"Leadership\",\"Tutortacademy\"]",
+          "Content": "{\"type\":\"document\",\"title\":\"AI UNICORNS\",\"subtitle\":\"\",\"url\":\"https://media.licdn.com/dms/document/media/v2/D561FAQGAmbf-dguXmw/feedshare-document-chunked-pdf/B56ZmRK5UHHQBo-/0/1759077179432?e=1759906800&v=beta&t=JPkrjdMVn2x1jqhiYnIsn6hjsVw-orM7OoDI4B8DObI\",\"thumbnail_url\":\"https://media.licdn.com/dms/image/v2/D561FAQGAmbf-dguXmw/feedshare-document-cover-images_1920/B56ZmRK5UHHQAw-/0/1759077179828?e=1759906800&v=beta&t=r0BoxeLbVHE7mcujj4xn8Mp--wLO2PttYCiw1ZMaAaY\"}",
+          "Is Connect Sent": "no",
+          "Post id": "urn:li:ugcPost:7378104956748414976",
+          "Stats": "{\"total\\_reactions\":79,\"comments\":16,\"shares\":0,\"reactions\":[{\"type\":\"LIKE\",\"count\":79}]}\n",
+          "is Comment Generated": "no",
+          "is Comment Posted": "no"
+        }
+      },
+      {
+        "json": {
+          "id": "recqqBwnVYsMivh1V",
+          "createdTime": "2025-09-05T14:00:47.000Z",
+          "Author": "{\"profile_url\":\"https://www.linkedin.com/in/saadhsnain?miniProfileUrn=urn%3Ali%3Afsd_profile%3AACoAADHp5pcBaraZPL2SyWB94k6evwVB94zr6P0\"}",
+          "Post URL": "\"https://www.linkedin.com/posts/saadhsnain_ive-been-a-little-quiet-on-here-for-a-while-activity-7369666384827539458-NObQ?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAF5zP1YB0E4xSq0iSeFg09b4cCW8uWQLRnc\"",
+          "Text": "\"I’ve been a little quiet on here for a while, and it’s long overdue that I reactivate LinkedIn and start sharing what I’ve been up to.\\n\\nA lot has been in the works simultaneously, and one of the most exciting chapters has been joining Overdrive 🏎️\\n\\nOverdrive is an Intelligence Studio building production-grade AI and automation systems that help VCs, enterprises, sales and HR teams scale smarter and focus on what counts.\\n\\nA special thank you to Rafael Posada, whose systems thinking has pushed me beyond the “man with a hammer” mindset and taught me how to reach for the right tools at the right time.\\n\\nAnd to Georgiy Sekretaryuk, who's been an incredible mentor in automation: throwing me into the deep end with code, n8n, and complex workflows, and showing me that diving into new skills is the best way to grow.\\n\\nA year ago, I’d never have guessed I’d be building automations and technical systems at this scale. 🔥\\n\\nExcited to share more soon about what we’re building.\"",
+          "Posted At": "2025-09-05T00:43:07.000Z",
+          "Hashtags": "[]",
+          "Content": "{\"type\":\"celebration\",\"celebration_type\":\"Starting a New Position\",\"highlighted_message\":\"\",\"celebration_image_url\":\"https://media.licdn.com/dms/image/v2/D4D22AQFmsVTuMyiAvw/feedshare-shrink_2048_1536/B4DZkZQhKxIYA8-/0/1757065386762?e=1759968000&v=beta&t=Y7pvyOrz7BGtM8APgu50jPuR13m6xvwLDnuMsGEM_0Q\"}",
+          "Is Connect Sent": "no",
+          "Post id": "urn:li:ugcPost:7369666383653093377",
+          "Stats": "{\"total\\_reactions\":43,\"comments\":9,\"shares\":0,\"reactions\":[{\"type\":\"PRAISE\",\"count\":17},{\"type\":\"LIKE\",\"count\":16},{\"type\":\"EMPATHY\",\"count\":9},{\"type\":\"APPRECIATION\",\"count\":1}]}\n",
+          "is Comment Generated": "no",
+          "is Comment Posted": "no"
+        }
+      }
+    ]
+  },
+  "versionId": "55b86e4d-27d4-4130-8778-42967f428efa",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-09-02T09:03:30.825Z",
+      "updatedAt": "2025-09-02T09:03:30.825Z",
+      "role": "workflow:owner",
+      "workflowId": "V4JijNE0qx45ESY1",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

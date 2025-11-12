@@ -1,0 +1,188 @@
+{
+  "createdAt": "2025-02-10T10:58:24.230Z",
+  "updatedAt": "2025-03-07T06:40:18.785Z",
+  "id": "0r6P9PWzF3vwa0dF",
+  "name": "workflow B",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        200,
+        0
+      ],
+      "id": "2ee0dd5d-84e3-4bc6-8849-b18519a8902b",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HOKFJ6mGRbBOxj2D",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "13TLgp6ZazwVJolvKzdZ-4kHxs5GklZCo",
+          "mode": "list",
+          "cachedResultName": "Tebta",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/13TLgp6ZazwVJolvKzdZ-4kHxs5GklZCo"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        0
+      ],
+      "id": "ae1ffaab-1b18-4824-b848-82bd6d8d80c8",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HOKFJ6mGRbBOxj2D",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "PmmCqwiMVYDKFehx",
+          "mode": "list",
+          "cachedResultName": "Pdf - image extract text"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        420,
+        0
+      ],
+      "id": "3ea633a9-5a36-44e3-82ff-bb962e6e1690",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "You are provided with a PNG image of a scanned document. Please analyze the image and extract all the visible text exactly as it appears. Return only the extracted text in plain text format, preserving line breaks, punctuation, and formatting as much as possible. Do not include any additional commentary or analysis—only output the raw text from the image.",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        600,
+        0
+      ],
+      "id": "3fc5cb85-1aa4-4bd4-94d5-16930126f7ac",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "O1PHcm8q29zCIxMY",
+          "name": "OpenAi account 3"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "fa908ec9-d8fa-4135-a7c8-57744352b56f",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-10T10:58:24.230Z",
+      "updatedAt": "2025-02-10T10:58:24.230Z",
+      "role": "workflow:owner",
+      "workflowId": "0r6P9PWzF3vwa0dF",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

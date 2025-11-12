@@ -1,0 +1,2186 @@
+{
+  "createdAt": "2025-04-24T20:50:54.370Z",
+  "updatedAt": "2025-04-24T20:50:54.370Z",
+  "id": "4HJqnPRhmdByzZvG",
+  "name": "My workflow 30",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{ $json.adAccountId }}/ads?fields=account_id,id,name,status,creative{image_url,object_story_id,effective_object_story_id,body,title,object_type}&date_preset=last_90d&limit=1000&filtering=[{\"field\":\"effective_status\",\"operator\":\"IN\",\"value\":[\"ACTIVE\"]}]",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -4060,
+        880
+      ],
+      "id": "9eaec299-251d-4e92-a448-e5fb3cda672b",
+      "name": "Ads in single Ad Account3",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblupA5NH2eKpej5w",
+          "mode": "list",
+          "cachedResultName": "Ad per Ad Account",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tblupA5NH2eKpej5w"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ad_id": "={{ $json.ad_id }}",
+            "ad_name": "={{ $json.ad_name }}",
+            "account_id": "={{ $json.account_id }}",
+            "creative_id": "={{ $json.creative_id }}",
+            "ad_text": "={{ $json.creative.body }}",
+            "ad_title": "={{ $json.creative.title }}",
+            "image": "=[]",
+            "video": "=[\n      {\n        \"url\": \"{{ $json.attachments.data[0].media.source }}\"\n      }\n    ]",
+            "brand": "={{ [$json.brand_name] }}",
+            "post_link": "={{ $json.attachments.data[0].target.url }}"
+          },
+          "matchingColumns": [
+            "ad_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_name",
+              "displayName": "ad_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "account_id",
+              "displayName": "account_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "creative_id",
+              "displayName": "creative_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_text",
+              "displayName": "ad_text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_title",
+              "displayName": "ad_title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "image",
+              "displayName": "image",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "video",
+              "displayName": "video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad per account",
+              "displayName": "ad per account",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "options": [
+                {
+                  "name": "CORKCICLE",
+                  "value": "CORKCICLE"
+                },
+                {
+                  "name": "Reggie",
+                  "value": "Reggie"
+                },
+                {
+                  "name": "BlueChew",
+                  "value": "BlueChew"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "post_link",
+              "displayName": "post_link",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Angle",
+              "displayName": "Angle",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Angle Type",
+              "displayName": "Angle Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Use-Case/Activity-Based Angle",
+                  "value": "Use-Case/Activity-Based Angle"
+                },
+                {
+                  "name": "Benefit-Based Angle",
+                  "value": "Benefit-Based Angle"
+                },
+                {
+                  "name": "Problem-Based Angle",
+                  "value": "Problem-Based Angle"
+                },
+                {
+                  "name": "Emotional Appeal Angle",
+                  "value": "Emotional Appeal Angle"
+                },
+                {
+                  "name": "Feature-Based Angle",
+                  "value": "Feature-Based Angle"
+                },
+                {
+                  "name": "Urgency/Promotional Angle",
+                  "value": "Urgency/Promotional Angle"
+                },
+                {
+                  "name": "Social Proof Angle",
+                  "value": "Social Proof Angle"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Explanation",
+              "displayName": "Explanation",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "comment 2",
+              "displayName": "comment 2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "brand-message-angel",
+              "displayName": "brand-message-angel",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Brand 12",
+              "displayName": "Brand 12",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f18a440b-60fa-4f01-8dd3-381bb6d167aa",
+      "name": "Airtable1",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zKI4T9icngPEPFoi",
+          "name": "Airtable Personal Access Token account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -3260,
+        780
+      ],
+      "id": "d799207d-386f-4d94-86ff-6115771108b1",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v22.0/me/accounts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -5060,
+        300
+      ],
+      "id": "33f471eb-d91d-4dd6-83f8-1af9089bbe34",
+      "name": "Get All Allowed Accounts",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "account_id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -2600,
+        320
+      ],
+      "id": "e5106f5e-560d-429b-90c7-08dd54649a2f",
+      "name": "Merge5"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -4860,
+        300
+      ],
+      "id": "a87eb568-428d-44d2-ae5a-de9f865037d7",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -1360,
+        300
+      ],
+      "id": "7da71666-3d6d-43c7-9ffa-ea92c68801a8",
+      "name": "Merge8"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1ea38987-cf74-4be0-b8b4-8f785e7c8e80",
+              "name": "body",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "3ca9b984-6341-494c-8668-dedb522596e0",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "8f18708d-6a39-4e7d-a3f0-2f5231cf43d3",
+              "name": "object_type",
+              "value": "={{ $json.object_type }}",
+              "type": "string"
+            },
+            {
+              "id": "a62d76f8-2fe4-4a2b-9455-48c746f9c007",
+              "name": "full_picture",
+              "value": "={{ $json.full_picture }}",
+              "type": "string"
+            },
+            {
+              "id": "4ddb21f4-d078-4e04-b112-90057ee9a521",
+              "name": "attachments",
+              "value": "={{ $json.attachments }}",
+              "type": "object"
+            },
+            {
+              "id": "a0a3475f-14b5-4e47-8f1d-6c69bccd6b8e",
+              "name": "account_id",
+              "value": "={{ $json.account_id }}",
+              "type": "string"
+            },
+            {
+              "id": "a6186fa4-c641-4994-8cd8-3150466d762d",
+              "name": "ad_id",
+              "value": "={{ $json.ad_id }}",
+              "type": "string"
+            },
+            {
+              "id": "7567f82d-bd30-4a13-949b-4db18766a7a1",
+              "name": "creative_id",
+              "value": "={{ $json.creative.id }}",
+              "type": "string"
+            },
+            {
+              "id": "6186e749-95db-4284-a503-36c64ec6346a",
+              "name": "ad_name",
+              "value": "={{ $json.ad_name }}",
+              "type": "string"
+            },
+            {
+              "id": "9157daab-497a-466c-9e1c-fc5a1174e07f",
+              "name": "brand_name",
+              "value": "={{ $json.brand_name }}",
+              "type": "string"
+            },
+            {
+              "id": "83894974-b020-4bb8-84d2-d478830040ae",
+              "name": "creative",
+              "value": "={{ $json.creative }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1020,
+        300
+      ],
+      "id": "cf61faf7-1609-4569-8df1-abe6632f1158",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.object_type }}",
+                    "rightValue": "VIDEO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a14ca39f-0b2c-4a0c-91c2-7e43026532b3",
+                    "leftValue": "={{ $json.object_type }}",
+                    "rightValue": "VIDEO",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -680,
+        300
+      ],
+      "id": "e7c704d2-c5d8-448b-bcd5-0a323aec6f1f",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2d57e344-ced3-4b0e-9001-7f9e81593adb",
+              "name": "access_token",
+              "value": "={{ $json.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "afa25261-ef60-429e-a68c-0863d4817cb1",
+              "name": "brand_name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "9f83fa16-fcc2-4693-b23e-49e2c9e42775",
+              "name": "account_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4680,
+        300
+      ],
+      "id": "106783f9-e9c5-4c11-86c3-6e9294793650",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "99b8a5ec-ea49-46af-ba7f-b397098599ee",
+              "name": "account_id",
+              "value": "={{ $json.account_id }}",
+              "type": "string"
+            },
+            {
+              "id": "fca45539-9056-4dab-8491-1bce5c32ac42",
+              "name": "ad_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "28d28546-b319-431e-9d56-b67a77a95011",
+              "name": "ad_name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "12688bc5-3473-47ff-970f-e149ab5865a9",
+              "name": "creative",
+              "value": "={{ $json.creative }}",
+              "type": "object"
+            },
+            {
+              "id": "d5a7eb2c-e3a6-40db-a55d-0f053ec88bcc",
+              "name": "account_id",
+              "value": "={{ $json.account_id }}",
+              "type": "string"
+            },
+            {
+              "id": "1a000bfa-ad81-49c0-9a00-c15b58f77ad7",
+              "name": "creative.body",
+              "value": "={{ $json.creative.body }}",
+              "type": "string"
+            },
+            {
+              "id": "5f9463f2-3fc9-4323-9a6d-dd2f7e900fb1",
+              "name": "creative.title",
+              "value": "={{ $json.creative.title }}",
+              "type": "string"
+            },
+            {
+              "id": "04b01855-ca8f-460c-95ff-b45f037fc57d",
+              "name": "object_type",
+              "value": "={{ $json.creative.object_type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2860,
+        780
+      ],
+      "id": "e0286483-89fd-450e-99df-a37494607bfd",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform the input array by adding 'account_id' to each item\nconst updatedArray = $input.all().map(item => {\n  // Extract account_id from effective_object_story_id\n  const account_id = item.json.creative?.effective_object_story_id?.split(\"_\")[0];\n\n  // Return new object with 'account_id' added\n  return {\n    ...item.json, // Spread existing properties\n    account_id // Add new field\n  };\n});\n\n// Return the updated array\nreturn updatedArray;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3080,
+        780
+      ],
+      "id": "32e3f969-c8c0-4c73-8c68-9334bb62073b",
+      "name": "Get account_id"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{ $json.creative.effective_object_story_id }}/?fields=message,picture,full_picture,attachments",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n    \"Authorization\": \"Bearer {{$json.access_token}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1960,
+        180
+      ],
+      "id": "e67a8252-ce48-4b9a-bf0d-91a10c7007af",
+      "name": "Get Attachements"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblupA5NH2eKpej5w",
+          "mode": "list",
+          "cachedResultName": "Ad per Ad Account",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tblupA5NH2eKpej5w"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "image": "=[\n      {\n        \"url\": \"{{ $json.full_picture }}\"\n      }\n    ]",
+            "ad_name": "={{ $('Merge5').item.json.ad_name }}",
+            "account_id": "={{ $('Merge5').item.json.account_id }}",
+            "creative_id": "={{ $('Merge5').item.json.creative.id }}",
+            "ad_text": "={{ $('Merge5').item.json.creative.body || \"\" }}",
+            "ad_title": "={{ $('Merge5').item.json.creative.title || \"\"}}",
+            "video": "[]",
+            "brand": "={{ [$json.brand_name] }}",
+            "post_link": "={{ $json.attachments.data[0].target.url }}",
+            "ad_id": "={{ $json.ad_id }}"
+          },
+          "matchingColumns": [
+            "ad_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_name",
+              "displayName": "ad_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "account_id",
+              "displayName": "account_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "creative_id",
+              "displayName": "creative_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_text",
+              "displayName": "ad_text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_title",
+              "displayName": "ad_title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "image",
+              "displayName": "image",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "video",
+              "displayName": "video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad per account",
+              "displayName": "ad per account",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "options": [
+                {
+                  "name": "CORKCICLE",
+                  "value": "CORKCICLE"
+                },
+                {
+                  "name": "Reggie",
+                  "value": "Reggie"
+                },
+                {
+                  "name": "BlueChew",
+                  "value": "BlueChew"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "post_link",
+              "displayName": "post_link",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Angle",
+              "displayName": "Angle",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Angle Type",
+              "displayName": "Angle Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Use-Case/Activity-Based Angle",
+                  "value": "Use-Case/Activity-Based Angle"
+                },
+                {
+                  "name": "Benefit-Based Angle",
+                  "value": "Benefit-Based Angle"
+                },
+                {
+                  "name": "Problem-Based Angle",
+                  "value": "Problem-Based Angle"
+                },
+                {
+                  "name": "Emotional Appeal Angle",
+                  "value": "Emotional Appeal Angle"
+                },
+                {
+                  "name": "Feature-Based Angle",
+                  "value": "Feature-Based Angle"
+                },
+                {
+                  "name": "Urgency/Promotional Angle",
+                  "value": "Urgency/Promotional Angle"
+                },
+                {
+                  "name": "Social Proof Angle",
+                  "value": "Social Proof Angle"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Explanation",
+              "displayName": "Explanation",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "comment 2",
+              "displayName": "comment 2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "brand-message-angel",
+              "displayName": "brand-message-angel",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Brand 12",
+              "displayName": "Brand 12",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -40,
+        300
+      ],
+      "id": "c0007f7c-9384-491e-8c1c-ebf7d41c147e",
+      "name": "Airtable2",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zKI4T9icngPEPFoi",
+          "name": "Airtable Personal Access Token account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        920,
+        520
+      ],
+      "id": "a804cf41-644f-4b0d-8eb1-8509eb9b7b5d",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -5880,
+        540
+      ],
+      "id": "e345d48c-0f70-400c-b091-eafa4c443416",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "1twYuXkSbsuNc6Vv",
+          "mode": "list",
+          "cachedResultName": "Facebook Ad Analysis Last"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1460,
+        520
+      ],
+      "id": "759a37eb-4a76-44d0-abf8-704f931c33be",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<script>window.close()</script>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -5380,
+        260
+      ],
+      "id": "8b006215-3c37-43c7-8cc5-66cdfc6e7c05",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        520
+      ],
+      "id": "4b489f42-19e8-4f29-aba8-b004a5196894",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -5880,
+        780
+      ],
+      "id": "3305a2f7-2cc3-4d9c-b796-ba3d2f15e65e",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v22.0/me/adaccounts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -5380,
+        780
+      ],
+      "id": "6d6da7a9-738e-4a8b-95bc-3a54893d9e4a",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json.data.map(account => {\n    return { json: { adAccountId: account.id } }; // Create an array of ad account IDs\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5000,
+        780
+      ],
+      "id": "ed4b75c9-283a-4475-8ded-f483557bdc1f",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.paging.next }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -5220,
+        1060
+      ],
+      "id": "8c5a2678-6153-4bf1-b01f-66764b4487d3",
+      "name": "HTTP Request7",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -5040,
+        1060
+      ],
+      "id": "8cbaa5b3-a558-4d7a-ad45-5d7a43056f92",
+      "name": "Loop Over Items5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -4680,
+        800
+      ],
+      "id": "311a2f6d-9ffc-452e-ae40-e4a27047191c",
+      "name": "Merge",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json.data.map(account => {\n    return { json: { adAccountId: account.id } }; // Create an array of ad account IDs\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4800,
+        1060
+      ],
+      "id": "58ac5f72-1c25-4816-bd52-016aae928c48",
+      "name": "Code9"
+    },
+    {
+      "parameters": {
+        "path": "c0833bb1-88a3-415e-86e4-c5bd94eed396",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -5880,
+        300
+      ],
+      "id": "10e7af14-f443-4cf5-84e2-6e5c89dee520",
+      "name": "Webhook",
+      "webhookId": "c0833bb1-88a3-415e-86e4-c5bd94eed396",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -4460,
+        800
+      ],
+      "id": "af6c9efa-38c0-484e-971a-afeecce485b4",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -3600,
+        880
+      ],
+      "id": "f14452cb-f674-4261-8f04-1c1d8729032c",
+      "name": "Wait",
+      "webhookId": "31dae35d-e245-4163-b183-10f63ed896fc"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{ $json.effective_object_story_id }}/comments?date_preset=last_90d&limit=1000",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n    \"Authorization\": \"Bearer {{$json.access_token}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2120,
+        600
+      ],
+      "id": "3d72590f-ce40-47ff-a677-ee5fc66d441c",
+      "name": "Get comments3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aab029a9-ff40-476f-96c3-a5653c2ddbab",
+              "name": "ad_id",
+              "value": "={{ $json.ad_id }}",
+              "type": "string"
+            },
+            {
+              "id": "0bde47a6-9506-43e4-80bb-a2f4add9e482",
+              "name": "account_id",
+              "value": "={{ $json.account_id }}",
+              "type": "string"
+            },
+            {
+              "id": "283548b5-a10d-4c63-96e5-e0893abfcf3a",
+              "name": "brand_name",
+              "value": "={{ $json.brand_name }}",
+              "type": "string"
+            },
+            {
+              "id": "f28b15b5-8ed0-4d05-825d-dc648e8863cb",
+              "name": "access_token",
+              "value": "={{ $json.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "64f392fb-d6f6-4034-a60c-e83f706c72ff",
+              "name": "effective_object_story_id",
+              "value": "={{ $json.creative.effective_object_story_id }}",
+              "type": "string"
+            },
+            {
+              "id": "336b441e-347f-4418-9498-20bdb0029151",
+              "name": "body",
+              "value": "={{ $json.creative.body }}",
+              "type": "string"
+            },
+            {
+              "id": "2784388a-5cce-4f7f-9df6-87aa782a1932",
+              "name": "title",
+              "value": "={{ $json.creative.title }}",
+              "type": "string"
+            },
+            {
+              "id": "aedcfd62-c572-4f67-868b-7835596f80fb",
+              "name": "ad_name",
+              "value": "={{ $json.ad_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2380,
+        780
+      ],
+      "id": "5974a61f-d241-4836-89b3-8dc880404fd3",
+      "name": "Edit Fields11"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -1120,
+        700
+      ],
+      "id": "f71c956b-9fdf-4a5e-b88d-8fc4c26b1a44",
+      "name": "Merge13"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c002f6d5-a7b1-4f42-b29c-eebd6ee9baf8",
+              "name": "comment",
+              "value": "={{ $json.data }}",
+              "type": "array"
+            },
+            {
+              "id": "1265ad78-9b15-4d0f-adab-6c97a502b652",
+              "name": "ad_id",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1760,
+        600
+      ],
+      "id": "68709822-6ac6-431a-b5ea-2ba821784207",
+      "name": "Edit Fields12"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -900,
+        700
+      ],
+      "id": "373b9eaf-a7f8-4f11-82cb-317d88b69f58",
+      "name": "Split Out8"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1340,
+        820
+      ],
+      "id": "a9509738-f76e-43b7-a381-a3e8cfcee7cd",
+      "name": "Aggregate6"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1360,
+        600
+      ],
+      "id": "85cf2962-b40f-4343-9e75-c47371b23209",
+      "name": "Aggregate7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -560,
+        940
+      ],
+      "id": "2a2bb395-84e4-4a94-80d7-d7681f377fd9",
+      "name": "Loop Over Items4"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "comment",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        940
+      ],
+      "id": "fe25a5cb-31f2-49a9-932b-d1abd89b92a9",
+      "name": "Split Out9",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2fc99ff2-203a-4090-ba49-cca39a0f3cab",
+              "leftValue": "={{ $json.comment.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -200,
+        620
+      ],
+      "id": "a80d918c-bc60-4b1b-860c-2e93fb173311",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl3nJr60faWbnLIc",
+          "mode": "list",
+          "cachedResultName": "comment",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tbl3nJr60faWbnLIc"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comment_id": "={{ $json.comment.id }}",
+            "created_time": "={{ $json.comment.created_time }}",
+            "ad_id": "={{ [$json.ad_id] }}",
+            "message": "={{ $json.comment.message }}"
+          },
+          "matchingColumns": [
+            "comment_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "comment_id",
+              "displayName": "comment_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "created_time",
+              "displayName": "created_time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_name (from ad_id)",
+              "displayName": "ad_name (from ad_id)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "image (from ad_id)",
+              "displayName": "image (from ad_id)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "video (from ad_id)",
+              "displayName": "video (from ad_id)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "brand (from ad_id)",
+              "displayName": "brand (from ad_id)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "theme",
+              "displayName": "theme",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        120,
+        640
+      ],
+      "id": "92ae350b-31df-4080-bc25-b6a81e351d23",
+      "name": "Airtable6",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zKI4T9icngPEPFoi",
+          "name": "Airtable Personal Access Token account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{ $json.ad_id }}?fields=account_id,created_time",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -300,
+        120
+      ],
+      "id": "4ebaa062-bab3-45f7-aa3b-28e9cd28e0a9",
+      "name": "Ad created date",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{ $json.ad_id }}?fields=account_id,created_time",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -380,
+        340
+      ],
+      "id": "de88e35e-c920-4c8c-86d1-1dd6f5d8f47f",
+      "name": "Ad created date1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Ads in single Ad Account3": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Get account_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Allowed Accounts": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge5": {
+      "main": [
+        []
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge8": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Ad created date",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ad created date1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get account_id": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Attachements": {
+      "main": [
+        [
+          {
+            "node": "Merge8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable2": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get All Allowed Accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items5": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code9": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ads in single Ad Account3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get comments3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields11": {
+      "main": [
+        [
+          {
+            "node": "Get comments3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Aggregate6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge13": {
+      "main": [
+        [
+          {
+            "node": "Split Out8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields12": {
+      "main": [
+        [
+          {
+            "node": "Aggregate7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out8": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate6": {
+      "main": [
+        [
+          {
+            "node": "Merge13",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Aggregate7": {
+      "main": [
+        [
+          {
+            "node": "Merge13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Split Out9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out9": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Airtable6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable6": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ad created date": {
+      "main": [
+        [
+          {
+            "node": "Airtable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ad created date1": {
+      "main": [
+        [
+          {
+            "node": "Airtable2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "c6d9f6d4-50d6-432a-805f-89ae0609b2dd",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-04-24T20:50:54.370Z",
+      "updatedAt": "2025-04-24T20:50:54.370Z",
+      "role": "workflow:owner",
+      "workflowId": "4HJqnPRhmdByzZvG",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "createdAt": "2025-03-03T07:37:47.218Z",
+  "updatedAt": "2025-03-03T08:28:04.342Z",
+  "id": "6Vu0qSRJ6UXmVhgJ",
+  "name": "Single Webpage Scrapper",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/david.bell~single-web-page-scrapper/run-sync-get-dataset-items?token=apify_api_TGnQ8WMc0lTBZE2vqB5YrhIiPF3L0f3Igurs",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"url\": \"{{ $json.webUrls }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        -60
+      ],
+      "id": "e2d01728-88c4-4a6c-9527-7a636aa5b2a8",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -60
+      ],
+      "id": "b7e997e0-12c3-4826-8675-b14e7214e4dc",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are helpful, intelligent web scrapper assistant.",
+              "role": "system"
+            },
+            {
+              "content": "You are tasked with converting raw Markdown to a short summarized form of content.\n\nYou have to give 2 paragraphs of summery of the markdown given "
+            },
+            {
+              "content": "=Input:  {{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        660,
+        -60
+      ],
+      "id": "cd2e6c70-ff93-4bc2-aaa6-03e8c9a79a38",
+      "name": "OpenAI",
+      "executeOnce": true,
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b4a33607-a489-4382-b30d-3aea83dcb53c",
+              "name": "webUrls",
+              "value": "={{ $json.url ? $json.url : $json.chatInput  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        -60
+      ],
+      "id": "db07a058-34bb-4d89-9293-c623f001a7aa",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -160
+      ],
+      "id": "0c392b05-bebb-4c0f-961d-b95b8995d6fa",
+      "name": "Execute Workflow Trigger"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "adcf9d0e-4eb2-4aed-bc61-a2bfe5a59b79",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-03-03T07:37:47.218Z",
+      "updatedAt": "2025-03-03T07:37:47.218Z",
+      "role": "workflow:owner",
+      "workflowId": "6Vu0qSRJ6UXmVhgJ",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

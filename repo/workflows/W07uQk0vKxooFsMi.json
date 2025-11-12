@@ -1,0 +1,813 @@
+{
+  "createdAt": "2025-08-20T12:55:59.730Z",
+  "updatedAt": "2025-09-06T06:32:19.272Z",
+  "id": "W07uQk0vKxooFsMi",
+  "name": "Hakim Bot - Automated Response",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a language detection assistant. \nYour only task is to detect the language of the provided text. \nFocus on distinguishing Amharic, Afaan Oromo (Oromifa), Somali, English, and Tigrinya (Tegregna). \nIf the text is clearly in another language, return \"Other\".\n\nRespond ONLY with one word: \"Amharic\", \"Oromifa\", \"Tigrinya\", \"English\", \"Somali\" or \"Other\".\nDo not provide explanations.",
+              "role": "system"
+            },
+            {
+              "content": "=Detect the language of the following message:\n{{ $json.message.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        176,
+        416
+      ],
+      "id": "f58b23cc-58e2-4f8b-9eb6-85e9de212d80",
+      "name": "Language Detector",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "Amharic",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e561cb4c-d7dd-45e4-9bd8-66f9511a3497"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "09af3e79-67f6-4789-a680-1fd5c17420d3",
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "Oromifa",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "837d064a-8705-42be-9b57-8391ba8154c5",
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "Tigrinya",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "39767f84-4596-4f73-b800-328ac79048fd",
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "Somali",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d1d09ab7-40ba-4cce-930f-48eff3b30ff7",
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "English",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        528,
+        368
+      ],
+      "id": "7781ce71-e804-4524-b612-f05a09b1602e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=ወደ ጥልቅ ጥናት እና ትርጉም ስንገባ ከ5 ደቂቃ ያህል ጊዜ ይወስዳል። ለአስቸኳይ ጉዳይ እባክዎ ወደ አስቸኳይ ክፍል ይሂዱ።",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        32
+      ],
+      "id": "ec7e9d2f-e274-49f2-abfc-7ebe44f52cf8",
+      "name": "Amharic Response",
+      "webhookId": "e318e24b-bbeb-46ab-9387-24cdb925a1c1",
+      "credentials": {
+        "telegramApi": {
+          "id": "humUyuIoeEmp3gOA",
+          "name": "Doctor Telegram Api Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Qorannoo fi hiikkaa gad-fageenyaan gochuu keenyaaf daqiiqaa 5 irratti fudhata. Yeroo hatattamaa ta’e, gara kutaa gargaarsa hatattamaa deemuu qabda.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        224
+      ],
+      "id": "31141c53-4b22-4e32-b595-fa32ab189c29",
+      "name": "Oromifa Response",
+      "webhookId": "e318e24b-bbeb-46ab-9387-24cdb925a1c1",
+      "credentials": {
+        "telegramApi": {
+          "id": "humUyuIoeEmp3gOA",
+          "name": "Doctor Telegram Api Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=ኣብ ብጥልቀት ምርምርናን ትርጉምናን ዝኸውን ምክንያት ኣንድ 5 ደቓይቕ ይወስድ። ንነጻነት ጉዳይ ኣብ ኣስኪ እማርጀንሲ ክፍሊ ሂዱ።",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        416
+      ],
+      "id": "30016dd3-f6a5-43fc-b0fc-1df8ef34d56b",
+      "name": "Tegrigna Response",
+      "webhookId": "e318e24b-bbeb-46ab-9387-24cdb925a1c1",
+      "credentials": {
+        "telegramApi": {
+          "id": "humUyuIoeEmp3gOA",
+          "name": "Doctor Telegram Api Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "7euzhyVBNQFC5iQj",
+          "mode": "list",
+          "cachedResultName": "Hakim Bot - Google API"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "textMessage": "={{ $('Telegram Trigger').item.json.message.text }}",
+            "language": "={{ $('Language Detector').item.json.message.content }}"
+          },
+          "matchingColumns": [
+            "message"
+          ],
+          "schema": [
+            {
+              "id": "textMessage",
+              "displayName": "textMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        32
+      ],
+      "id": "300b4afa-a055-42fa-b1c7-1e422f6a236d",
+      "name": "Amharic Subworkflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "7euzhyVBNQFC5iQj",
+          "mode": "list",
+          "cachedResultName": "Hakim Bot - Google API"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "textMessage": "={{ $('Telegram Trigger').item.json.message.text }}",
+            "language": "={{ $('Language Detector').item.json.message.content }}"
+          },
+          "matchingColumns": [
+            "message"
+          ],
+          "schema": [
+            {
+              "id": "textMessage",
+              "displayName": "textMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        224
+      ],
+      "id": "25618dc3-bb39-4f90-885a-defa3755cdf5",
+      "name": "Oromifa Subworkflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "7euzhyVBNQFC5iQj",
+          "mode": "list",
+          "cachedResultName": "Hakim Bot - Google API"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "textMessage": "={{ $('Telegram Trigger').item.json.message.text }}",
+            "language": "={{ $('Language Detector').item.json.message.content }}"
+          },
+          "matchingColumns": [
+            "message"
+          ],
+          "schema": [
+            {
+              "id": "textMessage",
+              "displayName": "textMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        416
+      ],
+      "id": "256fab24-75c1-465d-bbdc-6a5dc38889f3",
+      "name": "Tegrigna Subworkflow"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Waxay qaadan doontaa 5 daqiiqo maadaama aan si qoto dheer u baadhno oo u turjunno, wixii degdeg ah fadlan aad qolka gurmadka degdegga ah.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        608
+      ],
+      "id": "76ba6f58-899f-432f-b0f6-c15561dbb5de",
+      "name": "Somali Response",
+      "webhookId": "e318e24b-bbeb-46ab-9387-24cdb925a1c1",
+      "credentials": {
+        "telegramApi": {
+          "id": "humUyuIoeEmp3gOA",
+          "name": "Doctor Telegram Api Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "7euzhyVBNQFC5iQj",
+          "mode": "list",
+          "cachedResultName": "Hakim Bot - Google API"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "textMessage": "={{ $('Telegram Trigger').item.json.message.text }}",
+            "language": "={{ $('Language Detector').item.json.message.content }}"
+          },
+          "matchingColumns": [
+            "message"
+          ],
+          "schema": [
+            {
+              "id": "textMessage",
+              "displayName": "textMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        608
+      ],
+      "id": "475f421e-c528-4a66-a5a1-b15bc690ad4c",
+      "name": "Somali Subworkflow"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=It will take 5 min as we deep research and translate, for anything  urgent, please go to the emergency room .",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        800
+      ],
+      "id": "41768012-c2ae-4481-abc0-62e538cb0a0a",
+      "name": "English Response",
+      "webhookId": "e318e24b-bbeb-46ab-9387-24cdb925a1c1",
+      "credentials": {
+        "telegramApi": {
+          "id": "humUyuIoeEmp3gOA",
+          "name": "Doctor Telegram Api Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "7euzhyVBNQFC5iQj",
+          "mode": "list",
+          "cachedResultName": "Hakim Bot - Google API"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+            "textMessage": "={{ $('Telegram Trigger').item.json.message.text }}",
+            "language": "={{ $('Language Detector').item.json.message.content }}"
+          },
+          "matchingColumns": [
+            "message"
+          ],
+          "schema": [
+            {
+              "id": "textMessage",
+              "displayName": "textMessage",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "chatId",
+              "displayName": "chatId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        800
+      ],
+      "id": "3ee5406c-2cae-4669-82f9-d21f7d4e7598",
+      "name": "English Subworkflow"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        416
+      ],
+      "id": "83ef16c8-f10a-4bc8-be1a-cffbfda3b7b4",
+      "name": "Telegram Trigger",
+      "webhookId": "c91b533c-6d5d-4023-9881-e63890e1310d",
+      "credentials": {
+        "telegramApi": {
+          "id": "humUyuIoeEmp3gOA",
+          "name": "Doctor Telegram Api Token"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Language Detector": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Amharic Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Oromifa Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tegrigna Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Somali Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "English Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amharic Response": {
+      "main": [
+        [
+          {
+            "node": "Amharic Subworkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Oromifa Response": {
+      "main": [
+        [
+          {
+            "node": "Oromifa Subworkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tegrigna Response": {
+      "main": [
+        [
+          {
+            "node": "Tegrigna Subworkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Somali Response": {
+      "main": [
+        [
+          {
+            "node": "Somali Subworkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "English Response": {
+      "main": [
+        [
+          {
+            "node": "English Subworkflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Language Detector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 177260282,
+          "message": {
+            "message_id": 137,
+            "from": {
+              "id": 958191791,
+              "is_bot": false,
+              "first_name": "Yordanos",
+              "username": "yordanos_yirgu",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 958191791,
+              "first_name": "Yordanos",
+              "username": "yordanos_yirgu",
+              "type": "private"
+            },
+            "date": 1756620961,
+            "text": "hey"
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "1d49dc70-b50f-4a13-847d-693cc813ebf1",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-08-20T12:55:59.730Z",
+      "updatedAt": "2025-08-20T12:55:59.730Z",
+      "role": "workflow:owner",
+      "workflowId": "W07uQk0vKxooFsMi",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

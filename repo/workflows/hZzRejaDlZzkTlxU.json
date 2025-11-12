@@ -1,0 +1,574 @@
+{
+  "createdAt": "2025-11-03T07:34:21.794Z",
+  "updatedAt": "2025-11-06T06:21:11.912Z",
+  "id": "hZzRejaDlZzkTlxU",
+  "name": "Image to video",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputDataFieldName": "PRODUCT_PHOTOS",
+        "name": "={{ $json['Product title'] }} (original)",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1KNpmL6jkSuh9EEond07WwTSDTkFlZtB-",
+          "mode": "list",
+          "cachedResultName": "n8n video generation",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1KNpmL6jkSuh9EEond07WwTSDTkFlZtB-"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "2d864320-7bb6-41c8-a85a-9bb1e230f9dc",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "hS1iRmEenfa61v8l",
+          "name": "n8n  drive"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Product:{{ $('On form submission').item.json['Product title'] }}\nDescription:{{ $('On form submission').item.json['Product description'] }}",
+        "options": {
+          "systemMessage": "=#Overview\nYou are a world-class marketing strategist and an expert text-to-image prompt engineer specializing in creating hyper-realistic, high-quality product photography prompts for AI image generation models\n\n##Your Objective:\nWhen given a product description, your task is to craft a detailed, professional prompt that results in a hyper-realistic, clean, and visually stunning product image suitable for marketing material, advertising campaigns, or e-commerce platforms\n\n## Key Requirements:\n-Focus on hyper-realistic, professional studio photography.\n-Maintain a clean, minimalistic, and elegant visual style.\n-Highlight the product as the main subject with sharp detail and perfect lighting.\n- Use backgrounds that complement but do not overpower the product (e.g., soft gradient, light-colored, or pure white).\n-Include professional lighting details such as \"softbox lighting\",\"studio lights\", or \"natural soft shadows\".\n-Emphasize realism, texture, and color accuracy.\n-Maintain a high-end, premium look and feel.\n-If applicable, suggest a subtle setting that enhances the product's story (e.g., a luxury kitchen counter for a high-end blender).\n\n##Output Format:\n- Write a single text-to-image prompt optimized for a professional AI image model.\n- Be direct and descriptive without using excessive words.\n-Avoid unnecessary repetition or adjectives that do not enhance the image quality.\n-Ensure the prompt is complete and ready for direct input into an AI model.\n\n##Tone:\nProfessional, precise, clean, and optimized for maximum realism and marketing Impact\n\n#Example Input:\n\"A premium wireless Bluetooth speaker in matte black, cylindrical shape and modern design.\"\n\n#Example Output:\n\"Hyper-realistic product photo of a premium matte black wireless Bluetooth speaker with a cylindrical modern design, centered on a clean white studio background, softbox lighting with natural shadows, sharp focus on texture and material, minimalistic, professional advertising shot.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "0459cc9e-f449-41e7-9361-9ac39c3db7f4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        288,
+        208
+      ],
+      "id": "f21d2b15-6a6a-4eb2-8d00-497730fe8cb8",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "pTZ1uOt3PCGMnbSs",
+          "name": "OpenRouter new"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Upload file').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        720,
+        0
+      ],
+      "id": "0762dbb4-5955-4de8-86c6-14d20c5e19af",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "hS1iRmEenfa61v8l",
+          "name": "n8n  drive"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/images/edits",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-image-1"
+            },
+            {
+              "name": "prompt",
+              "value": "={{ $json.output }}"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        928,
+        0
+      ],
+      "id": "2d46ce50-df2d-4ff7-901b-0d3b91a531e8",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "wIpvjOKMCiHQRl0A",
+          "name": "openwebui contract"
+        },
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data[0].b64_json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        0
+      ],
+      "id": "9c56703b-bda8-4c3c-b9a6-7ed813f78458",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.imgbb.com/1/upload",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expiration",
+              "value": "600"
+            },
+            {
+              "name": "key",
+              "value": "058f6713e6922de9a561f64091538813"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "image",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1392,
+        0
+      ],
+      "id": "c3717d2e-d7e1-453a-95cf-1f3f0ffc75c1",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gateway.pixazo.ai/wan-video-2-5/v1/generateImageToVideo2-5Request",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "name": "Ocp-Apim-Subscription-Key",
+              "value": "ddf8c85d6dfa40af83690d1b64dbb555"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "img_url",
+              "value": "={{ $json.data.url }}"
+            },
+            {
+              "name": "prompt",
+              "value": "a proffessional realisting video of the image rotating  around"
+            },
+            {
+              "name": "resolution",
+              "value": "480P"
+            },
+            {
+              "name": "duration",
+              "value": "5"
+            },
+            {
+              "name": "audio",
+              "value": "false"
+            },
+            {
+              "name": "prompt_extend",
+              "value": "true"
+            },
+            {
+              "name": "watermark",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {
+              "followRedirects": false
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1600,
+        0
+      ],
+      "id": "70d4ab57-f64a-4ee1-92df-17fa30abdc46",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2160,
+        16
+      ],
+      "id": "9b397ec0-61b5-4d24-8695-c0042e12db8a",
+      "name": "Wait1",
+      "webhookId": "0ec011de-3963-49e5-8b4a-1912dee95e31"
+    },
+    {
+      "parameters": {
+        "formTitle": "market",
+        "formDescription": " Give us a product photo, title and description and we will get back to u with professional marketing materials",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "PRODUCT PHOTOS",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Product title",
+              "placeholder": "Toothpaste"
+            },
+            {
+              "fieldLabel": "Product description",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "email",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d438444d-20d4-41bc-abf0-ecba4744769b",
+      "name": "On form submission",
+      "webhookId": "c46aaa53-8477-440e-a33e-eee34a8f1b5b"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c0502ac1-0b6a-4ca1-a079-ec0635cd7e04",
+              "leftValue": "={{ $json.task_status }}",
+              "rightValue": "PENDING",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2336,
+        16
+      ],
+      "id": "bd301075-01fe-439a-83cc-7651f441e317",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gateway.pixazo.ai/wan-video-polling/getTextToVideoResult",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "name": "Ocp-Apim-Subscription-Key",
+              "value": "7c929b8072aa423daa83e2432df6cb37"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task_id",
+              "value": "={{ $json.task_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1808,
+        0
+      ],
+      "id": "05f57575-bd6c-4b9d-b4ab-a9207efd6267",
+      "name": "HTTP Request3"
+    }
+  ],
+  "connections": {
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "a161b9c9-61d4-4eb9-82e8-a2ed85851f56",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-11-03T07:34:21.794Z",
+      "updatedAt": "2025-11-03T07:34:21.794Z",
+      "role": "workflow:owner",
+      "workflowId": "hZzRejaDlZzkTlxU",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

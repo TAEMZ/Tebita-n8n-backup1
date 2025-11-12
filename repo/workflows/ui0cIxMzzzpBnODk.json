@@ -1,0 +1,609 @@
+{
+  "createdAt": "2025-08-28T07:03:49.997Z",
+  "updatedAt": "2025-08-28T07:15:19.892Z",
+  "id": "ui0cIxMzzzpBnODk",
+  "name": "My workflow 40",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        576,
+        -432
+      ],
+      "id": "123c9ba3-26eb-456c-841b-56e585c5f7a6",
+      "name": "Telegram Trigger",
+      "webhookId": "fa8a0c4c-b6fe-47ef-8eec-70490f81f240",
+      "credentials": {
+        "telegramApi": {
+          "id": "humUyuIoeEmp3gOA",
+          "name": "Doctor Telegram Api Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User query: trending healthy energy drink alternatives\nDate: {{ $now }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=<Role Definition>  \n\nYou are an expert AI assistant specializing in health and nutrition content for social media.  \nYour core task is to generate, for every user input or feedback, BOTH a fresh, motivational social media caption (“copy”) AND a corresponding, photorealistic image prompt (“image_prompt”)—each tailored for maximum engagement and clarity.\n\n<Context Setting> \n\nThe input you receive is a user request — either a new content query or revision request.\n\n<Task Instructions> \n\nFor every user input (whether a new topic or a revision), ALWAYS generate both:  \n- A fresh social media caption (“copy”) that educates, motivates, and supports readers seeking trustworthy health and nutrition advice.  \n- A matching, photorealistic image prompt (“image_prompt”) that visually reinforces the caption’s core message and emotional tone.\n<Constraints and Guidelines>  \nNever output any text outside the JSON object. The “copy” and “image_prompt” fields must always both be non-empty strings.\n\nCOPY (“caption”) GUIDELINES:  \n- Begin with a relatable, attention-grabbing hook (bold statement, question, or surprising fact) to engage and connect emotionally.  \n- Provide clear, concise, practical advice that answers the query directly.  \n- Use psychological triggers to boost engagement:  \n  - Connect to everyday challenges or struggles.  \n  - Use curiosity, social proof, positive affirmation, or novelty.  \n  - Clearly highlight transformation or benefits.  \n- Motivate and empower the reader (“you/your”).  \n- Use natural, friendly, and professional tone.  \n- Write in active voice and vary sentence length.  \n- Insert line breaks after each sentence or idea for readability.  \n- End with a CTA to Follow @healthybyte for more tips.  \n- Avoid filler, clichés, jargon, hashtags, emojis, marketing-speak, semicolons, asterisks, and references to AI.  \n- Ensure authenticity, clarity, and an approachable, conversational style.  \n\nIMAGE PROMPT GUIDELINES:   \n- Always describe a photorealistic (e.g a portrait photograph of...), visually compelling “studio shot” or natural setting that matches the caption’s theme and emotion.  \n- Any people or life scenes must relate to the caption’s advice or topic.  \n- Lighting should feel natural or professionally lit, with warmth, visual vibrance, and inviting atmosphere.  \n- Use harmonious, energizing colors and clear visual contrast.  \n- All products, packaging, and labels must appear plain, with no text or logos.  \n- Never include visible text, branding, graphics, or prompts to add text.  \n- Clearly describe the setting, subjects, mood, and atmosphere.\n\n<Tool Instructions>\n\nWHEN TO CALL “Research”\n• If the user’s request contains recency words (“current”, “latest”, “trending”, “this week”, “today”, “right now”, etc.),\n  OR you (the assistant) are unsure of the facts → trigger the Research tool.\n• Otherwise, answer directly. \n\nHOW TO CALL “Research”\n• Respond with a single line that is only the user’s request verbatim.\n  – No JSON object\n  – No key names\n  – No additional text \n\n<Output Format>  \n\nYou must always output a single, valid, raw JSON object with both keys populated and nothing else (no markdown, code fences, or text outside).  \n{  \n  \"copy\": \"Engaging, psychologically compelling caption here.\",  \n  \"image_prompt\": \"Detailed, photorealistic image description here.\"  \n}\n<Examples>  \n\nUser: How can I drink more water every day?  \nOutput:  \n{  \n  \"copy\": \"Feeling tired before lunchtime? Even mild dehydration can drain your energy. Keep a water bottle within arm’s reach, and take small sips often. You’ll notice a boost in focus and vitality. Adding gentle reminders can help you build this life-changing habit. Follow @healthybyte for more tips.\",  \n  \"image_prompt\": \"A photorealistic image of a smiling young woman in soft daylight, holding a clear water bottle as she sits in a sunlit kitchen with leafy plants on the windowsill. The scene feels fresh, bright, and motivating.\"  \n}\nUser: What are healthy snack ideas for weight loss?\nOutput:\n{\n  \"copy\": \"Struggling with midday cravings? Smart snacks stop hunger before it derails your progress. Try crunchy veggies with hummus, a handful of nuts, or a fresh berry mix. These small choices fuel your body and help you stay on track. Follow @healthybyte more tips.\",\n  \"image_prompt\": \"A close-up photograph of a rustic wooden table with small bowls of mixed nuts, crisp carrot sticks, celery, and a fresh berry medley. Sunlight streams through a kitchen window, creating a wholesome, inviting glow.\"\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        816,
+        -192
+      ],
+      "id": "8eb855d2-ce6b-4f38-be4c-81f106312cf1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"copy\": \"Social media caption text, written in a clear, engaging and direct style suitable for health and nutrition audiences.\",\n\t\"image_prompt\": \"Text prompt describing a visually striking social media image in a specified creative art style\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1088,
+        96
+      ],
+      "id": "7faa6f9b-4acc-47c0-9b86-8a4070f8c814",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        0
+      ],
+      "id": "c1a8941a-39d6-416e-8c34-1eb94cc63152",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "UWNUXgm95vfChWzU",
+          "name": "LMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "gpt-4o-mini-search-preview-2025-03-11"
+            },
+            {
+              "name": "messages[0].role",
+              "value": "user"
+            },
+            {
+              "name": "messages[0].content",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters2_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        976,
+        64
+      ],
+      "id": "69e07001-fe19-4444-a27d-195291c295fc",
+      "name": "Research"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=dsad"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        880,
+        48
+      ],
+      "id": "1aeefff4-1dda-498e-bfa2-8746cd9447d3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.freepik.com/v1/ai/text-to-image/flux-dev",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-freepik-api-key"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"{{ $json.output.image_prompt }}\",\n  \"aspect_ratio\": \"square_1_1\",\n  \"styling\": {\n    \"effects\": {\n      \"color\": \"softhue\",\n      \"framing\": \"portrait\",\n      \"lightning\": \"iridescent\"\n    },\n    \"colors\": [\n      {\n        \"color\": \"#FF0000\",\n        \"weight\": 0.5\n      }\n    ]\n  },\n  \"seed\": 2147483648\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1376,
+        -192
+      ],
+      "id": "d8373f7e-9e91-498d-a947-5a37603f26ae",
+      "name": "image gen"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1584,
+        -192
+      ],
+      "id": "b1d9cac1-8f92-4c0a-8422-be525db794a9",
+      "name": "Wait",
+      "webhookId": "cfc723cb-7362-401a-97ab-7022bfbd827a"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.freepik.com/v1/ai/text-to-image/flux-dev/{{ $json.data.task_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-freepik-api-key"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        -192
+      ],
+      "id": "e10e6ef3-79a0-4d06-a89c-85d3e42ac115",
+      "name": "get image"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8a511f3b-93ad-4e02-a4cd-932543b1b5f3",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "COMPLETED",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1936,
+        -192
+      ],
+      "id": "dcb0013f-41ba-48ae-8d63-609490ab9437",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data.generated }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2128,
+        -224
+      ],
+      "id": "86b61c4b-3773-425b-af83-65da0630a506",
+      "name": "download image"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "={{ $('AI Agent').item.json.output.copy }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2320,
+        -192
+      ],
+      "id": "81fef2b2-488a-45f3-8b73-60611ab445ef",
+      "name": "Telegram",
+      "webhookId": "6b7bffb8-886d-41bf-840e-d6c1dfe4969d",
+      "credentials": {
+        "telegramApi": {
+          "id": "humUyuIoeEmp3gOA",
+          "name": "Doctor Telegram Api Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Content Creation",
+        "height": 560,
+        "width": 1388,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -304
+      ],
+      "id": "cbcb0a96-5f21-44f5-889e-0d77dcb20e74",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## image gen",
+        "height": 340,
+        "width": 940,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        -304
+      ],
+      "id": "a7c6461c-f0bb-4f9d-88fa-dd4d5d997d21",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Output",
+        "height": 560,
+        "width": 260,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        -304
+      ],
+      "id": "fe8f4d34-4291-4609-9436-bc8d2d9cce0e",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Input",
+        "height": 560,
+        "width": 160,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        528,
+        -304
+      ],
+      "id": "151dfadb-d603-41ce-9525-158de0923674",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.5-flash-image-preview:free\",\n  \"modalities\": [\"image\", \"text\"],\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"{{ $json.output.image_prompt }}\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1168,
+        -192
+      ],
+      "id": "e943c1c3-5926-4023-a68c-3d12bfe4c4ff",
+      "name": "HTTP Request",
+      "credentials": {
+        "openRouterApi": {
+          "id": "MEY692uoQMThtFvA",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        544,
+        -240
+      ],
+      "id": "0d90f1f8-692c-4427-81c3-1fed65e6ee7e",
+      "name": "When chat message received",
+      "webhookId": "2878ca7c-4a9a-4a7c-8129-a36e67877396"
+    },
+    {
+      "parameters": {
+        "path": "50c97e87-b609-4391-9176-c8af85821a13",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        592,
+        112
+      ],
+      "id": "d43e7a3e-00dc-4051-8550-8c0b4dfcbdea",
+      "name": "Webhook",
+      "webhookId": "50c97e87-b609-4391-9176-c8af85821a13"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "image gen": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "get image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get image": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "download image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "download image": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "image gen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "AI Agent": [
+      {
+        "json": {
+          "output": {
+            "copy": "Tired of sugar crashes and jitters from traditional energy drinks? Discover natural energy boosters that fuel your body and mind effectively. Green tea and matcha offer caffeine with calming L-theanine for steady focus. Yerba mate gives you a smooth, antioxidant-rich lift. Hydrate and replenish with coconut water’s electrolytes or support digestion with kombucha’s probiotics. For lasting energy, try chia seed water or nutrient-packed protein shakes. These alternatives help you stay energized and balanced without compromising your health. Try incorporating one into your routine today. Follow @healthybyte for more tips.",
+            "image_prompt": "A photorealistic image of a bright kitchen counter with an assortment of healthy energy drink alternatives: a steaming cup of green tea, a vibrant glass of matcha latte, a chilled bottle of coconut water, a mason jar of kombucha, and a glass of chia seed water with visible seeds. The setting is naturally lit with warm sunlight, featuring fresh fruits and leafy green plants in the background, creating an inviting and energizing atmosphere."
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "65e18bd8-9388-408c-865f-d45fa0171f84",
+  "triggerCount": 3,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-08-28T07:03:49.997Z",
+      "updatedAt": "2025-08-28T07:03:49.997Z",
+      "role": "workflow:owner",
+      "workflowId": "ui0cIxMzzzpBnODk",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

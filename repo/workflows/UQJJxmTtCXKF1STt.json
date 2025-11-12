@@ -1,0 +1,708 @@
+{
+  "createdAt": "2025-07-23T09:51:08.808Z",
+  "updatedAt": "2025-07-29T04:07:15.834Z",
+  "id": "UQJJxmTtCXKF1STt",
+  "name": "Sofia slack",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "590787fc-d4e0-4b52-bc21-cdadd627756c",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        40
+      ],
+      "id": "0bff9998-297a-4fa6-9828-0f8694a10efc",
+      "name": "Webhook",
+      "webhookId": "590787fc-d4e0-4b52-bc21-cdadd627756c",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.fin-stg.findustriesai.com/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhMjU5MTM5LWJjYmUtNDVlZC1hNTE4LWM0MTkzY2E0ODhmMSJ9.OIzMFVTstXwdc9PzZWVc7IYz3OMSFQQegFT1nlKceRo"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"sofia-v01\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are Sofia, a helpful AI assistant. Be friendly, concise, and professional in your responses. Always maintain a conversational tone and provide helpful information based on the conversation context. Recent conversation: {{ $json.chat_history }}\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $('Slack Trigger').item.json.blocks[0].elements[0].elements[0].text }}\"\n    }\n  ],\n  \"tool_ids\": [\n    \"server:0\"\n  ],\n  \"stream\": false\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1900,
+        -140
+      ],
+      "id": "024c7e68-7858-467c-af40-96de2b00a2f2",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "efa65350-c14f-42ef-9ebd-eb2ec0eccd5a",
+              "leftValue": "={{ $json.channel_type }}",
+              "rightValue": "im",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        0
+      ],
+      "id": "60e4a8eb-0768-47a1-94dc-c2e49d4cd6ce",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.fin-stg.findustriesai.com/api/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU2MGJiMWUxLTljNzMtNGQxMi1hMjVkLTliZDdiNmQxYjI3YiJ9.ouBlVJgEFsssQGqSxuvvbukQHbO0HcRnkNYNBMSfPl4"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"sofia-v01\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $('Slack Trigger').item.json.blocks[0].elements[0].elements[1].text }}\"\n    }\n  ],\n  \"tool_ids\": [\"GPT-R\"]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1780,
+        100
+      ],
+      "id": "a00d58fc-ec66-4fd2-9db3-a83ed190630d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "={{ $('Slack Trigger').item.json.user }}",
+          "mode": "id"
+        },
+        "text": "={{ $json.choices[0].message.content }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        2220,
+        -140
+      ],
+      "id": "f3674d21-b453-4d51-ab35-da155fd8c67b",
+      "name": "slack response for dm",
+      "webhookId": "b9f6e698-9d30-4c09-97e4-59de6b81b2fc",
+      "credentials": {
+        "slackApi": {
+          "id": "bPStkr8m75FTko06",
+          "name": "sofia bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $('Slack Trigger').item.json.channel }}",
+          "mode": "id"
+        },
+        "text": "={{ $json.choices[0].message.content }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        2100,
+        100
+      ],
+      "id": "fb5d1690-5f44-4cbd-b729-7a583d416e34",
+      "name": "Slack response for channel",
+      "webhookId": "b9f6e698-9d30-4c09-97e4-59de6b81b2fc",
+      "credentials": {
+        "slackApi": {
+          "id": "bPStkr8m75FTko06",
+          "name": "sofia bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "trigger": [
+          "any_event",
+          "app_mention"
+        ],
+        "watchWorkspace": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        120,
+        0
+      ],
+      "id": "75d776e1-6f29-4b3f-be9a-26b508b54fe1",
+      "name": "Slack Trigger",
+      "webhookId": "c33ae646-c041-4309-93bf-5fcd43fbe8a0",
+      "credentials": {
+        "slackApi": {
+          "id": "bPStkr8m75FTko06",
+          "name": "sofia bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1580,
+        840
+      ],
+      "id": "cdf985c3-3643-4cc7-a963-b18bf86ad43b",
+      "name": "When chat message received",
+      "webhookId": "6c68da9b-a43a-473e-866b-ca981546aa8c"
+    },
+    {
+      "parameters": {
+        "resource": "channel",
+        "operation": "history",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $('Slack Trigger').item.json.channel }}",
+          "mode": "id"
+        },
+        "limit": 10,
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        320,
+        480
+      ],
+      "id": "495841e9-c2e3-428f-83d5-93f9182ccd29",
+      "name": "Get history",
+      "webhookId": "25dd852e-30b6-48d6-8b29-2fac272d9cef",
+      "credentials": {
+        "slackApi": {
+          "id": "bPStkr8m75FTko06",
+          "name": "sofia bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "user",
+        "operation": "getProfile",
+        "user": {
+          "__rl": true,
+          "value": "={{ $json.user }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        920,
+        -140
+      ],
+      "id": "c47c2cd3-8605-42cc-9a46-d2cfdabaeb2d",
+      "name": "get user profile",
+      "webhookId": "14a878ad-6d55-4a7e-aa65-df68aa284b2b",
+      "credentials": {
+        "slackApi": {
+          "id": "bPStkr8m75FTko06",
+          "name": "sofia bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "user",
+        "operation": "getProfile",
+        "user": {
+          "__rl": true,
+          "value": "={{ $('Slack Trigger').item.json.user }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1100,
+        100
+      ],
+      "id": "7f30450e-59af-455d-b15e-f01fad596030",
+      "name": "get user profile1",
+      "webhookId": "14a878ad-6d55-4a7e-aa65-df68aa284b2b",
+      "credentials": {
+        "slackApi": {
+          "id": "bPStkr8m75FTko06",
+          "name": "sofia bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://slack.com/api/conversations.history",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "channel",
+              "value": "={{ $('Slack Trigger').item.json.channel }}"
+            },
+            {
+              "name": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer xoxb-8789200681362-9235747336147-26WoHRVorFPi8XNyHNdkQR4S"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        -140
+      ],
+      "id": "8a7f3cdd-876c-407f-accf-fc8a39670628",
+      "name": "Get history1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let user_id = $('Slack Trigger').first().json.user;\nlet user_name = $('get user profile1').first().json.display_name;\nlet bot_name = \"sofia\";  // or you can pull from a bot_profile name if you want dynamic\n\nconst chat_history = $('Get history2').first().json.messages;\n\nfunction extractConversationPairs(messages) {\n  // Sort messages by timestamp ascending (oldest first)\n  messages.sort((a, b) => parseFloat(a.ts) - parseFloat(b.ts));\n\n  const conversationPairs = [];\n  let currentUserMessage = null;\n\n  for (const msg of messages) {\n    const isBot = !!msg.bot_id;\n    const text = msg.text?.trim();\n    if (!text) continue;\n\n    if (!isBot) {\n      // Save user message\n      currentUserMessage = text;\n    } else if (isBot && currentUserMessage) {\n      // Pair bot response with saved user message\n      conversationPairs.push({\n        user: currentUserMessage,\n        your_response: text,\n      });\n      currentUserMessage = null; // Reset after pairing\n    }\n  }\n\n  return conversationPairs;\n}\n\nreturn [\n  {\n    json: {\n      chat_history: extractConversationPairs(chat_history),\n      user_id,\n      user_name,\n      bot_name,\n    },\n  },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        100
+      ],
+      "id": "9ab270dc-bf9d-4ef2-af70-d8e8700e8e71",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let user_name = $('get user profile').first().json.display_name;\nconst chat_history = $input.first().json.messages;\n\nfunction extractConversationPairs(messages) {\n  // Sort messages by timestamp ascending\n  messages.sort((a, b) => parseFloat(a.ts) - parseFloat(b.ts));\n\n  const conversationPairs = [];\n  let currentUserMessage = null;\n\n  for (const msg of messages) {\n    const isBot = !!msg.bot_id;\n    const text = msg.text?.trim();\n    if (!text) continue;\n\n    if (!isBot) {\n      // Save user message\n      currentUserMessage = text;\n    } else if (isBot && currentUserMessage) {\n      // Pair bot response with saved user message\n      conversationPairs.push({\n        user: currentUserMessage,\n        your_response: text\n      });\n      currentUserMessage = null; // Reset after pairing\n    }\n  }\n\n  return conversationPairs;\n}\n\n// Return structured result\nreturn [\n  {\n    json: {\n      chat_history: extractConversationPairs(chat_history),\n      user_name,\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        -140
+      ],
+      "id": "56b533cd-d100-4877-9af1-4567c1fda26a",
+      "name": "format chat, question and response"
+    },
+    {
+      "parameters": {
+        "url": "https://slack.com/api/conversations.history",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "channel",
+              "value": "={{ $('Slack Trigger').item.json.channel }}"
+            },
+            {
+              "name": "limit",
+              "value": "5"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer xoxb-8789200681362-9235747336147-26WoHRVorFPi8XNyHNdkQR4S"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        80
+      ],
+      "id": "4962f8fa-201f-490b-8f48-c4fcd5b51c2d",
+      "name": "Get history2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2000,
+        340
+      ],
+      "typeVersion": 1,
+      "id": "afb95aaa-cb63-4912-8591-215c54a5be49",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant with access to two tools:\n\n1. **List Tools** – Use this to get all available tools, their endpoints, and parameters.\n2. **Use Tools** – Use this to call a specific tool by sending its endpoint and parameters.\n\n**Instructions:**\n- First, always call the **List Tools** function to see what's available.\n- Then use the **Use Tools** function to interact with the chosen tool.\n- Use the full URL format: `https://mcpo.fin-stg.findustriesai.com/grafana{endpoint}`\n- Do **not** add `/api` to the URL.\n\n**Example:**\nIf the endpoint is `/add_activity_to_incident`, send a request to:  \n`https://mcpo.fin-stg.findustriesai.com/grafana/add_activity_to_incident`  \nInclude the required parameters in the request body as specified in the tool listing.\n\nYour job is to determine what tool to use based on the list, and send requests accordingly.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1800,
+        840
+      ],
+      "id": "9baf0921-4578-4e8a-ba0d-910d2614e2ff",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1740,
+        1060
+      ],
+      "id": "cc7fd906-f70c-4db7-a776-c90a7325b114",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "NdqrWvU3kkpHiuep",
+          "name": "Tebita-openai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to use the tools",
+        "method": "POST",
+        "url": "=https://mcpo.fin-stg.findustriesai.com/grafana{{ $fromAI(\"enpoints\") }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer nnVXjcWLYo5PixYfAMBEcN"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"type\": \"{{ $json.chatInput }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        2100,
+        1080
+      ],
+      "id": "8c1354ee-e67d-4fac-9428-affe5660c15b",
+      "name": "use tools"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request to list all available tools ",
+        "url": "https://mcpo.fin-stg.findustriesai.com/grafana/openapi.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer nnVXjcWLYo5PixYfAMBEcN"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        2240,
+        1040
+      ],
+      "id": "2ff23082-906b-487b-b23e-93ed8101b314",
+      "name": "list tools"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "slack response for dm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "get user profile",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get history2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Slack response for channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get history": {
+      "main": [
+        []
+      ]
+    },
+    "get user profile": {
+      "main": [
+        [
+          {
+            "node": "Get history1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get user profile1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get history1": {
+      "main": [
+        [
+          {
+            "node": "format chat, question and response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format chat, question and response": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get history2": {
+      "main": [
+        [
+          {
+            "node": "get user profile1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "use tools": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "list tools": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "89118ca4-507f-4348-b266-9a4e41d1e62b",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-07-23T09:51:08.808Z",
+      "updatedAt": "2025-07-23T09:51:08.808Z",
+      "role": "workflow:owner",
+      "workflowId": "UQJJxmTtCXKF1STt",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

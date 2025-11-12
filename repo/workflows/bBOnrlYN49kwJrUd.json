@@ -1,0 +1,379 @@
+{
+  "createdAt": "2025-10-23T09:22:01.797Z",
+  "updatedAt": "2025-10-23T12:48:22.783Z",
+  "id": "bBOnrlYN49kwJrUd",
+  "name": "Pdf extractor",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        256
+      ],
+      "id": "474357d2-d5ee-41b7-b0fc-2a88467d716e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1lMf96YVsGSIx4HI9XkEAQ_OrcbBopyzw",
+          "mode": "list",
+          "cachedResultName": "1040, U.S. Individual Income Tax Return, Kariv, Asher & Smadar R Staricoff, 2023.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1lMf96YVsGSIx4HI9XkEAQ_OrcbBopyzw/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        256
+      ],
+      "id": "848403ae-2946-4a46-87ee-574eb9879e7b",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yAN7plSvHEZlFqiz",
+          "name": "Google Drive account kefe2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro-preview-06-05",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro-preview-06-05"
+        },
+        "text": "extract these data: Federal Tax Withheld, State Tax Withheld, SDI Tax, FICA Tax, Medicare Tax.\nyou will find those fields at page 118.\noutput them as a structured json",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        272
+      ],
+      "id": "60267b8b-dd6c-4345-9f02-c585b51f1a4d",
+      "name": "Analyze document",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YCeJexJMXYlXfsf0",
+          "name": "yordanos-google-gemini"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"anthropic/claude-sonnet-4\",\n  \"plugins\": [\n    {\n      \"id\": \"file-parser\",\n      \"pdf\": { \"engine\": \"native\" }\n    }\n  ],\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        { \n          \"type\": \"text\",\n          \"text\": \"Extract these fields: Federal Tax Withheld, State Tax Withheld, SDI Tax, FICA Tax, and Medicare Tax. Return structured JSON.\"\n        },\n        {\n          \"type\": \"file\",\n          \"file\": {\n            \"filename\": \"document.pdf\",\n            \"file_data\": \"{{ 'data:application/pdf;base64,' + $json.data }}\"\n          }\n        }\n      ]\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        768,
+        -192
+      ],
+      "id": "87885c0f-380b-44ac-86f3-53c81d427722",
+      "name": "gemini 2.5 pro",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        624,
+        -208
+      ],
+      "id": "a931b666-5353-4677-ac1c-c6d7aa68f273",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "from PyPDF2 import PdfReader, PdfWriter\nimport base64\n\n# Get PDF from input binary\ninput_pdf_b64 = items[0]['binary']['data']['data']  # base64 string\npage_range_input = items[0]['json'].get('pageRange', '1')  # e.g., \"118\" or \"10-13\"\n\n# Decode base64\npdf_bytes = base64.b64decode(input_pdf_b64)\n\n# Load PDF\nreader = PdfReader(io.BytesIO(pdf_bytes))\nwriter = PdfWriter()\ntotal_pages = len(reader.pages)\n\n# Parse page range\npages_to_extract = []\nif '-' in page_range_input:\n    start, end = map(int, page_range_input.split('-'))\n    pages_to_extract = list(range(start-1, end))  # 0-indexed\nelse:\n    pages_to_extract = [int(page_range_input)-1]\n\n# Validate pages\npages_to_extract = [p for p in pages_to_extract if 0 <= p < total_pages]\nif not pages_to_extract:\n    raise Exception(\"No valid pages to extract\")\n\n# Copy selected pages\nfor p in pages_to_extract:\n    writer.add_page(reader.pages[p])\n\n# Save to bytes\noutput_bytes = io.BytesIO()\nwriter.write(output_bytes)\noutput_bytes.seek(0)\noutput_b64 = base64.b64encode(output_bytes.read()).decode()\n\n# Return as n8n binary\nreturn [{\n    \"json\": {\"pageRange\": page_range_input, \"totalPages\": total_pages},\n    \"binary\": {\"data\": {\"data\": output_b64, \"mimeType\": \"application/pdf\", \"fileName\": f\"extracted_{page_range_input}.pdf\"}}\n}]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -208
+      ],
+      "id": "16dc2b20-b4f9-4a24-a458-35f881bb3934",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $('Create temp storage').item.json.presignedUrl }}",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        416,
+        256
+      ],
+      "id": "42acfc00-ee5a-4ac4-81dc-999f014d593e",
+      "name": "File to Temp storage"
+    },
+    {
+      "parameters": {
+        "url": "https://api.pdf.co/v1/file/upload/get-presigned-url",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "test.pdf"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "bakugomyhero1@gmail.com_V9sAnzcQdjm7fXMlEMf98CrEKrNzw82TXNOzOZEvbdam7UH9fCy4F4gPfuKQyOtj"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -32,
+        256
+      ],
+      "id": "19c9bbce-1289-49cb-8ee5-75d1ea53cec7",
+      "name": "Create temp storage"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pdf.co/v1/pdf/split",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "bakugomyhero1@gmail.com_V9sAnzcQdjm7fXMlEMf98CrEKrNzw82TXNOzOZEvbdam7UH9fCy4F4gPfuKQyOtj"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $('Create temp storage').item.json.url }}"
+            },
+            {
+              "name": "pages",
+              "value": "10-20"
+            },
+            {
+              "name": "inline",
+              "value": "true"
+            },
+            {
+              "name": "name",
+              "value": "result.pdf"
+            },
+            {
+              "name": "async",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        256
+      ],
+      "id": "59d40a8b-a60b-4012-a2c0-3f10ace9adcb",
+      "name": "Split pdf"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.urls[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        832,
+        256
+      ],
+      "id": "92785968-be15-4e14-80bc-9e704ccfa00a",
+      "name": "get pdf"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Create temp storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "File to Temp storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "gemini 2.5 pro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File to Temp storage": {
+      "main": [
+        [
+          {
+            "node": "Split pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create temp storage": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split pdf": {
+      "main": [
+        [
+          {
+            "node": "get pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Create temp storage": [
+      {
+        "json": {
+          "presignedUrl": "https://pdf-temp-files.s3.us-west-2.amazonaws.com/HXS0KJGZT7VBJ6CBD10J79ICFWAZHWNK/test.pdf?X-Amz-Expires=900&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIZJDPLX6D7EHVCKA/20251023/us-west-2/s3/aws4_request&X-Amz-Date=20251023T124116Z&X-Amz-SignedHeaders=host&X-Amz-Signature=f004df1988a677fc2123ebb68d22c41b3497f90aa64e5d2afd61c8cfecb56d34",
+          "url": "https://pdf-temp-files.s3.us-west-2.amazonaws.com/HXS0KJGZT7VBJ6CBD10J79ICFWAZHWNK/test.pdf?X-Amz-Expires=3600&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIZJDPLX6D7EHVCKA/20251023/us-west-2/s3/aws4_request&X-Amz-Date=20251023T124116Z&X-Amz-SignedHeaders=host&X-Amz-Signature=e663db8748311f2ac2a50550e61d1231acc1ebaf06869c24c270def21521c421",
+          "outputLinkValidTill": "2025-10-23T13:41:16.1377594+00:00",
+          "error": false,
+          "status": 200,
+          "name": "test.pdf",
+          "credits": 7,
+          "remainingCredits": 9993,
+          "duration": 0
+        }
+      }
+    ]
+  },
+  "versionId": "857bbc8a-36a1-4d04-9fa1-fb2fae1729fd",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-10-23T09:22:01.797Z",
+      "updatedAt": "2025-10-23T09:22:01.797Z",
+      "role": "workflow:owner",
+      "workflowId": "bBOnrlYN49kwJrUd",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

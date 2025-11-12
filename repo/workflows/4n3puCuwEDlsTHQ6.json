@@ -1,0 +1,1553 @@
+{
+  "createdAt": "2025-08-28T12:21:22.469Z",
+  "updatedAt": "2025-09-30T06:59:04.314Z",
+  "id": "4n3puCuwEDlsTHQ6",
+  "name": "Simplified Content Idea",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2752,
+        128
+      ],
+      "id": "da7ad13c-ffe9-457e-ad22-599df56189d5",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b2c07a30-f361-438d-9927-063d2124d7b0",
+              "name": "number of post",
+              "value": 10,
+              "type": "number"
+            },
+            {
+              "id": "ce328aca-2d8c-4a68-8f4d-f65e2e143c96",
+              "name": "Primary goal",
+              "value": "Maximize Engagement",
+              "type": "string"
+            },
+            {
+              "id": "ed6ec2f7-f8db-4fdb-a93d-9d1b005941ff",
+              "name": "Industry focus ",
+              "value": "AI Autommation",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2976,
+        16
+      ],
+      "id": "c5b9f698-8440-404e-a847-61b8c0396cf2",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format the Ideas - Enhanced JSON extraction and parsing for embedded content\n// This code processes the Content Researcher Agent output, extracts the JSON block,\n// and formats it for the loop.\n\nconst inputData = $input.all()[0].json;\nconsole.log(\"Raw input received:\", JSON.stringify(inputData, null, 2));\n\nlet ideasArray = [];\n\n// Enhanced function to find, clean, and parse JSON safely from a string\nfunction safeJsonParse(textBlock) {\n  if (!textBlock) return [];\n  \n  let jsonString = textBlock.toString();\n\n  // 1. Extract the JSON block from the markdown\n  const jsonMatch = jsonString.match(/```json\\s*([\\s\\S]*?)\\s*```/);\n  if (jsonMatch && jsonMatch[1]) {\n    jsonString = jsonMatch[1];\n    console.log(\"Successfully extracted JSON block from markdown.\");\n  } else {\n    console.warn(\"Could not find a ```json markdown block. Attempting to parse the whole input.\");\n  }\n  \n  try {\n    // 2. Clean and attempt to parse the extracted JSON string\n    let cleaned = jsonString.trim();\n    \n    // Fix common JSON issues like trailing commas\n    cleaned = cleaned.replace(/,(\\s*[}\\]])/g, '$1');\n    \n    // Attempt to parse the cleaned JSON\n    return JSON.parse(cleaned);\n  } catch (error) {\n    console.warn(\"Enhanced JSON parsing failed, attempting manual extraction...\", error.message);\n    \n    // 3. Manual extraction as a fallback for incomplete/malformed JSON\n    try {\n      // Find all occurrences of object-like structures\n      const objectMatches = jsonString.match(/{[^{}]*}/g);\n      if (objectMatches) {\n        const objects = objectMatches.map(objStr => {\n          try {\n            // Try to parse each individual object\n            return JSON.parse(objStr);\n          } catch (e) {\n            // If that fails, manually extract fields from the object string\n            console.warn(\"Parsing individual object failed, extracting fields manually.\", e.message);\n            return extractObjectFields(objStr);\n          }\n        }).filter(obj => obj !== null); // Filter out any nulls from failed extractions\n        \n        if (objects.length > 0) {\n            console.log(`Manual extraction successful. Found ${objects.length} objects.`);\n            return objects;\n        }\n      }\n    } catch (manualError) {\n      console.error(\"Manual extraction also failed:\", manualError.message);\n    }\n    \n    return []; // Return empty array if all attempts fail\n  }\n}\n\n// Function to extract object fields manually using regex (no changes from before)\nfunction extractObjectFields(objStr) {\n  const obj = {};\n  \n  const fields = [\n    'idea_number', 'topic', 'hook_angle', 'content_style', 'emotional_trigger',\n    'marketing_goal', 'brand_alignment', 'competitor_insight', 'unique_angle',\n    'performance_rationale', 'content_brief'\n  ];\n  \n  fields.forEach(field => {\n    const regex = new RegExp(`\"${field}\":\\\\s*\"([^\"]*)\"`, 'i');\n    const match = objStr.match(regex);\n    if (match && match[1]) {\n      obj[field] = match[1];\n    }\n  });\n  \n  if (obj.idea_number) {\n    obj.idea_number = parseInt(obj.idea_number, 10) || 1;\n  }\n  \n  return Object.keys(obj).length > 2 ? obj : null;\n}\n\n// Main processing logic\ntry {\n  // The AI output is expected within a single \"output\" field as a large text block\n  if (inputData.output) {\n    console.log(\"Processing text block from 'output' field...\");\n    ideasArray = safeJsonParse(inputData.output);\n  } else {\n      console.warn(\"Input data did not have an 'output' field. Attempting to process the whole input as a string.\");\n      ideasArray = safeJsonParse(JSON.stringify(inputData));\n  }\n\n  console.log(`Successfully processed ${ideasArray.length} ideas`);\n\n} catch (error) {\n  console.error(\"Error processing ideas:\", error.message);\n  console.log(\"Fallback: creating empty ideas array\");\n  ideasArray = [];\n}\n\n// Fallback to prevent workflow failure if no ideas were found\nif (!Array.isArray(ideasArray) || ideasArray.length === 0) {\n  console.warn(\"No valid ideas found after all parsing attempts, creating fallback idea.\");\n  ideasArray = [{\n    idea_number: 1,\n    topic: \"Error: Failed to parse content ideas\",\n    hook_angle: \"Technical error occurred during JSON extraction or parsing\",\n    content_brief: \"This is a fallback idea. Please check the Content Researcher Agent's raw output to debug the format.\",\n  }];\n}\n\n// Format each idea for the loop with all required fields (no changes from before)\nconst formattedIdeas = ideasArray.map((idea, index) => {\n  const formattedIdea = {\n    // Core idea fields with safe fallbacks\n    idea_id: `idea_${String(index + 1).padStart(2, '0')}`,\n    idea_number: idea.idea_number || (index + 1),\n    topic: idea.topic || `Topic ${index + 1}`,\n    hook_angle: idea.hook_angle || \"\",\n    content_style: idea.content_style || \"practical technique\",\n    emotional_trigger: idea.emotional_trigger || \"\",\n    marketing_goal: idea.marketing_goal || \"\",\n    brand_alignment: idea.brand_alignment || \"\",\n    competitor_insight: idea.competitor_insight || \"\",\n    unique_angle: idea.unique_angle || \"\",\n    performance_rationale: idea.performance_rationale || \"\",\n    content_brief: idea.content_brief || \"\",\n\n    // Retry tracking fields\n    retry_count: 0,\n    max_retries: 3,\n    retry_history: [],\n    current_attempt: 1,\n    last_failure_reason: null,\n    \n    // Metadata for tracking\n    generated_at: new Date().toISOString(),\n    processing_status: \"ready_for_content_creation\",\n    batch_id: `batch_${Date.now()}`,\n    \n    // Additional context for content creation\n    workflow_context: {\n      source: \"content_researcher_agent\",\n      processing_stage: \"formatted_for_loop\",\n      ready_for_content_generation: true\n    }\n  };\n\n  // Validate required fields\n  const requiredFields = ['topic', 'hook_angle', 'content_style', 'marketing_goal'];\n  const missingFields = requiredFields.filter(field => !formattedIdea[field]);\n  \n  if (missingFields.length > 0) {\n    console.warn(`Idea ${index + 1} missing fields: ${missingFields.join(', ')}`);\n  }\n\n  return formattedIdea;\n});\n\n// Add summary metadata (no changes from before)\nconst summary = {\n  total_ideas: formattedIdeas.length,\n  processing_timestamp: new Date().toISOString(),\n  parsing_status: formattedIdeas[0]?.topic.startsWith(\"Error:\") ? \"failed_with_fallback\" : \"success\"\n};\n\nconsole.log(\"Processing Summary:\", JSON.stringify(summary, null, 2));\nconsole.log(`Successfully formatted ${formattedIdeas.length} ideas for the content generation loop.`);\n\n// Return the formatted ideas array for the loop\nreturn formattedIdeas;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1904,
+        160
+      ],
+      "id": "fd15af7a-260b-4080-96c7-04e08933a5d3",
+      "name": "Format the Ideas"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert-level content strategist AI. Your only function is to generate a precise number of strategic content ideas by strictly following a two-phase process. You do not write full content; you create strategic blueprints.\n\nPHASE 1: MANDATORY RESEARCH & DATA GATHERING\n\nCRITICAL: You MUST NOT generate any ideas until you have successfully executed ALL of the following tool calls in this exact order. This data is the foundation for your work.\n\n    get_branding_strategy: To understand the core brand personality and voice.\n\n    get_marketing_strategy: To understand the primary marketing objectives and content pillars.\n\n    get_competitor_analysis: To identify successful content patterns, topics, and hooks.\n\n    get_script_examples: To reference proven content structures and formats.\n\nDo not proceed to Phase 2 until the data from all four tools is available to you.\n\nPHASE 2: STRATEGIC IDEA GENERATION\n\nCONDITION: Only execute this phase after all tool data from Phase 1 has been successfully retrieved and analyzed.\n\nYOUR TASK: Based exclusively on the insights gathered from the tools, generate exactly {{ $('Edit Fields').item.json['number of post'] }} unique content ideas.\n\nSynthesize the data to ensure each idea:\n\n    Aligns with the brand personality.\n\n    Serves a specific marketing goal.\n\n    Leverages a winning pattern from the competitor analysis.\n\n    Fits a proven structure from the script examples.\n\nFINAL OUTPUT: STRICT JSON ARRAY ONLY\n\nABSOLUTE RULES:\n\n    Your entire response MUST be a single, valid JSON array.\n\n    The response MUST start with [ and end with ].\n\n    There must be NO text, explanations, or markdown formatting (like ```json) before or after the array.\n\n    The array MUST contain exactly {{ $('Edit Fields').item.json['number of post'] }} JSON objects.\nThe industry focus is {{ $json['Industry focus '] }}.\n\nJSON Object Schema (Each object must match this exactly):\nJSON\n\n[\n  {\n    \"idea_number\": 1,\n    \"topic\": \"A specific, actionable topic or subject\",\n    \"hook_angle\": \"The attention-grabbing approach or question for the hook\",\n    \"content_style\": \"Choose one from the approved list: practical technique, green screen trend reactions, short form quiz, clients/students in dms, meme style, client assessment, drawing, transformation\",\n    \"emotional_trigger\": \"The primary emotion to evoke (e.g., curiosity, urgency, inspiration)\",\n    \"marketing_goal\": \"The specific marketing pillar this idea serves (e.g., Expert Positioning, Virality Engine)\",\n    \"brand_alignment\": \"A brief explanation of how this fits the brand's personality\",\n    \"competitor_insight\": \"The specific successful pattern or trend this idea leverages\",\n    \"unique_angle\": \"What makes this idea distinctly ours and not a copy of a competitor\",\n    \"performance_rationale\": \"A concise, 1-sentence reason why this idea is expected to perform well\",\n    \"content_brief\": \"A 2-3 sentence description of the content concept and its core message\"\n  }\n]",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2512,
+        -96
+      ],
+      "id": "9f851d81-d407-4330-990f-8564e6479ac1",
+      "name": "Content Researcher Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1680,
+        160
+      ],
+      "id": "4d107c1f-cf30-4dfd-bb00-294ac6af3cff",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -736,
+        208
+      ],
+      "id": "9a4baea0-1420-4246-8330-55cc03c6e51f",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// This code processes the Content Package AI Agent output.\n// It parses the generated Body, Media Type, Media Visual, and Video Script.\n\n// Get the input data from the previous node.\nconst inputData = $input.all()[0].json;\n\nlet contentObject = {};\n\n// --- 1. Try to Parse the JSON Output ---\n// This block attempts to cleanly parse the JSON from the AI's output.\ntry {\n  let jsonString = \"\";\n\n  // The AI output might be a string in the 'output' field or a direct JSON object.\n  if (inputData.output) {\n    jsonString = inputData.output;\n  } else if (inputData.Body) { // Check for the new primary key 'Body'\n    jsonString = JSON.stringify(inputData);\n  } else {\n    jsonString = JSON.stringify(inputData);\n  }\n\n  // Clean the string: find the JSON object within any extra text or markdown.\n  const jsonMatch = jsonString.match(/\\{[\\s\\S]*\\}/);\n\n  if (jsonMatch && jsonMatch[0]) {\n    contentObject = JSON.parse(jsonMatch[0]);\n  } else {\n    throw new Error(\"No valid JSON object found. Proceeding to manual extraction.\");\n  }\n\n} catch (error) {\n  // --- 2. Fallback: Manual Extraction with Regex ---\n  // This block runs if JSON parsing fails. It manually extracts the required fields.\n  console.log(\"JSON parsing failed. Reason:\", error.message);\n\n  const outputStr = inputData.output || JSON.stringify(inputData);\n\n  // Regex for all four fields.\n  const bodyMatch = outputStr.match(/\"Body\":\\s*\"([^\"]*)\"/);\n  const mediaTypeMatch = outputStr.match(/\"Media Type\":\\s*\"([^\"]*)\"/);\n  const mediaVisualMatch = outputStr.match(/\"Media Visual\":\\s*\"([^\"]*)\"/);\n  const videoScriptMatch = outputStr.match(/\"Video Script\":\\s*\"([^\"]*)\"/); // Added this line\n\n  contentObject = {\n    // Note: Bracket notation is used for keys with spaces.\n    \"Body\": bodyMatch ? bodyMatch[1] : \"\",\n    \"Media Type\": mediaTypeMatch ? mediaTypeMatch[1] : \"\",\n    \"Media Visual\": mediaVisualMatch ? mediaVisualMatch[1] : \"\",\n    \"Video Script\": videoScriptMatch ? videoScriptMatch[1] : \"\" // Added this line\n  };\n}\n\n// --- 3. Format the Data for the Next Node ---\n\n// Get current timestamp for a 'Created_At' field.\nconst now = new Date().toISOString();\n\n// Create the final object. The keys here should match your database column names.\nconst formattedContent = {\n  \"Body\": contentObject.Body || \"\",\n  \"Media Type\": contentObject[\"Media Type\"] || \"Text\", // Default to \"Text\"\n  \"Media Visual\": contentObject[\"Media Visual\"] || \"\",\n  \"Video Script\": contentObject[\"Video Script\"] || \"\", // Added this line\n  \"Status\": \"Generated\",\n  \"Created_At\": now,\n  \"Content_ID\": \"content_\" + Date.now(),\n  // This updated line checks the parsed object first.\n  \"Template Number\": contentObject[\"Template Number\"] || inputData[\"Template Number\"] || null\n};\n\n// --- 4. Preserve Retry Logic Data ---\n// This ensures that if the workflow retries, it has the necessary context.\nconst inputJson = $input.all()[0].json;\nif (inputJson.retry_count !== undefined) {\n  formattedContent.retry_count = inputJson.retry_count;\n  formattedContent.max_retries = inputJson.max_retries;\n  formattedContent.retry_history = inputJson.retry_history;\n  formattedContent.current_attempt = inputJson.current_attempt;\n  formattedContent.last_failure_reason = inputJson.last_failure_reason;\n}\n\n// Return the final, formatted content for the next node (e.g., Notion or Airtable).\nreturn [formattedContent];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "d4f6df7c-c8a7-4eab-ba23-1efead1fae26",
+      "name": "Format"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        208
+      ],
+      "id": "859a2eb4-5a60-43d1-a2ab-318e2943b7c8",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Template Compliance Auditor, a systematic AI agent. Your sole function is to provide an objective, evidence-based evaluation of a content package against its specified template guidelines. Your analysis must be strict, precise, and impartial.\n\nCore Principle: A submission either passes or fails. There is no partial credit. Any critical deviation from the template's structural or strategic intent constitutes a failure.\n\n## PHASE 1: MANDATORY RESEARCH\n\nCRITICAL: You MUST NOT perform any evaluation until you have successfully retrieved the exact guidelines for the template in question.\n\n    Tool Call: get_template_info_airtable_tool(template_number={{ $json[\"Template Number\"] }})\n\n        Use this tool to retrieve the complete rules, structure, and strategic rationale from Airtable for the specific Template_Number provided in the input.\n\nOn Tool Failure: If this tool call fails or does not return the expected guidelines, you must immediately stop and proceed to the Final Output phase. Your verdict will be \"fail\" and the reason will be documented as a process failure.\n\n## PHASE 2: SYSTEMATIC EVALUATION\n\nCONDITION: Only execute this phase if the template guidelines were successfully retrieved in Phase 1.\n\nYOUR TASK: Evaluate the provided content package against the official rules for the specified Template_Number.\n\nContent to Evaluate:\n\n    Template_Number: {{ $json[\"Template Number\"] }}\n\n    Body: {{ $json.Body }}\n\n    Media Type: {{ $json['Media Type'] }}\n\n    Media Visual: {{ $json['Media Visual'] }}\n\nEvaluation Process:\n\n    Deconstruct Content: Analyze the Body text and break it down into its core components (e.g., Hook, Main Content/Story Beats, CTA) based on the structure defined in the retrieved template guidelines.\n\n    Component-by-Component Validation: For each component, perform a strict comparison against the template's rules, assessing Structural Alignment, Intent Alignment, and Media Alignment.\n\n    Determine Verdict: Based on your component-level analysis, determine the overall_verdict.\n\n## FINAL OUTPUT: STRICT JSON ONLY\n\nABSOLUTE RULES:\n\n    Your entire response MUST be a single, valid JSON object.\n\n    There must be NO text or markdown formatting before or after the JSON.\n\n    Ensure all strings within the JSON are properly escaped.\n\nJSON Output Schema:\nJSON\n\n{\n  \"evaluation_summary\": {\n    \"overall_verdict\": \"pass\",\n    \"score_percentage\": 85,\n    \"evaluated_template_number\": \"the template number evaluated\",\n    \"evaluation\": \"A concise description of how the content aligns with the database template, including which beats match, any deviations, and a summary of the template’s key elements.\",\n    \"critical_violations_count\": 0,\n    \"soft_violations_count\": 1,\n    \"soft_violations\": [\n      \"CTA could more closely match the template's 'Why it works' rationale.\"\n    ],\n    \"autofix_suggestion\": {\n      \"field_to_fix\": \"cta\",\n      \"suggested_content\": \"New suggested CTA text based on the specific template's guidelines.\"\n    }\n  }\n}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        272,
+        -32
+      ],
+      "id": "eea7eaab-93c5-4d06-87ee-bd17d7f902ae",
+      "name": "Content Checker",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"evaluation_summary\": {\n    \"overall_verdict\": \"pass\",\n    \"score_percentage\": 85,\n    \"evaluated_template_number\": \"the template number evaluated\",\n    \"evaluation\": \"A concise description of how the content aligns with the database template, including which beats match, any deviations, and a summary of the template’s key elements.\",\n    \"critical_violations_count\": 0,\n    \"soft_violations_count\": 1,\n    \"soft_violations\": [\n      \"CTA could more closely match the template's 'Why it works' rationale.\"\n    ],\n    \"autofix_suggestion\": {\n      \"field_to_fix\": \"cta\",\n      \"suggested_content\": \"New suggested CTA text based on the specific template's guidelines.\"\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        208
+      ],
+      "id": "c0465a8a-42e8-4a2e-be0d-a7c642180a41",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a methodical, direct-response content creator AI. Your primary function is to transform a content idea into a complete JSON content package by strictly following a two-phase process. You do not create content randomly; you build it precisely according to a pre-selected template.\n\n## PHASE 1: MANDATORY RESEARCH & STRATEGY GATHERING\n\nCRITICAL: You MUST NOT create any content until you have successfully gathered ALL of the following data in order.\n\n    Get Strategic Context: Call the following tools to understand the broader strategy:\n\n        get_branding_strategy(): To understand voice, personality, and core messaging.\n\n        get_marketing_strategy(): To understand goals, target audience, and content pillars.\n\n        get_competitor_analysis(): To identify successful content patterns and opportunities.\n\n    Identify and Fetch Template Rules: This is your primary creative directive.\n\n        Acknowledge Incoming Mandate: First, recognize the Template Data you are being given. It contains the template_number to use and the selection_rationale (the \"why\").\n\n            Incoming Template Data: {{ $('AI Agent').item.json.output }}\n\n        Execute Airtable Search: Next, you MUST use the template_number from the data above to call the following tool and retrieve the official template guidelines from Airtable.\n\n            Tool Call: get_template_info_airtable_tool(template_number={{ $json.template_number }}\nDo not proceed to Phase 2 until all this data is gathered and synthesized.\n\n## PHASE 2: TEMPLATE-DRIVEN CONTENT CREATION\n\nCONDITION: Only execute this phase after all research in Phase 1 has been completed.\n\nYOUR TASK: Synthesize ALL research from Phase 1. Your content creation must adhere to two primary constraints:\n\n    The Official Template Rules: The structure, format, and key beats defined in the guidelines you fetched from Airtable.\n\n    The Strategic Intent: The specific tone, angle, and purpose described in the selection_rationale.\n\nContent Idea to Develop:\n\n    Topic: {{ $('Loop Over Items').item.json.topic }}\n\n    Brief: {{ $('Loop Over Items').item.json.content_brief }}\n\n    Hook Angle: {{ $('Loop Over Items').item.json.hook_angle }}\n\n    Content Style: {{ $('Loop Over Items').item.json.content_style }}\n\n    Emotional Trigger: {{ $('Loop Over Items').item.json.emotional_trigger }}\n\n    Marketing Goal: {{ $('Loop Over Items').item.json.marketing_goal }}\n\n    Unique Angle: {{ $('Loop Over Items').item.json.unique_angle }}\n\n## FINAL OUTPUT: VALID JSON ONLY\n\nCRITICAL RULES:\n\n    You MUST return ONLY a single, valid JSON object.\n\n    There must be NO markdown formatting (like ```json), comments, or any text before or after the JSON object.\n\n    All newlines inside the \"Body\" string MUST be escaped as \\\\n.\n\nJSON Schema:\nJSON\n\n{\n  \"Template Number\": \"Extract the template_number from the 'Template Data' provided in Phase 1.\",\n  \"Body\": \"Write the complete, final post text here. It must precisely follow the official structure from the fetched template rules while embodying the strategic intent of the 'selection_rationale'. It must include a strong hook, a main body, and a clear call-to-action (CTA). Format it with \\\\n for new paragraphs.\",\n  \"Media Type\": \"Analyze the 'Content Style' from the input. If the style is 'text_only', output 'Text'. For styles like 'meme style' or 'drawing', output 'Image'. For styles like 'green screen trend reactions', output 'Video'.\",\n  \"Media Visual\": \"Write a vivid description of the visual scene. Describe the setting, key actions, camera angles, and overall aesthetic, explaining what the video or image looks like. This is a brief for a designer or videographer or even a prompt for an ai so make sure you are very descriptive on the image/video to be generated. If the 'Media Type' is 'Text', this MUST be an empty string.\",\n  \"Video Script\": \"IF the 'Media Type' you determined is 'Video', write the complete, word-for-word script for the speaker. This should align with the 'Body' text but be formatted for spoken delivery. IF the 'Media Type' is 'Text' or 'Image', this MUST be an empty string.\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -560,
+        -32
+      ],
+      "id": "4b78e30b-4b08-463d-87db-0b28c6fc01c0",
+      "name": "Content Generation AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl45of88519wfsvb",
+          "mode": "list",
+          "cachedResultName": "My Business",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tbl45of88519wfsvb"
+        },
+        "options": {
+          "fields": [
+            "Branding strategy",
+            "About The Brand"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -608,
+        208
+      ],
+      "id": "1c5b9bbb-e249-469a-9888-3a92954f46b5",
+      "name": "Branding Strategy",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl45of88519wfsvb",
+          "mode": "list",
+          "cachedResultName": "My Business",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tbl45of88519wfsvb"
+        },
+        "options": {
+          "fields": [
+            "marketing strategy",
+            "Brand Name",
+            "Language",
+            "Business Email",
+            "Excluded Words"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -480,
+        208
+      ],
+      "id": "451d35b4-4b51-4e00-9df3-5e477a0e944c",
+      "name": "Marketing Strategy",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmtJgGpOS2hQn74",
+          "mode": "list",
+          "cachedResultName": "Brand Content Strategies",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tblmtJgGpOS2hQn74"
+        },
+        "filterByFormula": "AND(   ({is checked} = \"yes\"),   DATETIME_DIFF(TODAY(), {Created at}, 'days') < 3 )",
+        "returnAll": false,
+        "limit": 5,
+        "options": {
+          "fields": [
+            "Post Text",
+            "Content Format",
+            "Angle",
+            "Tone of Voice",
+            "Emotional Trigger",
+            "Visual Language",
+            "Story Device",
+            "Call To Engagement",
+            "Cultural Relevance",
+            "Takeaways"
+          ]
+        },
+        "sort": {
+          "property": [
+            {
+              "field": "Created at",
+              "direction": "desc"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -352,
+        208
+      ],
+      "id": "31de57ff-87bc-475a-93da-f601fe0b37ee",
+      "name": "Competitor Analysis",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl45of88519wfsvb",
+          "mode": "list",
+          "cachedResultName": "My Business",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tbl45of88519wfsvb"
+        },
+        "options": {
+          "fields": [
+            "Branding strategy"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -2624,
+        128
+      ],
+      "id": "4de6f4d1-ab74-4d20-a161-7d9b8ea64a50",
+      "name": "Branding Strategy1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl45of88519wfsvb",
+          "mode": "list",
+          "cachedResultName": "My Business",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tbl45of88519wfsvb"
+        },
+        "options": {
+          "fields": [
+            "marketing strategy"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -2496,
+        128
+      ],
+      "id": "f50948d9-4823-4960-954e-431116cc6af9",
+      "name": "Marketing Strategy1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmtJgGpOS2hQn74",
+          "mode": "list",
+          "cachedResultName": "Brand Content Strategies",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tblmtJgGpOS2hQn74"
+        },
+        "filterByFormula": "AND(   ({is checked} = \"yes\"),   DATETIME_DIFF(TODAY(), {Created at}, 'days') < 3 )",
+        "returnAll": false,
+        "limit": 5,
+        "options": {
+          "fields": [
+            "Post Text",
+            "Content Format",
+            "Angle",
+            "Tone of Voice",
+            "Emotional Trigger",
+            "Visual Language",
+            "Story Device",
+            "Call To Engagement",
+            "Cultural Relevance",
+            "Takeaways"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -2368,
+        128
+      ],
+      "id": "bfc0170f-e526-4520-8663-4516822725ac",
+      "name": "Competitor Analysis1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblpFtvh1CEpAl5xI",
+          "mode": "list",
+          "cachedResultName": "Justin Welsh Script Examples",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tblpFtvh1CEpAl5xI"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -2240,
+        128
+      ],
+      "id": "a70234eb-36f0-4268-8350-9d4ee8d5353b",
+      "name": "Script Examples1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2b3fbf3e-409c-47d9-b34b-635d67e6ce38",
+              "name": "final_status",
+              "value": "approved",
+              "type": "string"
+            },
+            {
+              "id": "38cfc840-7ce6-4a30-9aab-699b26786ca9",
+              "name": "approved_at",
+              "value": "={{ new Date().toISOString() }}",
+              "type": "string"
+            },
+            {
+              "id": "b377ef57-9da0-4c8f-965a-0b85e521db6c",
+              "name": "total_attempts",
+              "value": "={{ ($json.retry_count || 0) + 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "08594eec-9224-4ec3-b4cd-250c423280b1",
+              "name": "quality_score",
+              "value": "={{ $('Content Checker').item.json.output.evaluation_summary.score_percentage }}",
+              "type": "number"
+            },
+            {
+              "id": "aa2e7912-e157-4da7-836b-b6ab0fc62bb8",
+              "name": "processing_complete",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "39216783-4570-4db5-ba23-f754e9463f61",
+              "name": "Body",
+              "value": "={{ $json.formattedBody }}",
+              "type": "string"
+            },
+            {
+              "id": "e25da3bd-1b74-40a2-8437-c2d76c2db236",
+              "name": "Content_ID",
+              "value": "={{ $('Format').item.json.Content_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "2f49f01a-b41a-4f19-a86e-85a91e4eacc8",
+              "name": "status",
+              "value": "={{ $('Format').item.json.Status }}",
+              "type": "string"
+            },
+            {
+              "id": "cad877f2-6921-4f2d-8992-0dbe80f6f9a1",
+              "name": "=media_type",
+              "value": "={{ $('Format').item.json[\"Media Type\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "915ab675-e1c7-4793-a6fe-23c3ffea4dd7",
+              "name": "media_visual",
+              "value": "={{ $('Format').item.json[\"Media Visual\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "0ac58c9f-b2a6-430f-a927-4bdc2022bd66",
+              "name": "template_used",
+              "value": "={{ $('Content Checker').item.json.output.evaluation_summary.evaluated_template_number }}",
+              "type": "string"
+            },
+            {
+              "id": "2330561a-b654-428c-b854-32f9d6f4adf9",
+              "name": "Video Script",
+              "value": "={{ $json.formattedVideoScript }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        -32
+      ],
+      "id": "2251c0da-c85b-403e-aa93-70f161468d74",
+      "name": "Mark as Success"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblzKcr88wvgC51oF",
+          "mode": "list",
+          "cachedResultName": "Post idea",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tblzKcr88wvgC51oF"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Body": "={{ $json.Body }}",
+            "Quality Score": "={{ $json.quality_score }}",
+            "Media Type": "={{ $json.media_type }}",
+            "Media Visual": "={{ $json.media_visual }}",
+            "Content ID": "={{ $json.Content_ID }}",
+            "Approved At": "={{ new Date($json.approved_at).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }) }}",
+            "Video Script": "={{ $json['Video Script'] }}",
+            "Template Used": "={{ $json.template_used }}"
+          },
+          "matchingColumns": [
+            "Content ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Content ID",
+              "displayName": "Content ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Body",
+              "displayName": "Body",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Media Type",
+              "displayName": "Media Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Media Visual",
+              "displayName": "Media Visual",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Video Script",
+              "displayName": "Video Script",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Quality Score",
+              "displayName": "Quality Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Select",
+              "displayName": "Select",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Draft",
+                  "value": "Draft"
+                },
+                {
+                  "name": "Graphics",
+                  "value": "Graphics"
+                },
+                {
+                  "name": "Review",
+                  "value": "Review"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Media Link",
+              "displayName": "Media Link",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Approved At",
+              "displayName": "Approved At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Template Used",
+              "displayName": "Template Used",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1120,
+        160
+      ],
+      "id": "e3661ed0-594d-44cf-9749-6a73f6380cb3",
+      "name": "Create or update a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a Content Strategy Analyst AI. Your sole responsibility is to analyze a content idea, evaluate potential templates, and provide a clear, data-driven justification for selecting the single most suitable template. Your goal is to explain the \"why\" behind your choice, not to create instructions for another agent.\n\nPHASE 1: MANDATORY RESEARCH\n\nCRITICAL: You MUST NOT select a template until you have successfully executed the following tool call to find the most relevant templates from the vector database.\n\n    find_best_template: Call this tool (connected to your vector database: Templates). Use the core concepts from the Input Idea Data as the search query to find the most semantically similar templates.\n\nDo not proceed to Phase 2 until this data is available.\n\nPHASE 2: ANALYSIS & SELECTION\n\nCONDITION: Only execute this phase after the most relevant templates have been retrieved from the vector database in Phase 1.\n\nYOUR TASK: Analyze the following content idea and select the single best template from the search results that will most effectively achieve its goals. You must ensure your choice is deliberate and well-supported, not random.\n\nInput Idea Data:\n\n    topic: {{ $json.topic }}\n\n    hook_angle: {{ $json.hook_angle }}\n\n    content_style: {{ $json.content_style }}\n\n    emotional_trigger: {{ $json.emotional_trigger }}\n\n    marketing_goal: {{ $json.marketing_goal }}\n\n    brand_alignment: {{ $json.brand_alignment }}\n\n    competitor_insight: {{ $json.competitor_insight }}\n\n    unique_angle: {{ $json.unique_angle }}\n\n    performance_rationale: {{ $json.performance_rationale }}\n\n    content_brief: {{ $json.content_brief }}\n\nSelection Process:\n\n    Analyze Input: Review all fields of the input data to understand the idea's core strategic intent.\n\n    Evaluate Search Results: Meticulously compare each template returned by the tool against the input data.\n\n    Select Best Fit: Choose the one template that is the absolute strongest fit. Your decision should be primarily based on how well the template aligns with the idea's marketing_goal, hook_angle, and unique_angle.\n\nFINAL OUTPUT: STRICT JSON ONLY\n\nABSOLUTE RULES:\n\n    Your entire response MUST be a single, valid JSON object.\n\n    There must be NO text or markdown formatting before or after the JSON.\n\n    The output must contain exactly two fields: template_number and selection_rationale.\n\nJSON Output Schema:\nJSON\n\n{\n  \"template_number\": \"The number of the template you selected from the library\",\n  \"selection_rationale\": \"A clear and concise rationale explaining WHY the chosen template is the optimal fit. Your explanation MUST directly reference specific fields from the Input Idea Data (e.g., 'The hook_angle of X aligns perfectly with this template's structure because...') to justify your decision. This is NOT an instruction for another AI.\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1424,
+        -32
+      ],
+      "id": "9392a83f-6bc6-4a1e-99c8-ccfee83cc8c7",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1456,
+        208
+      ],
+      "id": "0e7d04c7-76db-4b7f-9eff-62050b2fa750",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1248,
+        416
+      ],
+      "id": "dc215e26-37ae-4bc5-8221-36cf1a9df9ca",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Access this to get script examples/guidelines",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -1328,
+        208
+      ],
+      "id": "8c948595-6133-4bb7-a881-857e4d906708",
+      "name": "Templates",
+      "credentials": {
+        "supabaseApi": {
+          "id": "D8dPI7PvnrBFgKHa",
+          "name": "Content"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1VyU6i0oRq6cd8",
+          "mode": "list",
+          "cachedResultName": "justin welsh templates structure",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tbl1VyU6i0oRq6cd8"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -3200,
+        -560
+      ],
+      "id": "fdb1c8cd-d80d-4ca6-bd6f-fb9154749582",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -2976,
+        -560
+      ],
+      "id": "bb5b50ed-7af1-49cb-af39-ee7dc7e7c3b2",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "D8dPI7PvnrBFgKHa",
+          "name": "Content"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -2848,
+        -336
+      ],
+      "id": "f397891e-5599-4f31-bc7a-18ab718ebfb1",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2976,
+        -336
+      ],
+      "id": "7a247e4c-ab2f-4c60-9763-334e0236af52",
+      "name": "Embeddings OpenAI3",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1VyU6i0oRq6cd8",
+          "mode": "list",
+          "cachedResultName": "justin welsh templates structure",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tbl1VyU6i0oRq6cd8"
+        },
+        "filterByFormula": "=(page = \"{{ $('Template info').item.json.template_number }}\")",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        208
+      ],
+      "id": "24bc09c0-2b9c-4757-b33b-6b1eeb715308",
+      "name": "Get Template info",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the single item from the previous n8n node\nconst item = $input.all()[0];\n\n// Access the 'output' key, which contains the JSON as a string\nconst jsonString = item.json.output;\n\n// Parse the string into a clean, usable JavaScript object\nconst cleanJson = JSON.parse(jsonString);\n\n// Return the data in the standard n8n format for the next node\nreturn [{\n  json: cleanJson\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        -32
+      ],
+      "id": "cdcdecaa-21d2-440b-9747-270ca29abde1",
+      "name": "Template info"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl1VyU6i0oRq6cd8",
+          "mode": "list",
+          "cachedResultName": "justin welsh templates structure",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tbl1VyU6i0oRq6cd8"
+        },
+        "filterByFormula": "=(page = \"{{ $('Template info').item.json.template_number }}\")",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        336,
+        208
+      ],
+      "id": "2531aac5-ee2e-40aa-a4fd-fcaf86edd04c",
+      "name": "Get Template info1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        -2112,
+        128
+      ],
+      "id": "33daa9f3-65f9-4cce-a533-b5e23150a152",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -3200,
+        -96
+      ],
+      "id": "5c863e94-9ae9-42b8-b402-a5ca4fe63325",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Function Node\nconst body = $('Format').first().json.Body || \"\";\nconst videoScript = $('Format').first().json[\"Video Script\"] || \"\";\n\n// Utility: replace escaped newlines with actual newlines\nfunction formatText(text) {\n  return text.replace(/\\\\n/g, '\\n').replace(/\\n/g, '\\n');\n}\n\nreturn [\n  {\n    json: {\n      formattedBody: formatText(body),\n      formattedVideoScript: formatText(videoScript),\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -32
+      ],
+      "id": "4fa7e0fe-236e-4900-9331-9eafe80c89f9",
+      "name": "Format texts"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -3200,
+        96
+      ],
+      "id": "c1e85d97-170e-4c48-9401-da13f39cf6d6",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Researcher Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Content Researcher Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format the Ideas": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Researcher Agent": {
+      "main": [
+        [
+          {
+            "node": "Format the Ideas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Generation AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format": {
+      "main": [
+        [
+          {
+            "node": "Content Checker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content Checker",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Checker": {
+      "main": [
+        [
+          {
+            "node": "Format texts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Content Checker",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Generation AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Branding Strategy": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Generation AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Strategy": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Generation AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor Analysis": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Generation AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Branding Strategy1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Researcher Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marketing Strategy1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Researcher Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor Analysis1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Researcher Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Script Examples1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Researcher Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Success": {
+      "main": [
+        [
+          {
+            "node": "Create or update a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or update a record": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Template info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Templates",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Templates": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Template info": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Generation AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Template info": {
+      "main": [
+        [
+          {
+            "node": "Content Generation AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Template info1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Checker",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "ai_tool": [
+        [
+          {
+            "node": "Content Researcher Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format texts": {
+      "main": [
+        [
+          {
+            "node": "Mark as Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "id": "recalomN36FxrTHjE",
+          "createdTime": "2025-09-28T22:01:51.000Z",
+          "fields": {
+            "Post Id": "nabil_haouam_y2025m09d28_h11m56s30",
+            "Business Name": "Nabil Haouam",
+            "Content Format": "Static infographic image",
+            "Angle": "Demonstrates ROI from automating manual processes using context-driven AI workflows",
+            "Tone of Voice": "Professional, data-driven, and insightful",
+            "Emotional Trigger": "Relief from burnout and excitement about scale and profit",
+            "Visual Language": "Futuristic digital aesthetic with circuit patterns and gradient blues",
+            "Story Device": "Before-vs-after transformation",
+            "Call To Engagement": "Implied encouragement for professionals to adopt context-based automation strategies",
+            "Pattern Disruption": "Highly detailed automation visual and financial breakdown uncommon in casual feeds",
+            "Cultural Relevance": "Taps into growing AI adoption and agency automation discourse",
+            "Takeaways": "Context architecture outperforms prompt improvement in AI automation\nAutomation enables higher client volume and profitability\nManual content creation is expensive and unsustainable for scaling agencies",
+            "Script": "Explains the leap from under-scale manual processes to profitable automation using a detailed system built on context engineering, not just prompt tweaking",
+            "is checked": "yes",
+            "Post Text": "We turned a 15-hour manual process into a 2-hour automated system.\n\nHere's the ROI breakdown that changed everything:\n\nBEFORE: Manual Newsletter Creation\n\n→ 15 hours per client per week\n→ $75/hour = $1,125 weekly cost per client\n→ Limited to 3-4 clients max\n→ Burnout after 6 months\n\nAFTER: Context-Engineered Automation\n\n→ 2 hours per client per week\n→ Same $75/hour = $150 weekly cost per client\n→ Now handling 12+ clients\n→ 87% margin improvement\n\nThe difference?\nWe stopped focusing on \"\"better prompts.\"\"\nWe started engineering context.\n\nMost agencies think AI automation means:\n\"\"Find the magic prompt and scale\"\"\nThat's backwards.\n\nThe real ROI comes from context architecture:\n→ Strategy extraction frameworks\n→ Brand voice replication systems\n→ Personal story integration engines\n→ Quality control checkpoints\n\nHere's what this actually means:\n\nInstead of hiring a writer at $4K/month...\nWe automated 90% of the work with better output quality.\n\nROI math:\n→ Saved: $4K/month in writer costs\n→ Added: 8 more clients at $2K/month each\n→ Total impact: $28K/month revenue increase\n\nThe secret really is in context engineering, not prompt engineering.\n\nMost people are optimizing the wrong 20%.",
+            "Media Type": "Image",
+            "Media URL": "https://media.licdn.com/dms/image/v2/D4D22AQFM8zy_ecdlfA/feedshare-shrink_2048_1536/B4DZmQLHbzIYAw-/0/1759060464840?e=1761782400&v=beta&t=w8cZhI7ynGFJXkg8q21hw7A6Zk6PLw6w6TKo5DhfjoU",
+            "Created at": "2025-09-28T22:01:51.000Z"
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "5c2744c1-ffa6-41b4-a83e-d6b18a5d1e1d",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-08-28T12:21:22.469Z",
+      "updatedAt": "2025-08-28T12:21:22.469Z",
+      "role": "workflow:owner",
+      "workflowId": "4n3puCuwEDlsTHQ6",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

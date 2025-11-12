@@ -1,0 +1,37 @@
+{
+  "createdAt": "2025-02-26T14:05:59.058Z",
+  "updatedAt": "2025-02-26T14:05:59.058Z",
+  "id": "ufCBihYjZ3QjHqHD",
+  "name": "My workflow 18",
+  "active": false,
+  "isArchived": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "f396fa20-10b9-41cd-a3bb-494fbe97598c",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-26T14:05:59.058Z",
+      "updatedAt": "2025-02-26T14:05:59.058Z",
+      "role": "workflow:owner",
+      "workflowId": "ufCBihYjZ3QjHqHD",
+      "projectId": "VgkBsgW7KMLc7cPH",
+      "project": {
+        "createdAt": "2025-02-22T09:23:18.057Z",
+        "updatedAt": "2025-02-22T09:24:27.776Z",
+        "id": "VgkBsgW7KMLc7cPH",
+        "name": "Elisha Abriham <elishabu28@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

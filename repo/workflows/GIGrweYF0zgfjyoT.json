@@ -1,0 +1,153 @@
+{
+  "createdAt": "2025-03-03T07:36:41.148Z",
+  "updatedAt": "2025-03-03T08:28:25.906Z",
+  "id": "GIGrweYF0zgfjyoT",
+  "name": "Linkedin Personal Profile Scrapper",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        220
+      ],
+      "id": "f4f2c9c9-8f73-4a91-a4d3-4f12858105bb",
+      "name": "When chat message received",
+      "webhookId": "2baa4317-5ba4-4260-b627-c5248ba1b84b"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c86192db-15b2-4c52-a057-f4a0a2461cdb",
+              "name": "url",
+              "value": "={{ $json.query }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        360,
+        180
+      ],
+      "id": "961c792f-efb1-46cd-8bba-25de11662e59",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/actor-tasks/david.bell~linkedin-profile-scraper/run-sync-get-dataset-items?token=apify_api_TGnQ8WMc0lTBZE2vqB5YrhIiPF3L0f3Igurs",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"profileUrls\": [\n        \"{{ $json.url }}\"\n    ]\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        580,
+        180
+      ],
+      "id": "4c983319-9e0c-487f-98cc-1232c6b94f8e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "content": "## LinkedIn Personal Profile Scrapper \n\n** It takes Profile Url as tringger in chat node.\n** Then it return All the profile information of the preson \n** Http Resquest send a post and get request to Apify to trigger custom made Actor on Apify. \n",
+        "height": 340,
+        "width": 760
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20,
+        -40
+      ],
+      "typeVersion": 1,
+      "id": "94980f45-8ab5-49e3-8069-64dbd72db0f1",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        20
+      ],
+      "id": "98616bb7-6dcc-4ddc-844f-f3b8d091844c",
+      "name": "Execute Workflow Trigger"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "19f85f0f-9688-4877-8261-56b388afc5b2",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-03-03T07:36:41.148Z",
+      "updatedAt": "2025-03-03T07:36:41.148Z",
+      "role": "workflow:owner",
+      "workflowId": "GIGrweYF0zgfjyoT",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

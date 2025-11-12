@@ -1,0 +1,318 @@
+{
+  "createdAt": "2025-02-10T06:46:39.040Z",
+  "updatedAt": "2025-02-10T11:30:53.004Z",
+  "id": "PmmCqwiMVYDKFehx",
+  "name": "Pdf - image extract text",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "13TLgp6ZazwVJolvKzdZ-4kHxs5GklZCo",
+          "mode": "list",
+          "cachedResultName": "Tebta",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/13TLgp6ZazwVJolvKzdZ-4kHxs5GklZCo"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        -280
+      ],
+      "id": "f0759622-9f83-40d7-abdf-afc2e4d68419",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HOKFJ6mGRbBOxj2D",
+          "name": "Google Drive account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -940,
+        -280
+      ],
+      "id": "08615999-2a16-47ba-9c70-336c968e4097",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HOKFJ6mGRbBOxj2D",
+          "name": "Google Drive account 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://618f-149-102-239-232.ngrok-free.app/convert",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "pdf_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -760,
+        60
+      ],
+      "id": "858b2188-65ea-4b21-be88-58772f270336",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "fileName"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a033ab85-bbde-447d-b5a5-a7cba109a332",
+      "name": "Sort Pages",
+      "type": "n8n-nodes-base.sort",
+      "position": [
+        -200,
+        60
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "89f4c270-f25c-466a-8178-936b09fd5669",
+      "name": "Extract Zip File",
+      "type": "n8n-nodes-base.compression",
+      "position": [
+        -560,
+        60
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [];\n\nfor (item of items) {\n    for (key of Object.keys(item.binary)) {\n        results.push({\n            json: {\n                fileName: item.binary[key].fileName\n            },\n            binary: {\n                data: item.binary[key],\n            }\n        });\n    }\n}\n\nreturn results;"
+      },
+      "id": "d8719c5b-afc8-4146-ab43-9f7ca79199c6",
+      "name": "Images To List",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -380,
+        60
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 75,
+        "height": 75,
+        "resizeOption": "percent",
+        "options": {}
+      },
+      "id": "b5097f4f-b4fe-4454-808d-a4aa706831c5",
+      "name": "Resize Images For AI",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        20,
+        60
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "You are provided with a PNG image of a scanned document. Please analyze the image and extract all the visible text exactly as it appears. Return only the extracted text in plain text format, preserving line breaks, punctuation, and formatting as much as possible. Do not include any additional commentary or analysis—only output the raw text from the image.",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -40,
+        -260
+      ],
+      "id": "b2f244ad-2e85-4899-bbc1-a1f757f18479",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "O1PHcm8q29zCIxMY",
+          "name": "OpenAi account 3"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1000,
+        40
+      ],
+      "id": "94b08ee7-5498-4bda-a7a1-4eadf4b61259",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        []
+      ]
+    },
+    "Sort Pages": {
+      "main": [
+        [
+          {
+            "node": "Resize Images For AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Zip File": {
+      "main": [
+        [
+          {
+            "node": "Images To List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Images To List": {
+      "main": [
+        [
+          {
+            "node": "Sort Pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Images For AI": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Extract Zip File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        []
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Google Drive Trigger": {
+      "lastTimeChecked": "2025-02-10T11:12:35Z"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e14b629f-4b93-4285-bc05-c9e85993fce8",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-10T06:46:39.040Z",
+      "updatedAt": "2025-02-10T06:46:39.040Z",
+      "role": "workflow:owner",
+      "workflowId": "PmmCqwiMVYDKFehx",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

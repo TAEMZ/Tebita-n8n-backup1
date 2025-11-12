@@ -1,0 +1,2032 @@
+{
+  "createdAt": "2025-07-29T11:36:34.832Z",
+  "updatedAt": "2025-07-30T09:29:25.807Z",
+  "id": "lU3eI1lw0wwY3SAD",
+  "name": "Real Estate Ai Agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -40,
+        400
+      ],
+      "id": "807c592b-4536-4ded-9681-0e574645451e",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "i7uXNlPSEakokJkR",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblUz0KiKHqASFMsV",
+          "mode": "list",
+          "cachedResultName": "Tenants",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tblUz0KiKHqASFMsV"
+        },
+        "filterByFormula": "=Email = \"{{ $json.email }}\"",
+        "options": {
+          "fields": [
+            "Name",
+            "Email",
+            "Phone Number",
+            "Status",
+            "Property",
+            "Property (from Property)",
+            "Jobs"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        205
+      ],
+      "id": "b0d3f012-7e3d-4386-ad5e-483b65694977",
+      "name": "Look up Tenets based on email",
+      "alwaysOutputData": false,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl3K7APzL91bSBPU",
+          "mode": "list",
+          "cachedResultName": "Property",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tbl3K7APzL91bSBPU"
+        },
+        "filterByFormula": "=Tenants = \"{{ $json.Name }}\"",
+        "options": {
+          "fields": [
+            "Name",
+            "Property",
+            "Tenants",
+            "Jobs"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        205
+      ],
+      "id": "626bb1b3-ef21-4de3-9ea2-6c896d749bcc",
+      "name": "Look up Property based on Tenets",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxFitHlHqhMt3zp",
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tblxFitHlHqhMt3zp"
+        },
+        "filterByFormula": "=Property = \"{{ $json.Name }}\"",
+        "options": {
+          "fields": [
+            "Work",
+            "Status",
+            "Date",
+            "Cost",
+            "Classification",
+            "Name",
+            "Contractor",
+            "Confirm",
+            "Property",
+            "Property (from Property)"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        880,
+        205
+      ],
+      "id": "547d1c4b-7e23-461a-9e8b-773d1426dbfc",
+      "name": "Look up if Property has open jobs",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxFitHlHqhMt3zp",
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tblxFitHlHqhMt3zp"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Work": "={{ $json.Work }}",
+            "Status": "={{ $json.Status }}",
+            "Classification": "={{ $json.Classification }}",
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Work",
+              "displayName": "Work",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Cost",
+              "displayName": "Cost",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Classification",
+              "displayName": "Classification",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Classified",
+                  "value": "Classified"
+                },
+                {
+                  "name": "unclassified",
+                  "value": "unclassified"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Contractor",
+              "displayName": "Contractor",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Confirm",
+              "displayName": "Confirm",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Confirmed",
+                  "value": "Confirmed"
+                },
+                {
+                  "name": "Unconfirmed",
+                  "value": "Unconfirmed"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Property",
+              "displayName": "Property",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Property (from Property)",
+              "displayName": "Property (from Property)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1320,
+        105
+      ],
+      "id": "9d7b8b1a-865f-450b-950f-6d6fb4196342",
+      "name": "Update Job with new massage",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxFitHlHqhMt3zp",
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tblxFitHlHqhMt3zp"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Contractor",
+              "displayName": "Contractor",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Work",
+              "displayName": "Work",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name (from Name)",
+              "displayName": "Name (from Name)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Property (from Property) (from Name)",
+              "displayName": "Property (from Property) (from Name)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1320,
+        305
+      ],
+      "id": "a3e623f2-1efb-4a91-8a2a-6e3cef27c843",
+      "name": "Create job record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=your a property management ai agent your job is to identify issuse from  {{ $json.massage }}\n\nand if ther is an issuses provide a json output of a short issuse and if there is issus write yes if there are none say no and also include  what contractro will do it like if its electric electrician someting like that\n\nsometing like this\n\n[\n  {\n      \"data\": {\n        \"issue_detected\": \"yes\",\n        \"issue\": \"Electrical wiring is exposed and poses a safety hazard\",\n        \"contractor\": \"Electrician\"\n      }\n  }\n]"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1760,
+        205
+      ],
+      "id": "968a98e0-7526-4317-b3f8-c698c27928db",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "NdqrWvU3kkpHiuep",
+          "name": "Tebita-openai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxFitHlHqhMt3zp",
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tblxFitHlHqhMt3zp"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2560,
+        340
+      ],
+      "id": "bd8db2e0-29ac-4682-a97e-a47da293ff65",
+      "name": "check job if its still unclassified",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "5",
+        "subject": "5",
+        "message": "4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3060,
+        340
+      ],
+      "id": "14e7c0f0-771a-4e76-a62d-71c12be2d594",
+      "name": "Gmail",
+      "webhookId": "97283266-e1a8-47a4-a97f-7c54e7aee679",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "i7uXNlPSEakokJkR",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2320,
+        20
+      ],
+      "id": "b268090f-db96-4655-b81b-facd60d1fe61",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblANU2K7gUzEzC31",
+          "mode": "list",
+          "cachedResultName": "Contractors",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tblANU2K7gUzEzC31"
+        },
+        "filterByFormula": "=WorkType = \"{{ $json.message.content.response[0].data.contractor }}\"",
+        "options": {
+          "fields": [
+            "Name",
+            "Status",
+            "Jobs",
+            "WorkType",
+            "Property",
+            "Property (from Property)"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2540,
+        40
+      ],
+      "id": "71f391c4-8a07-480b-8ea0-de94e4e37383",
+      "name": "Look up contractor",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxFitHlHqhMt3zp",
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tblxFitHlHqhMt3zp"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Property": "={{ $json.Property }}",
+            "Status": "={{ $json.Status }}"
+          },
+          "matchingColumns": [
+            "Status"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Work",
+              "displayName": "Work",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Cost",
+              "displayName": "Cost",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Classification",
+              "displayName": "Classification",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Classified",
+                  "value": "Classified"
+                },
+                {
+                  "name": "unclassified",
+                  "value": "unclassified"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Contractor",
+              "displayName": "Contractor",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Confirm",
+              "displayName": "Confirm",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Confirmed",
+                  "value": "Confirmed"
+                },
+                {
+                  "name": "Unconfirmed",
+                  "value": "Unconfirmed"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Property",
+              "displayName": "Property",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property (from Property)",
+              "displayName": "Property (from Property)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2760,
+        40
+      ],
+      "id": "d1b097c6-11e3-4009-a764-04233652bea2",
+      "name": "Add contractor to job",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d8b3a890-d987-47f8-bac2-263a0876f879",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2980,
+        40
+      ],
+      "id": "3d3f78c5-04bc-41f1-aa7f-b27baacfbfd0",
+      "name": "If number or email"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        3380,
+        20
+      ],
+      "id": "7405e86c-3fa2-4188-a6d5-c23ffbeb47c3",
+      "name": "WhatsApp Business Cloud",
+      "webhookId": "0ff643e1-18e9-47d6-bf91-db8e8b56ff96",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "5",
+        "subject": "7",
+        "message": "8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3220,
+        60
+      ],
+      "id": "cb176e56-cf1f-4cd4-b09f-a3ad459edf40",
+      "name": "Gmail1",
+      "webhookId": "8a8d9757-a389-4fc7-b7fa-2dd66ea465f6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "i7uXNlPSEakokJkR",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c66d96ab-78af-4969-bb5a-ebd256b4dd8c",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2800,
+        340
+      ],
+      "id": "6a01d56d-600c-4ef9-b27c-ab72559c7384",
+      "name": "If job is still unclassified"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        105
+      ],
+      "id": "9768d2ce-2c60-463c-84aa-2f73f6f80370",
+      "name": "WhatsApp Trigger",
+      "webhookId": "45dbd9c2-6513-4600-8281-33851cbfec39",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "aa5c073a-204b-43d6-ae24-90995d0c22d9",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Open",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        205
+      ],
+      "id": "a2da4d1c-5d4f-4931-b1ae-ff6fe7256d48",
+      "name": "Check if open jobs exist for property"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9c94708e-a198-460b-a930-2192ac65de97",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        205
+      ],
+      "id": "a2586511-049a-4913-ba30-c98d3929de51",
+      "name": "Reformat Email / Phone Number"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "01fefd73-c353-4c43-b299-e9b4cc816ccf",
+              "name": "massage",
+              "value": "={{ $json.fields.Work }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1540,
+        205
+      ],
+      "id": "ff6d47c1-ac5d-4056-81fd-07f416b03e33",
+      "name": "Set Message(s) to Analyze"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "hours"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2360,
+        340
+      ],
+      "id": "0dfe13c4-0365-43b5-84a2-5c09996c7734",
+      "name": "1hr",
+      "webhookId": "33b0f78b-9e99-4b12-8716-9ea925eb4b47"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f538107a-2efe-449c-8ddc-f1fac28ffc57",
+              "leftValue": "={{ $json.message.content.response[0].data.issue_detected }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2140,
+        200
+      ],
+      "id": "7c3420a2-9492-4398-a3aa-0edd75740798",
+      "name": "Check if there are any identified issues"
+    },
+    {
+      "parameters": {
+        "formTitle": "confirmation job",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "can you do this job",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "yes"
+                  },
+                  {
+                    "option": "no"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "what day do you want to schedule the work",
+              "fieldType": "date",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "What time do you want to schedule the work",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "8:00"
+                  },
+                  {
+                    "option": "8:30"
+                  },
+                  {
+                    "option": "9:00"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "How do you quote for this job?(USD)",
+              "fieldType": "number",
+              "placeholder": "$"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        780
+      ],
+      "id": "fd4ba71d-8682-4ef3-a7c2-92b73c940acd",
+      "name": "On form submission",
+      "webhookId": "9f0c7de9-6d28-4c48-ad73-6213525d4e31"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "73fd934a-fdc4-4570-bfac-c2d48e237449",
+              "leftValue": "={{ $json[\"can you do this job\"] }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        220,
+        780
+      ],
+      "id": "c5cee312-e576-47b8-b024-62e49d51d14d",
+      "name": "If Contract accepted"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxFitHlHqhMt3zp",
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tblxFitHlHqhMt3zp"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json[\"what day do you want to schedule the work\"] }}",
+            "Confirm": "Confirmed",
+            "Cost": "={{ $json[\"How do you quote for this job?(USD)\"] }}",
+            "id": "={{ $json[\"can you do this job\"] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Work",
+              "displayName": "Work",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Cost",
+              "displayName": "Cost",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Classification",
+              "displayName": "Classification",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Classified",
+                  "value": "Classified"
+                },
+                {
+                  "name": "unclassified",
+                  "value": "unclassified"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Contractor",
+              "displayName": "Contractor",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Confirm",
+              "displayName": "Confirm",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Confirmed",
+                  "value": "Confirmed"
+                },
+                {
+                  "name": "Unconfirmed",
+                  "value": "Unconfirmed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Property",
+              "displayName": "Property",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Property (from Property)",
+              "displayName": "Property (from Property)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        460,
+        760
+      ],
+      "id": "e842d343-6a81-4c33-9841-3e63716d2f1d",
+      "name": "update Job with Date, cost and confirmation",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmhENL9zA3Tumbw",
+          "mode": "list",
+          "cachedResultName": "Cost Sheet",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tblmhENL9zA3Tumbw"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Work",
+              "displayName": "Work",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Cost",
+              "displayName": "Cost",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        680,
+        760
+      ],
+      "id": "5ec19eb2-a044-493e-a075-143086fe01b1",
+      "name": "Add cost to monthly cost sheet",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appY1uoK7H9Hnjejz",
+          "mode": "list",
+          "cachedResultName": "Real Estate",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblUz0KiKHqASFMsV",
+          "mode": "list",
+          "cachedResultName": "Tenants",
+          "cachedResultUrl": "https://airtable.com/appY1uoK7H9Hnjejz/tblUz0KiKHqASFMsV"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        900,
+        760
+      ],
+      "id": "30cfaff8-8ed7-400c-9c3d-ed99270ad1ec",
+      "name": "Check how tenet originally contacted us",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "D4Wbd5bpBwiM4u1U",
+          "name": "Real Estate"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4c13ef3d-122d-49df-b95e-756c11dce640",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        760
+      ],
+      "id": "53f5e193-52c2-4ceb-9879-6babc6945c20",
+      "name": "If originally contacted with whatsapp"
+    },
+    {
+      "parameters": {
+        "sendTo": "5",
+        "subject": "5",
+        "message": "4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1560,
+        760
+      ],
+      "id": "bb894ff2-95ae-46bd-8e24-cf5b24546b08",
+      "name": "email confirmation to yona",
+      "webhookId": "c14602ec-a618-4fa8-a95c-0c18e7852662",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "i7uXNlPSEakokJkR",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "8",
+        "subject": "7",
+        "message": "5",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        460,
+        980
+      ],
+      "id": "31c49c72-b362-445b-8691-f87edd3d4f89",
+      "name": "email yona to highlight Contractor",
+      "webhookId": "c2d1e3e2-2918-42c0-8f21-6e85e4980c8d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "i7uXNlPSEakokJkR",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        660
+      ],
+      "id": "c1bb1c47-e61c-41a2-a727-21cddfca2ed7",
+      "name": "Send tenant booking confirmation",
+      "webhookId": "c5f9c9ea-e4a7-44ff-923a-5c2e65f79d49",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "58",
+        "subject": "8",
+        "message": "8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1320,
+        860
+      ],
+      "id": "0eff67d3-55de-4d19-9b77-efb2dbf3d5a5",
+      "name": "Send tenant booking confirmation1",
+      "webhookId": "dac80e2b-6eae-4f27-8fe5-8649b198ef70",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "i7uXNlPSEakokJkR",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        260
+      ],
+      "id": "259b42a4-dd71-47dc-96b1-96f460cba59e",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Reformat Email / Phone Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look up Tenets based on email": {
+      "main": [
+        [
+          {
+            "node": "Look up Property based on Tenets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look up Property based on Tenets": {
+      "main": [
+        [
+          {
+            "node": "Look up if Property has open jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look up if Property has open jobs": {
+      "main": [
+        [
+          {
+            "node": "Check if open jobs exist for property",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create job record": {
+      "main": [
+        [
+          {
+            "node": "Set Message(s) to Analyze",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Job with new massage": {
+      "main": [
+        [
+          {
+            "node": "Set Message(s) to Analyze",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Check if there are any identified issues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check job if its still unclassified": {
+      "main": [
+        [
+          {
+            "node": "If job is still unclassified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Look up contractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Look up contractor": {
+      "main": [
+        [
+          {
+            "node": "Add contractor to job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add contractor to job": {
+      "main": [
+        [
+          {
+            "node": "If number or email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If number or email": {
+      "main": [
+        [
+          {
+            "node": "WhatsApp Business Cloud",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Business Cloud": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If job is still unclassified": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Reformat Email / Phone Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if open jobs exist for property": {
+      "main": [
+        [
+          {
+            "node": "Update Job with new massage",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create job record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reformat Email / Phone Number": {
+      "main": [
+        [
+          {
+            "node": "Look up Tenets based on email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Message(s) to Analyze": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1hr": {
+      "main": [
+        [
+          {
+            "node": "check job if its still unclassified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if there are any identified issues": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "1hr",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If Contract accepted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Contract accepted": {
+      "main": [
+        [
+          {
+            "node": "update Job with Date, cost and confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "email yona to highlight Contractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update Job with Date, cost and confirmation": {
+      "main": [
+        [
+          {
+            "node": "Add cost to monthly cost sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add cost to monthly cost sheet": {
+      "main": [
+        [
+          {
+            "node": "Check how tenet originally contacted us",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check how tenet originally contacted us": {
+      "main": [
+        [
+          {
+            "node": "If originally contacted with whatsapp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If originally contacted with whatsapp": {
+      "main": [
+        [
+          {
+            "node": "Send tenant booking confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send tenant booking confirmation1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send tenant booking confirmation": {
+      "main": [
+        [
+          {
+            "node": "email confirmation to yona",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send tenant booking confirmation1": {
+      "main": [
+        [
+          {
+            "node": "email confirmation to yona",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Reformat Email / Phone Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {
+          "email": "bhaha@gmail.com"
+        }
+      }
+    ]
+  },
+  "versionId": "653336b4-7043-4775-acb9-f9b561417532",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-07-29T11:36:34.832Z",
+      "updatedAt": "2025-07-29T11:36:34.832Z",
+      "role": "workflow:owner",
+      "workflowId": "lU3eI1lw0wwY3SAD",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,401 @@
+{
+  "createdAt": "2025-10-30T06:43:13.246Z",
+  "updatedAt": "2025-11-10T12:08:12.153Z",
+  "id": "QdY2JJR1Nas4LnlX",
+  "name": "linkedin leads",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ce40c305-15f8-40fe-ba0b-c98b17d4c970",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        -16
+      ],
+      "id": "a91aac57-45bb-409c-ac5c-f7e3c8a7e474",
+      "name": "Pagination Check"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items\nconst inputItems = $input.all();\nconsole.log(\"Input items count:\", inputItems.length);\n\n// Extract pagination values with fallbacks\nlet nextStartIndex = 1;\nlet hasMoreResults = false;\n\n// Try different approaches to find the pagination info\nif (inputItems && inputItems.length > 0) {\n    const firstItem = inputItems[0];\n\n    // Check direct properties\n    if (firstItem.json) {\n        console.log(\"First item JSON:\", JSON.stringify(firstItem.json));\n\n        // Check for \"index\" property (instead of startIndex)\n        if (firstItem.json.index !== undefined) {\n            nextStartIndex = firstItem.json.index;\n            console.log(\"Found index:\", nextStartIndex);\n        }\n\n        // Check for \"results\" property (instead of hasMoreResults)\n        if (firstItem.json.results !== undefined) {\n            hasMoreResults = firstItem.json.results;\n            console.log(\"Found results flag:\", hasMoreResults);\n        }\n\n        // Check for startIndex directly\n        if (firstItem.json.startIndex !== undefined) {\n            nextStartIndex = firstItem.json.startIndex;\n            console.log(\"Found startIndex:\", nextStartIndex);\n        }\n\n        // Check for hasMoreResults directly\n        if (firstItem.json.hasMoreResults !== undefined) {\n            hasMoreResults = firstItem.json.hasMoreResults;\n            console.log(\"Found hasMoreResults:\", hasMoreResults);\n        }\n\n        // Check if we need to calculate hasMoreResults based on index\n        if (firstItem.json.totalResults !== undefined && firstItem.json.startIndex !== undefined) {\n            const totalResults = firstItem.json.totalResults;\n            const currentStart = firstItem.json.startIndex;\n            const itemsPerPage = 10; // Default Google results per page\n            \n            hasMoreResults = (currentStart + itemsPerPage) <= totalResults && (currentStart + itemsPerPage) <= 100;\n            console.log(\"Calculated hasMoreResults:\", hasMoreResults, \"totalResults:\", totalResults, \"currentStart:\", currentStart);\n        }\n    }\n\n    // Also check the last item for pagination info (common pattern)\n    const lastItem = inputItems[inputItems.length - 1];\n    if (lastItem.json) {\n        if (lastItem.json.startIndex !== undefined) {\n            nextStartIndex = lastItem.json.startIndex;\n            console.log(\"Found startIndex in last item:\", nextStartIndex);\n        }\n        if (lastItem.json.hasMoreResults !== undefined) {\n            hasMoreResults = lastItem.json.hasMoreResults;\n            console.log(\"Found hasMoreResults in last item:\", hasMoreResults);\n        }\n    }\n}\n\nconsole.log(\"Final pagination - nextStartIndex:\", nextStartIndex, \"hasMoreResults:\", hasMoreResults);\n\n// Return the proper structure for loop continuation\nif (hasMoreResults) {\n    return {\n        json: {\n            startIndex: nextStartIndex\n        },\n        \"continue\": true\n    };\n} else {\n    return {\n        json: {\n            startIndex: nextStartIndex\n        },\n        \"continue\": false\n    };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -16
+      ],
+      "id": "a114771b-8268-4a21-b414-64c3cc890889",
+      "name": "Pagination"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1cPVVsl-ENY-AtkxBMk_5Hco467zj9ftHgz5GIg21YOQ",
+          "mode": "list",
+          "cachedResultName": "linkedin leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cPVVsl-ENY-AtkxBMk_5Hco467zj9ftHgz5GIg21YOQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1cPVVsl-ENY-AtkxBMk_5Hco467zj9ftHgz5GIg21YOQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "title": "={{ $json.title }}",
+            "link": "={{ $json.link }}",
+            "snippet": "={{ $json.snippet }}",
+            "image": "={{ $json.image }}",
+            "startIndex": "={{ $json.startIndex }}",
+            "hasMoreResults": "={{ $json.hasMoreResults }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "snippet",
+              "displayName": "snippet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "image",
+              "displayName": "image",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "startIndex",
+              "displayName": "startIndex",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hasMoreResults",
+              "displayName": "hasMoreResults",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        -16
+      ],
+      "id": "5b1a9ed3-f26a-4b80-9140-71e6ed2bfd48",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QRDbPRePSjuJZQ2h",
+          "name": "lead scrape"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        -16
+      ],
+      "id": "430e5d7e-b492-4706-8db8-a35e733a3f68",
+      "name": "Wait",
+      "webhookId": "190131ee-b73f-402f-a618-b30ac9ae16e6"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the response data\nconst response = $input.first().json;\nconst items = response.items || [];\n\n// Track pagination info\nlet nextStartIndex = 1;\nif (response.queries && response.queries.nextPage && response.queries.nextPage[0]) {\n    nextStartIndex = response.queries.nextPage[0].startIndex;\n}\n\n// Calculate if we should continue (Google only allows up to 100 results)\nconst hasMoreResults = nextStartIndex <= 100;\n\n// Process the items and include pagination info in each item\nconst results = items.map(item => {\n    const titleParts = item.title.split(\" - \");\n    return {\n        name: titleParts[0] || null,\n        title: titleParts.slice(1).join(\" - \") || null,\n        link: item.link || null,\n        snippet: item.snippet || null,\n        image: item.pagemap?.cse_thumbnail?.[0]?.src || null,\n        // Add pagination info to each item\n        startIndex: nextStartIndex,\n        hasMoreResults: hasMoreResults\n    };\n});\n\n// If there are no results, return at least one item with pagination info\nif (results.length === 0) {\n    return {\n        json: {\n            name: null,\n            title: null,\n            link: null,\n            snippet: null,\n            image: null,\n            startIndex: nextStartIndex,\n            hasMoreResults: false\n        }\n    };\n}\n\n// Return the processed results\nreturn results.map(r => ({ json: r }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -16
+      ],
+      "id": "2ad029c8-9f07-4542-bb5b-515e3693b51c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/customsearch/v1",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "AIzaSyBN8L5pPTMwgVFa0y51JXwOTyL4NR5t2es"
+            },
+            {
+              "name": "cx",
+              "value": "121ed6b2c2df74653"
+            },
+            {
+              "name": "q",
+              "value": "ceo automotive united states site:linkedin.com/in"
+            },
+            {
+              "name": "start",
+              "value": "={{ $runIndex == 0 ? $node[\"Set Fields\"].json.currentStartindex: $node[\"Pagination Check\"].json.startIndex }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        -16
+      ],
+      "id": "e2748acc-1b53-4e14-862d-6008a9847400",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d719dcd-4217-40ee-a980-6f88b86fe9b2",
+              "name": "currentStartindex",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "7bdba7f9-fea9-49b1-956c-5718dbd29299",
+              "name": "maxPages",
+              "value": 10,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "42e6ae37-a896-4cb4-a2fd-7190d8642429",
+      "name": "Set Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -432,
+        -16
+      ],
+      "id": "2a5de436-800a-4ee5-8bd4-a2e74e568c91",
+      "name": "When chat message received",
+      "webhookId": "3219ab37-a76e-4850-8803-cab6ed9f812f"
+    }
+  ],
+  "connections": {
+    "Pagination Check": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pagination": {
+      "main": [
+        [
+          {
+            "node": "Pagination Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Pagination",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Set Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "73d288a9-416d-4b64-aa0f-a9b56be0ba2e",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-10-30T06:43:13.246Z",
+      "updatedAt": "2025-10-30T06:43:13.246Z",
+      "role": "workflow:owner",
+      "workflowId": "QdY2JJR1Nas4LnlX",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

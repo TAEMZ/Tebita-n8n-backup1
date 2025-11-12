@@ -1,0 +1,146 @@
+{
+  "createdAt": "2025-11-10T10:22:53.121Z",
+  "updatedAt": "2025-11-10T10:29:03.156Z",
+  "id": "0AGSPZKsb8CDIyIa",
+  "name": "tg_trigger",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst { newsItems, selectedCategories, chatId, callbackQueryId } = input;\n\nif (!newsItems || newsItems.length === 0) {\n  // If it's from callback, answer it\n  if (callbackQueryId) {\n    return [{\n      json: {\n        callback_query_id: callbackQueryId,\n        text: \"❌ No news found for selected categories.\",\n        show_alert: true,\n        action: 'answer_callback'\n      }\n    }];\n  } else {\n    return [{\n      json: {\n        chatId: chatId,\n        message: '❌ No news found for your selected categories: ' + selectedCategories.join(', '),\n        action: 'send_message'\n      }\n    }];\n  }\n}\n\n// Group by category\nconst groupedNews = {};\nnewsItems.forEach(item => {\n  if (!groupedNews[item.category]) {\n    groupedNews[item.category] = [];\n  }\n  groupedNews[item.category].push(item);\n});\n\n// Format message\nlet message = '*📰 YOUR PERSONALIZED NEWS FEED*\\n\\n';\n\nObject.keys(groupedNews).forEach(category => {\n  message += `*${category.toUpperCase()}*\\n`;\n  groupedNews[category].slice(0, 3).forEach((news, index) => {\n    message += `${index + 1}. ${news.title}\\n`;\n    message += `   📝 ${news.summary || 'Read more'}\\n`;\n    message += `   🔗 ${news.url}\\n\\n`;\n  });\n  message += '\\n';\n});\n\nmessage += '\\n_Send /start to update preferences_';\n\n// If this came from a callback, we need to edit the original message\nif (callbackQueryId) {\n  return [{\n    json: {\n      chatId: chatId,\n      message: message,\n      message_id: input.callback_query?.message?.message_id, // Edit original message\n      action: 'edit_message'\n    }\n  }];\n} else {\n  return [{\n    json: {\n      chatId: chatId,\n      message: message,\n      action: 'send_message'\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -16
+      ],
+      "id": "5307ce78-6ea9-4026-8062-a146ff2839f6",
+      "name": "format response"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "callback_query"
+        ],
+        "additionalFields": {
+          "download": false
+        }
+      },
+      "id": "4b15bb46-4fe3-4cc7-a31e-02f730f056cc",
+      "name": "Telegram Trigger1",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -32
+      ],
+      "webhookId": "5d18e99d-22de-4101-b516-9851aa6325a0",
+      "retryOnFail": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "NqHlvqylD4LKFDH0",
+          "name": "tg_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "id": "e5117b2d-3a54-4296-928d-17abc985300b",
+      "name": "Send Telegram Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        496,
+        -32
+      ],
+      "webhookId": "2df67571-f3f4-4dea-9c30-337419f2d05f",
+      "credentials": {
+        "telegramApi": {
+          "id": "NqHlvqylD4LKFDH0",
+          "name": "tg_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.first().json;\nconsole.log('SCRAPING NODE - INPUT:', JSON.stringify(inputData, null, 2));\n\nlet selectedCategories, websites, chatId, callbackQueryId;\n\n// Check if this is raw Telegram data (needs processing)\nif (inputData.callback_query) {\n  console.log('RAW CALLBACK QUERY DETECTED - PROCESSING...');\n  \n  // Extract from raw Telegram data\n  const callbackData = inputData.callback_query.data;\n  chatId = inputData.callback_query.message.chat.id;\n  callbackQueryId = inputData.callback_query.id;\n  \n  // Define categories and websites here since they're not passed\n  const categories = ['technology', 'sports', 'business', 'entertainment', 'health', 'politics'];\n  websites = {\n    'technology': ['https://techcrunch.com', 'https://thenextweb.com'],\n    'sports': ['https://www.espn.com', 'https://www.skysports.com'],\n    'business': ['https://www.bloomberg.com', 'https://www.cnbc.com'],\n    'entertainment': ['https://variety.com', 'https://www.hollywoodreporter.com'],\n    'health': ['https://www.medicalnewstoday.com', 'https://www.healthline.com'],\n    'politics': ['https://www.reuters.com/politics', 'https://www.politico.com']\n  };\n  \n  // Determine categories based on callback data\n  if (callbackData === 'all') {\n    selectedCategories = categories;\n  } else if (categories.includes(callbackData)) {\n    selectedCategories = [callbackData];\n  }\n  \n  console.log('Processed from raw data - Categories:', selectedCategories);\n} \n// Already processed data (from previous node)\nelse {\n  console.log('PROCESSED DATA DETECTED');\n  ({ selectedCategories, websites, chatId, callbackQueryId } = inputData);\n}\n\nconsole.log('Final categories to scrape:', selectedCategories);\n\n// Validate input\nif (!selectedCategories || !Array.isArray(selectedCategories) || selectedCategories.length === 0) {\n  console.log('ERROR: No categories to scrape');\n  return [{\n    json: {\n      chatId: chatId,\n      callbackQueryId: callbackQueryId,\n      message: '❌ No categories selected for scraping.',\n      action: 'send_message'\n    }\n  }];\n}\n\n// Answer callback query first (remove loading state)\nif (callbackQueryId) {\n  try {\n    await $httpRequest({\n      method: 'POST',\n      url: `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/answerCallbackQuery`,\n      body: {\n        callback_query_id: callbackQueryId,\n        text: `📡 Fetching news for ${selectedCategories.length} category(s)...`\n      },\n      json: true\n    });\n  } catch (error) {\n    console.log('Error answering callback:', error);\n  }\n}\n\n// Mock news data\nconst newsItems = [];\nselectedCategories.forEach(category => {\n  const categoryWebsites = websites[category] || [];\n  \n  categoryWebsites.forEach(website => {\n    newsItems.push({\n      title: `Latest ${category} news from ${website}`,\n      url: `${website}/latest`,\n      summary: `Breaking news in ${category}`,\n      category: category,\n      source: website\n    });\n    \n    newsItems.push({\n      title: `Trending in ${category}`,\n      url: `${website}/trending`,\n      summary: `Popular stories in ${category}`,\n      category: category,\n      source: website\n    });\n  });\n});\n\nconsole.log(`Generated ${newsItems.length} news items`);\n\nreturn [{\n  json: {\n    chatId: chatId,\n    callbackQueryId: callbackQueryId,\n    newsItems: newsItems,\n    selectedCategories: selectedCategories,\n    action: 'format_news'\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        -32
+      ],
+      "id": "b00a1d79-9816-427a-9d3a-1a89bb471bdd",
+      "name": "scrape news"
+    }
+  ],
+  "connections": {
+    "format response": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger1": {
+      "main": [
+        [
+          {
+            "node": "scrape news",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "scrape news": {
+      "main": [
+        [
+          {
+            "node": "format response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "4d250496-888c-4749-b5ae-4a11fb235078",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-11-10T10:22:53.121Z",
+      "updatedAt": "2025-11-10T10:22:53.121Z",
+      "role": "workflow:owner",
+      "workflowId": "0AGSPZKsb8CDIyIa",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

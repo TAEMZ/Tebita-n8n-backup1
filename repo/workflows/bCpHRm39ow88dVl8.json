@@ -1,0 +1,99 @@
+{
+  "createdAt": "2025-02-23T19:30:45.440Z",
+  "updatedAt": "2025-02-23T19:31:30.601Z",
+  "id": "bCpHRm39ow88dVl8",
+  "name": "My workflow 13",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        -120
+      ],
+      "id": "75c3a5a2-46bb-4dd8-a9cd-128a630c951f",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "03-mini-2025-01-31",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "you create a video concepts based on the user query \n\nYou output the following in JSON:\n{\n   \"Script\": {\n       \"Intro\": \"40-70 characters\",\n       \"Base\": \"280-350 characters\",\n        \"CTA\": \"55 characters\"\n    }\n    \"Title\": \"30-50 characters (Short and engaging), Keep it curiosity-driven (e-g-, 'I Tried THIS for 7 Days... Crazy Results!')\",\n    \"Description\": \"50-150 characters (Shorter, with key hashtags), hook.\nAdd context, CTA, and hashtags.\"\n}",
+              "role": "system"
+            },
+            {
+              "content": "<user-query>\nVideo Ideas\n</user-query>"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -140,
+        -120
+      ],
+      "id": "fa020aae-5a59-4309-9db3-2d4a7d996c9d",
+      "name": "Ideator 🧠",
+      "credentials": {
+        "openAiApi": {
+          "id": "YW9ZsdAeAy4i8EgN",
+          "name": "OpenAi account 4"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Ideator 🧠",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1c4bbe5d-825a-43bb-ab80-de6a94f857a3",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-23T19:30:45.440Z",
+      "updatedAt": "2025-02-23T19:30:45.440Z",
+      "role": "workflow:owner",
+      "workflowId": "bCpHRm39ow88dVl8",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

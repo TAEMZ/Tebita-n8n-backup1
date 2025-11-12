@@ -1,0 +1,614 @@
+{
+  "createdAt": "2025-05-08T08:21:42.046Z",
+  "updatedAt": "2025-05-15T11:38:41.692Z",
+  "id": "eFtFnWcsZ90rNCaF",
+  "name": "Legal_Doc",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "You are provided with a PNG image of a scanned document. Please analyze the image and extract all the visible text exactly as it appears. Return only the extracted text in plain text format, preserving line breaks, punctuation, and formatting as much as possible. Do not include any additional commentary or analysis—only output the raw text from the image.",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1000,
+        400
+      ],
+      "id": "a672dde0-e2fc-49e3-8ac4-e47a99da2832",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 75,
+        "height": 75,
+        "resizeOption": "percent",
+        "options": {}
+      },
+      "id": "5c0c51b8-9d5d-4840-b206-74ae6ff71659",
+      "name": "Resize Images For AI",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        840,
+        400
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "fileName"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0eb0591d-489e-4e8e-ad4d-7a412b18139e",
+      "name": "Sort Pages",
+      "type": "n8n-nodes-base.sort",
+      "position": [
+        680,
+        400
+      ],
+      "typeVersion": 1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        20,
+        240
+      ],
+      "id": "aaa248e2-54b8-486e-98e2-64cf7aadcac0",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QeqECymepCzuAesh",
+          "name": "Google Drive account bnobody"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "let allContents = items.map(item => item.json.content).filter(Boolean);\n\nreturn [\n  {\n    json: {\n      fullContent: allContents.join(\"\\n\\n\")\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        400
+      ],
+      "id": "9d52da18-9fdc-4a76-957c-b2c2b2b0c495",
+      "name": "Code",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_77h0c71rsRXepwgWo2Ribll0",
+          "mode": "list",
+          "cachedResultName": "Justin Welsh 1"
+        },
+        "prompt": "define",
+        "text": "=You are my personal assistant.\nFrom the content of the file data {{ $json.fullContent }}, extract and summarize real estate or property-related information using the following structure and formatting:\n\n🔹 Analyse des charges immobilières\nCharges trimestrielles\nProvide a table with columns:\n\nPériode\n\nCharges courantes\n\nFonds travaux\n\nTotal appelé\n\nTotaux annuels\nSummarize in a table:\n\nCatégorie (e.g., Charges courantes, Fonds travaux, Total provisions)\n\nMontant\n\nFrais exceptionnels\nList any exceptional fees:\n\nNature\n\nMontant\n\nRécapitulatif\nShow:\n\nTOTAL GLOBAL DÛ\n\n🟦 If the PDF is not a charge report but another type of real estate document (e.g., lease, sale deed, product listing):\nSwitch format automatically to one of these styles:\n\n🔹 Analyse de la vente immobilière (for notarial deeds)\nInformations générales\n\nDate de l'acte\n\nLieu\n\nNotaire\n\nAdresse du bien\n\nNature du bien\n\nSurface\n\nPrix de vente\n\nPropriétaires\n\nFinancement\n\nFiscalité et frais\n\nDroits de mutation\n\nPlus-value\n\nTVA\n\nDiagnostics techniques\n\nPlomb, amiante, termites, électricité, etc.\n\nDPE, GES\n\nUrbanisme & préemptions\n\nDroit de préemption, PLU, risques\n\nJouissance\n\nStatut d’occupation\n\nDate de transfert\n\n🔹 Fiche de présentation locative ou vente (for listings or leases)\nCharges locatives & taxes\n\nLoyer, charges mensuelles, taxe foncière, etc.\n\nFrais annexes\n\nDépôt de garantie, honoraires, caution\n\nSurface & type de bail\n\nDétail des surfaces (RDC, sous-sol…)\n\nType et durée du bail\n\nPrix de vente / rendement\n\nNet vendeur\n\nRendement brut\n\n✅ RULES:\nAutomatically detect document type and extract only relevant sections.\n\nFormat output in clean, structured Markdown.\n\nIf any amounts are missing, state \"Non précisé\".\n\nUse European number formatting (e.g., 1 041,50 €).\n\nLet me know if I want CSV or JSON export.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1360,
+        400
+      ],
+      "id": "a0b05d5d-ae24-4ac3-8a2b-2ab180ac7f5c",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2020,
+        400
+      ],
+      "id": "0d740238-97d0-440f-b06c-e578212e32a7",
+      "name": "HTTP Request1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1u97Hsdde-OpSujKF4OEAm0g_jxDW92RQ",
+          "mode": "list",
+          "cachedResultName": "newnew",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1u97Hsdde-OpSujKF4OEAm0g_jxDW92RQ"
+        },
+        "event": "fileCreated",
+        "options": {
+          "fileType": "all"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        240
+      ],
+      "id": "1fdf1596-3598-4f6a-aad0-36135705d722",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QeqECymepCzuAesh",
+          "name": "Google Drive account bnobody"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const binary = items[0].binary.data;\nreturn [{\n  json: {\n    fileBase64: binary.data,  // already base64 if from binary input\n    filename: binary.fileName || 'uploaded_file',\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        320
+      ],
+      "id": "48df4650-d9d8-4772-8d2f-f77d2e56f5a0",
+      "name": "Code1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_77h0c71rsRXepwgWo2Ribll0",
+          "mode": "list",
+          "cachedResultName": "Justin Welsh 1"
+        },
+        "prompt": "define",
+        "text": "=You are an expert in real estate data structuring and formatting. Your task is to take raw or markdown-formatted text describing a property (for sale or lease) and reformat it into a clean, professional, and well-structured presentation sheet.\n\nFormatting goals:\n\nOrganize the content into clearly labeled sections (e.g., General Information, Financial Overview, Exceptional Expenses, etc.)\n\nUse tables wherever appropriate (e.g., surface area, quarterly charges, expense breakdowns)\n\nClean up poorly formatted or redundant content\n\nPresent all monetary values with the € symbol and format using European conventions (e.g., 1 200 € instead of 1,200.00 €)\n\nHighlight key metrics such as sale price, gross yield, and total surface area\n\nAdd line breaks and spacing to ensure high readability\n\nHere is the raw content to clean and format:\n{{ $json.output }}\nReturn only the final cleaned-up output, formatted professionally for presentation. Do not include explanations or notes.\n\nif the data is in franch it should be the same dont convert it to english",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1660,
+        400
+      ],
+      "id": "2b0fa4c8-9725-4e02-81eb-2163044e11cb",
+      "name": "OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are my personal assistant.\nFrom the content of the file data {{ $json.fullContent }}, extract and summarize real estate or property-related information using the following structure and formatting:\n\n🔹 Analyse des charges immobilières\nCharges trimestrielles\nProvide a table with columns:\n\nPériode\n\nCharges courantes\n\nFonds travaux\n\nTotal appelé\n\nTotaux annuels\nSummarize in a table:\n\nCatégorie (e.g., Charges courantes, Fonds travaux, Total provisions)\n\nMontant\n\nFrais exceptionnels\nList any exceptional fees:\n\nNature\n\nMontant\n\nRécapitulatif\nShow:\n\nTOTAL GLOBAL DÛ\n\n🟦 If the PDF is not a charge report but another type of real estate document (e.g., lease, sale deed, product listing):\nSwitch format automatically to one of these styles:\n\n🔹 Analyse de la vente immobilière (for notarial deeds)\nInformations générales\n\nDate de l'acte\n\nLieu\n\nNotaire\n\nAdresse du bien\n\nNature du bien\n\nSurface\n\nPrix de vente\n\nPropriétaires\n\nFinancement\n\nFiscalité et frais\n\nDroits de mutation\n\nPlus-value\n\nTVA\n\nDiagnostics techniques\n\nPlomb, amiante, termites, électricité, etc.\n\nDPE, GES\n\nUrbanisme & préemptions\n\nDroit de préemption, PLU, risques\n\nJouissance\n\nStatut d’occupation\n\nDate de transfert\n\n🔹 Fiche de présentation locative ou vente (for listings or leases)\nCharges locatives & taxes\n\nLoyer, charges mensuelles, taxe foncière, etc.\n\nFrais annexes\n\nDépôt de garantie, honoraires, caution\n\nSurface & type de bail\n\nDétail des surfaces (RDC, sous-sol…)\n\nType et durée du bail\n\nPrix de vente / rendement\n\nNet vendeur\n\nRendement brut\n\n✅ RULES:\nAutomatically detect document type and extract only relevant sections.\n\nFormat output in clean, structured Markdown.\n\nIf any amounts are missing, state \"Non précisé\".\n\nUse European number formatting (e.g., 1 041,50 €).\n\nLet me know if I want CSV or JSON export.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        1300,
+        640
+      ],
+      "id": "32622d50-3f73-48cc-a0e8-ff99877da07f",
+      "name": "AI Agent",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4",
+          "mode": "list",
+          "cachedResultName": "gpt-4"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1340,
+        860
+      ],
+      "id": "009aff27-e1fe-4154-bda6-dd6edb972129",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1220,
+        -160
+      ],
+      "id": "304d730b-c040-4a5a-a5f8-a571279603c3",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [];\n\nfor (item of items) {\n    for (key of Object.keys(item.binary)) {\n        results.push({\n            json: {\n                fileName: item.binary[key].fileName\n            },\n            binary: {\n                data: item.binary[key],\n            }\n        });\n    }\n}\n\nreturn results;"
+      },
+      "id": "99279b24-8027-4a36-9f33-a01bd1549ac2",
+      "name": "Images To List1",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        2020,
+        -320
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {},
+      "id": "d7c7cf77-7901-4cfb-9b02-a92161608c4f",
+      "name": "Extract Zip File1",
+      "type": "n8n-nodes-base.compression",
+      "position": [
+        1840,
+        -320
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-tesseractjs.tesseractNode",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        -320
+      ],
+      "id": "0e1d368a-4d22-45d8-af87-9ba6bb17d37c",
+      "name": "Tesseract1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://143.198.47.9:8000/convert/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "pdf_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1640,
+        -320
+      ],
+      "id": "d6ae4482-6411-4e24-b565-96c01e69001a",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "path": "b2cdce2d-5b76-4b3e-b7a7-e3febb3065bf",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        1160,
+        -320
+      ],
+      "id": "50280d70-30ee-4002-82fa-bbca5837a52c",
+      "name": "Webhook1",
+      "webhookId": "b2cdce2d-5b76-4b3e-b7a7-e3febb3065bf"
+    },
+    {
+      "parameters": {
+        "url": "https://yokydxfxcuappjhpvkcx.supabase.co/storage/v1/object/public/documents//Adobe%20Scan%2026%20oct.%202022.pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        -320
+      ],
+      "id": "9e09d166-970c-41c1-a8c9-267ef257d10f",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        2420,
+        -320
+      ],
+      "id": "87ec7b30-3dc5-409c-8139-01896e5564e4",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "connections": {
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Images For AI": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort Pages": {
+      "main": [
+        [
+          {
+            "node": "Resize Images For AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        []
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Images To List1": {
+      "main": [
+        [
+          {
+            "node": "Tesseract1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Zip File1": {
+      "main": [
+        [
+          {
+            "node": "Images To List1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tesseract1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Extract Zip File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b21bec62-686a-49f9-b08c-dab24929334f",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-05-08T08:21:42.046Z",
+      "updatedAt": "2025-05-08T08:21:42.046Z",
+      "role": "workflow:owner",
+      "workflowId": "eFtFnWcsZ90rNCaF",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

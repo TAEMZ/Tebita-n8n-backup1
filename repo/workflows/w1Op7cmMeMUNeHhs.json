@@ -1,0 +1,741 @@
+{
+  "createdAt": "2025-08-26T13:15:29.875Z",
+  "updatedAt": "2025-10-23T06:10:09.330Z",
+  "id": "w1Op7cmMeMUNeHhs",
+  "name": "Linkedin Post fetching",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        112
+      ],
+      "id": "e7043ad2-37c9-43dd-b56e-0f3e028dd440",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/supreme_coder~linkedin-post/run-sync-get-dataset-items?token=apify_api_Y5NA8JcUNnrVW8C2AZKRJwrGWk7jIR1BafhA",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"deepScrape\": true,\n    \"limitPerSource\": 10,\n    \"rawData\": false,\n    \"scrapeUntil\": \"{{new Date(new Date().setDate(new Date().getDate() - 2)).toISOString().split('T')[0]}}\",\n    \"urls\": {{ JSON.stringify($json.urls) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        96,
+        320
+      ],
+      "id": "a3312ac5-63c5-4842-b12c-2f762c8e4e31",
+      "name": "HTTP Request",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst urls = items.map(item => item.json[\"Profile URL\"]);\n\nreturn [{\n  json: {\n    urls: urls\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        112
+      ],
+      "id": "96bc893f-6e90-4ce3-bc93-7797b4cfb55f",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLOyRrHiCDL6zuT",
+          "mode": "list",
+          "cachedResultName": "Profile Data",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tblLOyRrHiCDL6zuT"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        112
+      ],
+      "id": "89f5ee26-3111-4aa4-87b1-f7b4876dcdc5",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "8906d3f3-c22a-4d51-9c6c-9fbbff210c9a",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        -32
+      ],
+      "id": "4fb5c220-d7ca-42b1-b1e0-8170afc0ceee",
+      "name": "Webhook",
+      "webhookId": "8906d3f3-c22a-4d51-9c6c-9fbbff210c9a"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Role: You are an expert data processing system.\n\nTask: Your task is to transform the following raw, scraped social media data into a structured JSON format. You must follow all rules precisely.\n\nRules:\n\n    The final output must be a single, valid JSON object.\n\n    The top-level keys of the JSON object will be the usernames.\n\n    The value for each company key must be an array of post objects.\n\n    Each post object must contain the following four fields:\n\n        post_id: A unique text only(don't include emoji's) identifier for the post. This must be a string constructed by concatenating the company name (all lowercase, spaces replaced with underscores), an underscore, the letter 'y', the four-digit year, 'm', the two-digit month, 'd', the two-digit day, an underscore, 'h', the two-digit hour, 'm', the two-digit minute, 's', and the two-digit second. (e.g., company_yYYYYmMMdDD_hHHmMMsSS).\n\n        post_text: The text content of the post. If no text is present, use an empty string \"\".\n\n        media_type: A string that must be either \"Image\", \"Video\", or \"Text\".\n\n        media_url: The URL for the media. If media_type is null, this value must also be null.\n\n    Your response must contain ONLY the JSON output. Do not add any introduction, explanation, or summary.\n\nExample of Raw Input Data:\n\nusername: \"Allbirds\"\nPosted Date: \"2023-08-15\"\nPosted Time: \"14:22:05\"\nPost: \"Our new Tree Dasher 2.0 is here! 👟\"\nImage URL: \"https://example.com/allbirds_img1.jpg\"\n---\nbusiness name: \"On Running\"\nPosted Date: \"2023-08-15\"\nPosted Time: \"16:05:10\"\nPost: \"Pushing the limits of technology and design. #RunOnClouds\"\n---\nusername: \"Allbirds\"\nPosted Date: \"2023-08-16\"\nPosted Time: \"09:00:00\"\nPost: \"A look inside our material innovation process.\"\nVideo URL: \"https://example.com/allbirds_video.mp4\"\n\nExample of Desired JSON Output:\nJSON\n\n{\n  \"Allbirds\": [\n    {\n      \"post_id\": \"allbirds_y2023m08d15_h14m22s05\",\n      \"post_text\": \"Our new Tree Dasher 2.0 is here! 👟\",\n      \"media_type\": \"Image\",\n      \"media_url\": \"https://example.com/allbirds_img1.jpg\"\n    },\n    {\n      \"post_id\": \"allbirds_y2023m08d16_h09m00s00\",\n      \"post_text\": \"A look inside our material innovation process.\",\n      \"media_type\": \"Video\",\n      \"media_url\": \"https://example.com/allbirds_video.mp4\"\n    }\n  ],\n  \"On Running\": [\n    {\n      \"post_id\": \"on_running_y2023m08d15_h16m05s10\",\n      \"post_text\": \"Pushing the limits of technology and design. #RunOnClouds\",\n      \"media_type\": \"text\",\n      \"media_url\": null\n    }\n  ]\n}\n\nNow, process the following raw data:\n{{ JSON.stringify($input.all()) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        336,
+        320
+      ],
+      "id": "696326b5-9af4-4649-ac31-999534f602f8",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "da9067ca-f7a7-45ad-b66b-ff3a5261cfcd",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1296,
+        592
+      ],
+      "id": "d950b94f-39a9-4e4d-98d9-541594e263ee",
+      "name": "If",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "post_id",
+              "field2": "Post Id"
+            }
+          ]
+        },
+        "joinMode": "keepNonMatches",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1568,
+        336
+      ],
+      "id": "2663eaed-12ff-444c-87b9-c0356abc11d2",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmtJgGpOS2hQn74",
+          "mode": "list",
+          "cachedResultName": "Brand Content Strategies",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tblmtJgGpOS2hQn74"
+        },
+        "filterByFormula": "=({Post id} = '{{ $json.post_id }}')",
+        "returnAll": false,
+        "limit": 1,
+        "options": {
+          "fields": [
+            "Post Id"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1024,
+        592
+      ],
+      "id": "ed0d45ca-3099-440d-b643-d40c6840f879",
+      "name": "Search records2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appmWyFwWRB5CmvhO",
+          "mode": "list",
+          "cachedResultName": "Idea & Content Inspiration App",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmtJgGpOS2hQn74",
+          "mode": "list",
+          "cachedResultName": "Brand Content Strategies",
+          "cachedResultUrl": "https://airtable.com/appmWyFwWRB5CmvhO/tblmtJgGpOS2hQn74"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Post Id": "={{ $json.post_id }}",
+            "Business Name": "={{ $json.company }}",
+            "Post Text": "={{ $json.post_text }}",
+            "Media Type": "={{ $json.media_type }}",
+            "Media URL": "={{ $json.media_url }}"
+          },
+          "matchingColumns": [
+            "Post Id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Post Id",
+              "displayName": "Post Id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Business Name",
+              "displayName": "Business Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Content Format",
+              "displayName": "Content Format",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Angle",
+              "displayName": "Angle",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Tone of Voice",
+              "displayName": "Tone of Voice",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Emotional Trigger",
+              "displayName": "Emotional Trigger",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Visual Language",
+              "displayName": "Visual Language",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Story Device",
+              "displayName": "Story Device",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Call To Engagement",
+              "displayName": "Call To Engagement",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Credibility Builders",
+              "displayName": "Credibility Builders",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Pattern Disruption",
+              "displayName": "Pattern Disruption",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Cultural Relevance",
+              "displayName": "Cultural Relevance",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Camera Performance",
+              "displayName": "Camera Performance",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Takeaways",
+              "displayName": "Takeaways",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Script",
+              "displayName": "Script",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "is checked",
+              "displayName": "is checked",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post Text",
+              "displayName": "Post Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Media Type",
+              "displayName": "Media Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Media URL",
+              "displayName": "Media URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "updateAllMatches": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1776,
+        336
+      ],
+      "id": "9f0cf0ba-70e1-4d91-bb0a-7ded831faf83",
+      "name": "Create or update a record1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * This n8n Function node unnests and formats AI-generated post data.\n *\n * It performs the following steps:\n * 1. Reads the `content` field, which is a JSON string.\n * 2. Parses this string into a JavaScript object.\n * 3. Loops through each company (e.g., \"On\", \"HOKA\").\n * 4. Adds the company name to each post's data.\n * 5. Returns each individual post as a separate item, making it easy to\n * process them one by one in subsequent nodes.\n */\n\nconst allPosts = [];\n\n// Loop through each incoming item from the previous node.\nfor (const item of items) {\n  try {\n    // 1. Get the content, which is a string that looks like JSON.\n    const jsonString = item.json.message.content;\n\n    // 2. Parse the string into a usable JavaScript object.\n    const parsedContent = JSON.parse(jsonString);\n\n    // 3. Loop through the keys of the object (which are the company names).\n    for (const companyName in parsedContent) {\n      const postsForCompany = parsedContent[companyName];\n\n      // 4. For each post, create a new object that includes the company name.\n      for (const post of postsForCompany) {\n        const newPostObject = {\n          company: companyName,\n          post_id: post.post_id,\n          post_text: post.post_text,\n          media_type: post.media_type,\n          media_url: post.media_url,\n        };\n        allPosts.push(newPostObject);\n      }\n    }\n  } catch (error) {\n    // If an item's content is not valid JSON, we'll log it and skip.\n    console.error(\"Could not parse JSON content for an item:\", error);\n  }\n}\n\n// 5. Return each cleaned-up post as its own n8n item.\nreturn allPosts.map(post => ({ json: post }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        320
+      ],
+      "id": "cc166543-8ebb-4454-be44-7a4edcb2fa70",
+      "name": "Code1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        336
+      ],
+      "id": "328d46d1-e903-402f-a5fc-3bad57de7013",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "zswuvHDn33P8aqjY",
+          "mode": "list",
+          "cachedResultName": "competitor scraping"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2192,
+        336
+      ],
+      "id": "357d45e4-2c19-4c92-b0fa-1a0f52b0d291",
+      "name": "Execute Workflow"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Search records2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Create or update a record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Search records2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or update a record1": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "z5dK4hrIczUamG3b"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "8aba4a63-a4f9-4c22-9cbd-df18a10e2063",
+  "triggerCount": 2,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-08-26T13:15:29.875Z",
+      "updatedAt": "2025-08-26T13:15:29.875Z",
+      "role": "workflow:owner",
+      "workflowId": "w1Op7cmMeMUNeHhs",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

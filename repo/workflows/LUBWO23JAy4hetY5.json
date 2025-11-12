@@ -1,0 +1,181 @@
+{
+  "createdAt": "2025-02-11T08:43:13.203Z",
+  "updatedAt": "2025-02-26T13:35:47.491Z",
+  "id": "LUBWO23JAy4hetY5",
+  "name": "Video-Audio-Text",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "13TLgp6ZazwVJolvKzdZ-4kHxs5GklZCo",
+          "mode": "list",
+          "cachedResultName": "Tebta",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/13TLgp6ZazwVJolvKzdZ-4kHxs5GklZCo"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        -80
+      ],
+      "id": "759639e6-6791-4fb5-8a6c-fe1fac376d85",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HOKFJ6mGRbBOxj2D",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -60,
+        -80
+      ],
+      "id": "3c0f9c60-16c5-43ba-906d-f38cedbd4c36",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HOKFJ6mGRbBOxj2D",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://4f05-31-14-252-9.ngrok-free.app/extract-audio/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "video_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        160,
+        -80
+      ],
+      "id": "33dd5d1f-c7d1-4ea3-bcb5-29cad60a357a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        380,
+        -80
+      ],
+      "id": "925cac97-0bb8-4255-bdb4-98f1443323ab",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "O1PHcm8q29zCIxMY",
+          "name": "OpenAi account 3"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ed829169-c928-4281-8d01-5d2178f5cc35",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-11T08:43:13.203Z",
+      "updatedAt": "2025-02-11T08:43:13.203Z",
+      "role": "workflow:owner",
+      "workflowId": "LUBWO23JAy4hetY5",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

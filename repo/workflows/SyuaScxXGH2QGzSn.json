@@ -1,0 +1,433 @@
+{
+  "createdAt": "2025-07-30T09:54:15.497Z",
+  "updatedAt": "2025-07-31T11:12:16.191Z",
+  "id": "SyuaScxXGH2QGzSn",
+  "name": "Client agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1040,
+        160
+      ],
+      "id": "e57352d8-a11a-4980-8d8f-81decdb59bbf",
+      "name": "When chat message received",
+      "webhookId": "b8bc57c7-8fa0-4e0e-9883-ce38c52cdd5a"
+    },
+    {
+      "parameters": {
+        "content": "## Agent Tools for RAG",
+        "height": 528.85546469693,
+        "width": 583.4552380860637,
+        "color": 4
+      },
+      "id": "f0f565e0-8e51-4e6e-8e0e-4c2005beea46",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        20
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ad971e55-542a-4cce-b5ed-9d432eb8719f",
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1,
+      "position": [
+        -600,
+        380
+      ],
+      "notesInFlow": false,
+      "credentials": {
+        "postgres": {
+          "id": "8qqqb9DJVa1FebqY",
+          "name": "Postgres account hybrid"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## RAG AI Agent with Chat Interface",
+        "height": 464.8027193303974,
+        "width": 1035.6381264595484
+      },
+      "id": "6a8c2e76-fabe-406e-82c8-f34c5986df7e",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1060,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9a9a245e-f1a1-4282-bb02-a81ffe629f0f",
+              "name": "chatInput",
+              "value": "={{ $json?.chatInput || $json.body.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "b80831d8-c653-4203-8706-adedfdb98f77",
+              "name": "sessionId",
+              "value": "={{ $json?.sessionId || $json.body.sessionId}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "da3fdbc1-f442-421d-a7b4-3ba057c8ac95",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -760,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "=🔧 Legal Info Assistant: Smart Law Query Handler (Client-Facing)\n🎯 Purpose\nProvide clear, accurate, and structured legal information in response to general law-related questions from clients.\n\n🧠 Agent Behavior\nYou are a legal information assistant designed to help users understand legal topics, legal terminology, procedures, and rights across various domains (e.g., family law, employment, immigration, housing, contracts, etc.).\n\nYou do not provide legal advice or handle case-specific data. You only respond based on a public legal knowledge base, official legal documents, and structured legal data.\n\n🛠️ Capabilities & Tools\nYou are equipped with the following tools:\n\n🔍 Hybrid Search Tool (MANDATORY USE)\nPerforms semantic + keyword search across a legal knowledge base using a vector database. Sources include indexed legal documents and their metadata (documents, document_metadata tables).\nYou must always perform a hybrid search for every query to retrieve relevant legal information before responding. This tool is your default and mandatory method for information gathering.\n\n📄 Document Reader / Extractor\nAllows you to extract specific sections or passages from legal documents returned by the hybrid search, for deeper context or precision.\n\n📊 SQL Query Tool\nProvides access to structured legal data (e.g., fees, statutory penalties, timelines, and statistics) using the document_rows table.\n\n📌 Response Strategy & Workflow\nUnderstand the User Query\nIdentify whether the user is asking about a legal definition, right, timeline, process, or statute across any legal domain.\n\nAlways Perform Hybrid Search First\nRegardless of query simplicity, you must always initiate a hybrid search to retrieve relevant legal content before forming a response. Do not attempt to answer from memory or prior responses.\n\nExtract Specific Text When Needed\nIf the hybrid search returns documents that require deeper detail, use the document reader tool to extract and summarize precise content.\n\nUse SQL for Structured Data\nWhen the query involves legal fees, penalties, durations, or statistical/legal table data, query the SQL database using document_rows.\n\nFallback When No Relevant Information Found\nIf hybrid search and document tools yield no useful content, explicitly state that the requested information is unavailable and suggest the user consult a licensed attorney.\n\n⚠️ Rules & Constraints\n❌ Never give personalized legal advice or opinions.\n\n✅ Always clarify that your responses are for informational purposes only.\n\n❌ Do not fabricate or guess legal information.\n\n✅ Cite official or authoritative legal sources when applicable.\n\n🗂️ Output Format Guidelines\nWhen responding to users:\n\n✅ Provide a clear summary of the answer\n\n✅ Explain any relevant legal definitions or terms in simple language\n\n✅ Outline steps or procedures, if applicable\n\n✅ Include jurisdictional context where known or relevant\n\n✅ Always close with this disclaimer:\n“This information is for general understanding only and does not constitute legal advice. Please consult a qualified attorney for help with your specific case.”"
+        }
+      },
+      "id": "6b5625c3-9787-4b00-88e5-17c4f2399178",
+      "name": "RAG AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        -520,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to fetch all available documents, including the table schema if the file is a CSV or Excel file.",
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "document_metadata",
+          "mode": "list",
+          "cachedResultName": "document_metadata"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.5,
+      "position": [
+        -460,
+        380
+      ],
+      "id": "09c9460d-8dfb-4102-b562-03aba6b7e458",
+      "name": "List Documents",
+      "credentials": {
+        "postgres": {
+          "id": "8qqqb9DJVa1FebqY",
+          "name": "Postgres account hybrid"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Given a file ID, fetches the text from the document.",
+        "operation": "executeQuery",
+        "query": "SELECT \n    string_agg(content, ' ') as document_text\nFROM documents\n  WHERE metadata->>'file_id' = $1\nGROUP BY metadata->>'file_id';",
+        "options": {
+          "queryReplacement": "={{ $fromAI('file_id') }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.5,
+      "position": [
+        -320,
+        380
+      ],
+      "id": "596e40d4-53c3-40ea-9f39-5424324a35fd",
+      "name": "Get File Contents",
+      "credentials": {
+        "postgres": {
+          "id": "8qqqb9DJVa1FebqY",
+          "name": "Postgres account hybrid"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Run a SQL query - use this to query from the document_rows table once you know the file ID you are querying. dataset_id is the file_id and you are always using the row_data for filtering, which is a jsonb field that has all the keys from the file schema given in the document_metadata table.\n\nExample query:\n\nSELECT AVG((row_data->>'revenue')::numeric)\nFROM document_rows\nWHERE dataset_id = '123';\n\nExample query 2:\n\nSELECT \n    row_data->>'category' as category,\n    SUM((row_data->>'sales')::numeric) as total_sales\nFROM dataset_rows\nWHERE dataset_id = '123'\nGROUP BY row_data->>'category';",
+        "operation": "executeQuery",
+        "query": "{{ $fromAI('sql_query') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.5,
+      "position": [
+        -160,
+        380
+      ],
+      "id": "36bc717f-6d0c-49c4-85aa-971f4b3557cc",
+      "name": "Query Document Rows",
+      "credentials": {
+        "postgres": {
+          "id": "8qqqb9DJVa1FebqY",
+          "name": "Postgres account hybrid"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "documents",
+        "toolDescription": "Use RAG to look up information in the knowledgebase.",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        160,
+        160
+      ],
+      "id": "61471bb0-39cc-4ab5-99e8-beb7d902601b",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "kdYQQPbbiPSBmQMg",
+          "name": "Supabase account hybrid"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        260,
+        320
+      ],
+      "id": "6b29af93-dc1b-43bf-845a-41e4dbe12515",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "NdqrWvU3kkpHiuep",
+          "name": "Tebita-openai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "1bc8d5d1-e986-4322-8c59-70a0f557b9e6",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -760,
+        380
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "NdqrWvU3kkpHiuep",
+          "name": "Tebita-openai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://tltmtkbabhrtefxxsmyi.supabase.co/functions/v1/hybrid-search-trigger",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        360
+      ],
+      "id": "42529fad-35ec-4cad-90e0-16feb6a2d363",
+      "name": "Supabase Hybrid Function1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "T3Im4XDqPzDnYikV",
+          "name": "Hybrid_Search"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Documents": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get File Contents": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Document Rows": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Hybrid Function1": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "ae2c4a25-05ae-45cd-b849-e52f9a05eb29",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-07-30T09:54:15.497Z",
+      "updatedAt": "2025-09-05T08:41:59.880Z",
+      "role": "workflow:owner",
+      "workflowId": "SyuaScxXGH2QGzSn",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

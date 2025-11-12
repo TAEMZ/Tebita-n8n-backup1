@@ -1,0 +1,338 @@
+{
+  "createdAt": "2025-09-29T15:54:15.664Z",
+  "updatedAt": "2025-10-01T08:17:55.302Z",
+  "id": "7wr0g0b4oLWLfMdX",
+  "name": "telegram-agent",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        -112
+      ],
+      "id": "7c52f074-36e3-4491-80d9-93456d7a3b6e",
+      "name": "Telegram Trigger",
+      "webhookId": "763af026-66ae-4488-9e50-16c4ab9bdf3a",
+      "credentials": {
+        "telegramApi": {
+          "id": "luymKvQ2tLLIkip0",
+          "name": "yordanos-lesson-bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=You are a helpful assistant\nThe date and time is {{ $now }}\n\nIt is a must to use tools that are available to you.\nAll the tools must be used.\nyou have access to tools like google calendar, gmail and google sheets.\nwhenever you send an email, you must first find the email of the person you want to send it to by using the \"Get Contacts\" tool.\n\n\nwhenever you send an email use the \"Send Email to Contacts\" tool.\n\nwhenever you are trying to create a meeting use the \"Create Meeting\" tool.\n\ndon't ask follow up question. do what you are asked to do."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        632,
+        -112
+      ],
+      "id": "154ab487-37e5-486a-b16e-bbe6dfe04a82",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.from.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        576,
+        112
+      ],
+      "id": "378be33e-b732-4db4-9f84-2c36f8595efb",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "use this to get contact information\nGet row(s) in sheet in Google Sheets",
+        "documentId": {
+          "__rl": true,
+          "value": "1SVFxkDCTP-zfWpQTWnv4ODR5OrCVf7Fu7EWzS8dsbqs",
+          "mode": "list",
+          "cachedResultName": "Contact Lesson",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SVFxkDCTP-zfWpQTWnv4ODR5OrCVf7Fu7EWzS8dsbqs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SVFxkDCTP-zfWpQTWnv4ODR5OrCVf7Fu7EWzS8dsbqs/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        704,
+        112
+      ],
+      "id": "b172f08d-6e92-453a-8e53-1acdac01dd81",
+      "name": "Get Contacts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "U2T5AcZWZXCZQwjL",
+          "name": "yordanos-google-sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "use this to send email to people\nSend a message in Gmail",
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        832,
+        112
+      ],
+      "id": "8d6d988e-924a-4b62-ac95-1f45ebad8458",
+      "name": "Send Email to Contacts",
+      "webhookId": "e1fc1b1a-bb9f-45f6-a23d-25714d619bde",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YolHf3KYOMJZbR3t",
+          "name": "yordanos.yirgu1@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Create an event in Google Calendar",
+        "calendar": {
+          "__rl": true,
+          "value": "yordanos.yirgu1@gmail.com",
+          "mode": "list",
+          "cachedResultName": "yordanos.yirgu1@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        960,
+        112
+      ],
+      "id": "b1d41055-adc3-433d-b4fe-cf2b7b13cbe0",
+      "name": "Create Meeting",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "IrvkdGuEum0YyWFk",
+          "name": "yordanos-calendar-account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1168,
+        -112
+      ],
+      "id": "c1f5fac7-b65a-40f2-be4e-ed2d55de6ec3",
+      "name": "Send a text message",
+      "webhookId": "71579d85-c193-4ee5-b25e-5494306ed8ab",
+      "credentials": {
+        "telegramApi": {
+          "id": "luymKvQ2tLLIkip0",
+          "name": "yordanos-lesson-bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        112
+      ],
+      "id": "981ff45d-acf5-45f7-9e75-246287e01d9c",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contacts": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to Contacts": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Meeting": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "z5dK4hrIczUamG3b"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Telegram Trigger": [
+      {
+        "json": {
+          "update_id": 731444427,
+          "message": {
+            "message_id": 10,
+            "from": {
+              "id": 958191791,
+              "is_bot": false,
+              "first_name": "Yordanos",
+              "username": "yordanos_yirgu",
+              "language_code": "en"
+            },
+            "chat": {
+              "id": 958191791,
+              "first_name": "Yordanos",
+              "username": "yordanos_yirgu",
+              "type": "private"
+            },
+            "date": 1759239947,
+            "text": "please set up a meeting with stefan tomorrow at 3pm and let him know"
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "6819fed4-79c8-4c0a-833a-d2119c9f2220",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-09-29T15:54:15.664Z",
+      "updatedAt": "2025-09-29T15:54:15.664Z",
+      "role": "workflow:owner",
+      "workflowId": "7wr0g0b4oLWLfMdX",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

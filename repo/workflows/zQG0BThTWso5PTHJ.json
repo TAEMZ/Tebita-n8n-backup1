@@ -1,0 +1,420 @@
+{
+  "createdAt": "2025-02-03T13:19:03.922Z",
+  "updatedAt": "2025-02-05T12:26:02.343Z",
+  "id": "zQG0BThTWso5PTHJ",
+  "name": "RFP Historical Answer for the question RAG",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1320,
+        400
+      ],
+      "id": "c7ca2c14-9f09-44cf-839c-c4c7b8bfbcda",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "9dZkBlQ9pjp5qbos",
+          "name": "Openai1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Questions }}",
+        "options": {
+          "systemMessage": "you are an agent that will answer question that the user asked you by getting the answer from the pinecone vector store. and if the question don't have an answer on the db then return \"No Anaswer\"\n**return in this forma**\n{\nAnswer: \"the answer to the questiosn\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1380,
+        140
+      ],
+      "id": "cbceb8ce-7ad3-44d0-a898-cd8117bd3152",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "rfp",
+        "toolDescription": "on this database there will be questions and answers for the RFP questions and Prioritize recents",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "rfp",
+          "mode": "list",
+          "cachedResultName": "rfp"
+        },
+        "options": {
+          "pineconeNamespace": "QnA"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        420
+      ],
+      "id": "558bf999-8502-4b79-8c3a-4e0769ba632e",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "N5Rk30RA0QKEKVjk",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        640
+      ],
+      "id": "043a0ebb-3b99-44c5-997c-53fdf20ce697",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "9dZkBlQ9pjp5qbos",
+          "name": "Openai1"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.query.sheetURL }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        140
+      ],
+      "id": "2ffbfd85-e36a-495e-bbb0-522cd0686a8f",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Uu8fHmMcHyVMgg3q",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "6f6a3330-8658-478f-8e0e-560e61a60db0",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        620,
+        140
+      ],
+      "id": "f6067396-a643-49ba-a40a-ff995b9f917d",
+      "name": "Webhook",
+      "webhookId": "6f6a3330-8658-478f-8e0e-560e61a60db0"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.query.sheetURL }}",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18Q7_eqwgBhL1Se2pm5nPBLLl9JNKGeW3CajkCahDVks/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Questions": "={{ $('Google Sheets').item.json.Questions }}",
+            "Answers": "={{ $json.output.Answer }}",
+            "row_number": "={{ $('Google Sheets').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Questions",
+              "displayName": "Questions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Answers",
+              "displayName": "Answers",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1980,
+        140
+      ],
+      "id": "ce399a87-2039-4642-bb99-acdcce93ca96",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Uu8fHmMcHyVMgg3q",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "56e58f68-8cbc-4cc6-a8f1-e5725d93618d",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1740,
+        140
+      ],
+      "id": "6eba5b7c-fc22-4eb0-b2ea-58316740724e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "yonatantesfaye30@gmail.com",
+        "subject": "Hey Your answer question is answered",
+        "message": "=<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n<html>\n<head>\n  <title>RFP Answering Completed</title>\n</head>\n<body>\n  <table width=\"600\" align=\"center\" cellpadding=\"10\" cellspacing=\"0\" style=\"background-color: #ffffff; border: 1px solid #cccccc;\">\n    <!-- Header -->\n    <tr>\n      <td bgcolor=\"#4CAF50\" style=\"padding: 20px; text-align: center;\">\n        <font color=\"#ffffff\" size=\"5\" face=\"Arial, sans-serif\">\n          <strong>RFP Answering Completed</strong>\n        </font>\n      </td>\n    </tr>\n\n    <!-- Content -->\n    <tr>\n      <td style=\"padding: 20px; font-family: Arial, sans-serif; color: #333333;\">\n        <h2>Hello,</h2>\n        <p>The RFP aswering the question process has been successfully completed! ✅</p>\n        <p>📌 <strong>Questions Extracted:</strong></p>\n        <p>You can review the answers and questions in the Google Sheet here:</p>\n        <table width=\"100%\" cellpadding=\"10\" cellspacing=\"0\">\n          <tr>\n            <td align=\"center\">\n              <a href=\"{{ $('Webhook').item.json.query.sheetURL }}\" style=\"background-color: #4CAF50; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;\">\n                View Google Sheet\n              </a>\n            </td>\n          </tr>\n        </table>\n        <p>If you notice any issues or need modifications, feel free to edit them directly in the sheet.</p>\n        <p>Once reviewed, please approve the extraction:</p>\n        <table width=\"100%\" cellpadding=\"10\" cellspacing=\"0\">\n          <tr>\n            <td align=\"center\">\n              <a href=\"https://n8n.tebita.com/webhook-test/d4a3d84a-4b46-407a-82bb-113024560869?sheetUrl={{ $('Webhook').item.json.query.sheetURL }}\" style=\"background-color: #2196F3; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 16px;\">\n                Approve\n              </a>\n            </td>\n          </tr>\n        </table>\n      </td>\n    </tr>\n\n    <!-- Footer -->\n    <tr>\n      <td bgcolor=\"#f4f4f4\" style=\"padding: 10px; text-align: center; font-family: Arial, sans-serif; font-size: 14px; color: #666666;\">\n        <p>Thank you for using our services!</p>\n      </td>\n    </tr>\n  </table>\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2220,
+        140
+      ],
+      "id": "62acbbc2-4d5b-40ad-bafd-0c4c8b48e2f2",
+      "name": "Gmail",
+      "webhookId": "6312d2e4-efa2-41df-bd14-d63dbb9f7a43",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Zd7T3toCltLxTYTO",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<script>window.close()</script>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        140
+      ],
+      "id": "4531d061-e2d1-4c84-bac9-1696a876f896",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "8b782155-42d5-494a-b8c8-f826e7237f3c",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-02-05T06:40:19.181Z",
+      "updatedAt": "2025-02-05T06:40:19.181Z",
+      "id": "JqCj5tAHj8mJnTwR",
+      "name": "RFP"
+    }
+  ],
+  "shared": [
+    {
+      "createdAt": "2025-02-03T13:19:03.922Z",
+      "updatedAt": "2025-02-03T13:19:03.922Z",
+      "role": "workflow:owner",
+      "workflowId": "zQG0BThTWso5PTHJ",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

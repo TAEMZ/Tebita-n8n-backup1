@@ -1,0 +1,1576 @@
+{
+  "createdAt": "2025-02-03T07:44:02.403Z",
+  "updatedAt": "2025-02-05T06:35:16.211Z",
+  "id": "KUQgKTtv4gMO9nNx",
+  "name": "My workflow 3",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        -60
+      ],
+      "id": "14cb7078-2d1a-419c-bed1-26dfbf96fb6c",
+      "name": "When chat message received",
+      "webhookId": "166b1d54-ff06-4188-a675-93adeca0cabd"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            },
+            {
+              "mode": "everyHour",
+              "minute": 5
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "13TLgp6ZazwVJolvKzdZ-4kHxs5GklZCo",
+          "mode": "list",
+          "cachedResultName": "Tebta",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/13TLgp6ZazwVJolvKzdZ-4kHxs5GklZCo"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        220
+      ],
+      "id": "8ed28240-8857-4c3f-806c-ea9230df9536",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ogdNonSmHM5xqLPK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1xW0MVwNBaLtIoaxXtRZgUjXPjO-ba7jB",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        120,
+        220
+      ],
+      "id": "2eba7865-4dd6-4a55-97db-5d2615c00736",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ogdNonSmHM5xqLPK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        380,
+        0
+      ],
+      "id": "1383e366-59e8-4a5e-8121-f0eecafc2e6f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        840
+      ],
+      "id": "e81a39f4-aa0a-4adb-a3ac-92546d8df3dd",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "geWtWp2RVNF0xiRd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -200
+      ],
+      "id": "1063f083-47da-4cd8-95c8-9db4ac20eaa4",
+      "name": "Extract from File",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1mk2UnyTd_HCFNU8EM2oXyq0vejZqOtLpBY7NWbNfZr0/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1mk2UnyTd_HCFNU8EM2oXyq0vejZqOtLpBY7NWbNfZr0/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "Question"
+          ],
+          "schema": [
+            {
+              "id": "question",
+              "displayName": "question",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "error",
+              "displayName": "error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "headers",
+              "displayName": "headers",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "params",
+              "displayName": "params",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "body",
+              "displayName": "body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "webhookUrl",
+              "displayName": "webhookUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "executionMode",
+              "displayName": "executionMode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2040,
+        280
+      ],
+      "id": "d465d535-5291-4a45-81e7-82a411809c55",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "L47xnG6aPvm4qfpY",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1rs6KEGPmRdqUWIYv25UdW8m0TabuvrbMZQtkeviqjUM/edit?tab=t.dkh4gbaqsczi"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        700,
+        660
+      ],
+      "id": "f2d73301-7e10-4f56-b46e-3625b551e5af",
+      "name": "Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "J438s6g9vV5KxiM7",
+          "name": "Google Docs account 3"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "options": {
+          "systemMessage": "Extract only the questions from the following text. Ignore any answers, explanations, or extra information.\n\nFormat the output as a JSON object with a single key questions, where the value is an array containing each extracted question as a separate entry.\n\nImportant Note: If you don't find any questions in the text, you must still return a JSON object with an empty array for questions. However, if you do find questions, make sure to include them all—don't pretend they don't exist!\n\nExample Output:\n\n{\n  \"questions\": [\n    \"What is your company’s legal name?\",\n    \"Please provide your company's registration number.\",\n    \"Does your company comply with GDPR?\"\n  ]\n}\nOnly return the JSON object. Do not include any additional text, explanations, or formatting outside the JSON structure. And remember, the questions are real—don't gaslight me into thinking they aren't!"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        920,
+        660
+      ],
+      "id": "89206f11-85bb-4185-be89-7392e3d49400",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f22b0669-bd68-4db5-9a9c-80dbabdc4791",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1400,
+        660
+      ],
+      "id": "00fff69a-b730-4c43-a59e-1295808bcd45",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the first input\nconst inputData = $input.first().json;\n\n// Check if 'output' exists and is a string or object\nlet rawJson;\n\n// Check if 'output' is a string and parse it\nif (typeof inputData.output === 'string') {\n    try {\n        rawJson = JSON.parse(inputData.output);\n    } catch (e) {\n        throw new Error(\"Invalid JSON format in 'output'.\");\n    }\n} else if (typeof inputData.output === 'object') {\n    // If 'output' is already an object, just assign it directly\n    rawJson = inputData.output;\n} else {\n    throw new Error(\"'output' is not a valid string or object.\");\n}\n\n// Ensure questions exist in the JSON\nif (!rawJson.questions || !Array.isArray(rawJson.questions)) {\n    throw new Error(\"No questions found in the extracted data.\");\n}\n\nreturn rawJson.questions.map((question)=> ({json:{question}}))\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1620,
+        660
+      ],
+      "id": "9a478d51-d74b-4f96-9474-cd869074c30e",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        700,
+        100
+      ],
+      "id": "a0142e7f-dd5e-4cfd-969e-7e144bf635ef",
+      "name": "Extract from File1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "Extract only the questions from the following text. Ignore any answers, explanations, or extra information.\n\nFormat the output as a JSON object with a single key questions, where the value is an array containing each extracted question as a separate entry.\n\nImportant Note: If you don't find any questions in the text, you must still return a JSON object with an empty array for questions. However, if you do find questions, make sure to include them all—don't pretend they don't exist!\n\nExample Output:\n\n{\n  \"questions\": [\n    \"What is your company’s legal name?\",\n    \"Please provide your company's registration number.\",\n    \"Does your company comply with GDPR?\"\n  ]\n}\nOnly return the JSON object. Do not include any additional text, explanations, or formatting outside the JSON structure. And remember, the questions are real—don't gaslight me into thinking they aren't!"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        940,
+        60
+      ],
+      "id": "b6722b14-9102-4563-bd11-f5b63b0d97e7",
+      "name": "AI Agent2",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        980,
+        240
+      ],
+      "id": "bb6827e6-1056-433d-8aaa-7744340a954c",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "geWtWp2RVNF0xiRd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f22b0669-bd68-4db5-9a9c-80dbabdc4791",
+              "name": "=output",
+              "value": "={{ $json.output }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1380,
+        100
+      ],
+      "id": "8f68c782-a0d1-4e6e-8995-2b859d6284a6",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the first input\nconst inputData = $input.first().json;\n\n// Check if 'output' exists and is a string or object\nlet rawJson;\n\n// Check if 'output' is a string and parse it\nif (typeof inputData.output === 'string') {\n    try {\n        rawJson = JSON.parse(inputData.output);\n    } catch (e) {\n        throw new Error(\"Invalid JSON format in 'output'.\");\n    }\n} else if (typeof inputData.output === 'object') {\n    // If 'output' is already an object, just assign it directly\n    rawJson = inputData.output;\n} else {\n    throw new Error(\"'output' is not a valid string or object.\");\n}\n\n// Ensure questions exist in the JSON\nif (!rawJson.questions || !Array.isArray(rawJson.questions)) {\n    throw new Error(\"No questions found in the extracted data.\");\n}\n\nreturn rawJson.questions.map((question)=> ({json:{question}}))\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        180
+      ],
+      "id": "090800b8-6591-4858-9c90-57134f5140cd",
+      "name": "Code1",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        800,
+        380
+      ],
+      "id": "084882d7-b518-418d-a63f-8668840f3d96",
+      "name": "Extract from File2",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['Section\tQuestion\tResponse\t\t'] }}",
+        "options": {
+          "systemMessage": "Extract only the questions from the following text. Ignore any answers, explanations, or extra information.\n\nFormat the output as a plain list of questions, with each question on a new line. Do not include any headers, labels, or empty rows. If no questions are found, return nothing.\n\nExample Output:\n\nWhat is your company’s legal name?\nPlease provide your company's registration number.\nDoes your company comply with GDPR?\n\nOnly return the list of questions. Do not include any additional text, explanations, or formatting outside the list. And remember, the questions are real—don't gaslight me into thinking they aren't!"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1080,
+        360
+      ],
+      "id": "51fe9e24-c3fe-48b6-aa65-e1c5b66acf20",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1020,
+        520
+      ],
+      "id": "e4fd16d2-3ce0-44e4-ad04-f008f66f90a6",
+      "name": "OpenAI Chat Model3",
+      "credentials": {
+        "openAiApi": {
+          "id": "geWtWp2RVNF0xiRd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "beamlakadaneb@gmail.com",
+        "subject": "RFP Extraction Complete",
+        "emailType": "text",
+        "message": "Hello,    The RFP extraction process has been successfully completed! ✅    📌 **Questions Extracted:**     You can review the extracted questions in the Google Sheet here: [https://docs.google.com/spreadsheets/d/1mk2UnyTd_HCFNU8EM2oXyq0vejZqOtLpBY7NWbNfZr0/edit?gid=0#gid=0]    If you notice any issues or need modifications, feel free to edit them directly in the sheet.  \n\n<a src=\"https://n8n.tebita.com/webhook-test/6f6a3330-8658-478f-8e0e-560e61a60db0?sheetURL=https://docs.google.com/spreadsheets/d/1mk2UnyTd_HCFNU8EM2oXyq0vejZqOtLpBY7NWbNfZr0/edit?gid=0#gid=0\"> Approve </a>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2260,
+        240
+      ],
+      "id": "d26d289f-0090-41b1-adb8-bdfb83aac245",
+      "name": "Gmail",
+      "webhookId": "1546d1c6-2ca5-4720-845f-7071038121e1",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Zd7T3toCltLxTYTO",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "rfp",
+        "toolDescription": "on this database there will be questions and answers for the RFP questions",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "rfp",
+          "mode": "list",
+          "cachedResultName": "rfp"
+        },
+        "options": {
+          "pineconeNamespace": "QnA"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        3300,
+        -160
+      ],
+      "id": "5147375e-fcca-4d0c-b70c-713f0ceac83d",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "so3aTqTFV5qEOLKq",
+          "name": "PineconeApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3220,
+        80
+      ],
+      "id": "3693308e-3594-4411-add1-89a506ecd194",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "geWtWp2RVNF0xiRd",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3060,
+        -60
+      ],
+      "id": "c6e615b6-ec44-4be0-8da7-55a8e527436e",
+      "name": "OpenAI Chat Model4",
+      "credentials": {
+        "openAiApi": {
+          "id": "geWtWp2RVNF0xiRd",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "you are an agent that will answer question that the user asked you by getting the answer from the pinecone vector store. and if the question don't have an answer on the db then return \"No Anaswer\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        3120,
+        -400
+      ],
+      "id": "f92dd4e9-e440-4338-89eb-29e22639eeed",
+      "name": "AI Agent4",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        3340,
+        160
+      ],
+      "id": "0cf5e043-067a-44d4-a1a4-d0cfd927d4c6",
+      "name": "Window Buffer Memory1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "rfp",
+          "mode": "list",
+          "cachedResultName": "rfp"
+        },
+        "options": {
+          "pineconeNamespace": "QnA"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        -400
+      ],
+      "id": "20129074-a4fa-47e5-8766-5e3d0223b891",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "so3aTqTFV5qEOLKq",
+          "name": "PineconeApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2500,
+        -200
+      ],
+      "id": "8ca55d39-8b2e-4427-843e-12afa80b0a61",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "geWtWp2RVNF0xiRd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        -160
+      ],
+      "id": "effce411-9cba-4492-bd26-9f5987870a5a",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 5000,
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        2660,
+        0
+      ],
+      "id": "08f31d10-8fe4-4e24-b68e-b6751130a3f6",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1JD03JB4PIINMaVDbUm3nSJraPO3iLE8I",
+          "mode": "list",
+          "cachedResultName": "RFP Question and Answer",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1JD03JB4PIINMaVDbUm3nSJraPO3iLE8I"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        2140,
+        -380
+      ],
+      "id": "55cd0ecf-513a-473e-8fb5-7e47e298a049",
+      "name": "Google Drive Trigger1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ogdNonSmHM5xqLPK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.webViewLink }}",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2360,
+        -380
+      ],
+      "id": "b27cf048-9e67-44cb-ac28-6da8b83e7fb4",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "ogdNonSmHM5xqLPK",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        440,
+        240
+      ],
+      "id": "cc0a8884-f412-4bf8-a58e-bbea9cfcca38",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        380,
+        540
+      ],
+      "id": "5f3e00b9-ef21-4f11-808d-809c1ab4b221",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['Section\tQuestion\tResponse\t\t'] }}",
+        "options": {
+          "systemMessage": "Extract only the questions from the following text. Ignore any answers, explanations, or extra information.\n\nFormat the output as a plain list of questions, with each question on a new line. Do not include any headers, labels, or empty rows. If no questions are found, return nothing.\n\nExample Output:\n\nWhat is your company’s legal name?\nPlease provide your company's registration number.\nDoes your company comply with GDPR?\n\nOnly return the list of questions. Do not include any additional text, explanations, or formatting outside the list. And remember, the questions are real—don't gaslight me into thinking they aren't!"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1080,
+        -340
+      ],
+      "id": "198cdc9f-4402-4461-9ab4-9e89c69a81d1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -100
+      ],
+      "id": "2e392c30-d46c-465e-bc59-53e433a29ca0",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "geWtWp2RVNF0xiRd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "6f6a3330-8658-478f-8e0e-560e61a60db0",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2180,
+        660
+      ],
+      "id": "b4e410f3-bf80-49ff-9e78-a2e963ad58e3",
+      "name": "Webhook",
+      "webhookId": "6f6a3330-8658-478f-8e0e-560e61a60db0",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1mk2UnyTd_HCFNU8EM2oXyq0vejZqOtLpBY7NWbNfZr0/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1mk2UnyTd_HCFNU8EM2oXyq0vejZqOtLpBY7NWbNfZr0/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2540,
+        640
+      ],
+      "id": "b0c684b5-1885-449a-b722-a62997825f00",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "L47xnG6aPvm4qfpY",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "rfp",
+        "toolDescription": "on this database there will be questions and answers for the RFP questions",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "rfp",
+          "mode": "list",
+          "cachedResultName": "rfp"
+        },
+        "options": {
+          "pineconeNamespace": "QnA"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1,
+      "position": [
+        3000,
+        860
+      ],
+      "id": "650aa404-4f6e-41fe-84ec-cfbad0ccec92",
+      "name": "Pinecone Vector Store2",
+      "credentials": {
+        "pineconeApi": {
+          "id": "so3aTqTFV5qEOLKq",
+          "name": "PineconeApi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "you are an agent that will answer question that the user asked you by getting the answer from the pinecone vector store. and if the question don't have an answer on the db then return \"No Anaswer\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        2800,
+        640
+      ],
+      "id": "c6118859-48be-4b0b-b43e-d023fe0fa19d",
+      "name": "AI Agent6"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2620,
+        880
+      ],
+      "id": "1e8f034a-8738-43e5-ac86-5e2b3d153f76",
+      "name": "OpenAI Chat Model5",
+      "credentials": {
+        "openAiApi": {
+          "id": "geWtWp2RVNF0xiRd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.row_number }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        2820,
+        880
+      ],
+      "id": "c42889c5-a79b-46f0-8dac-c1ec99ec2ab5",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2980,
+        1060
+      ],
+      "id": "0381280f-bb29-489c-bfe9-542344798355",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "geWtWp2RVNF0xiRd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1mk2UnyTd_HCFNU8EM2oXyq0vejZqOtLpBY7NWbNfZr0/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1mk2UnyTd_HCFNU8EM2oXyq0vejZqOtLpBY7NWbNfZr0/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "output": "={{ $json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3340,
+        640
+      ],
+      "id": "22dc1ab9-0034-41ef-8162-f1012ec56891",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "L47xnG6aPvm4qfpY",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        []
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        []
+      ]
+    },
+    "Google Docs": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        []
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Google Drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Extract from File2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent6",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent6",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent6",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent6": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "86a45ff8-c0fb-4bfc-89a2-f620327ecc68",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-03T07:44:02.403Z",
+      "updatedAt": "2025-02-03T07:44:02.403Z",
+      "role": "workflow:owner",
+      "workflowId": "KUQgKTtv4gMO9nNx",
+      "projectId": "vKcmfoNgJMmTWSGs",
+      "project": {
+        "createdAt": "2025-02-03T05:57:52.818Z",
+        "updatedAt": "2025-02-03T06:02:26.701Z",
+        "id": "vKcmfoNgJMmTWSGs",
+        "name": "Beamlak Adane <beamlakadaneb@gamil.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

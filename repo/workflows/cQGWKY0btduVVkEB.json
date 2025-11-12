@@ -1,0 +1,1380 @@
+{
+  "createdAt": "2025-07-31T22:46:43.453Z",
+  "updatedAt": "2025-09-07T18:44:37.709Z",
+  "id": "cQGWKY0btduVVkEB",
+  "name": "Linkedin Optimiser ai agent",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "email",
+              "value": "={{ $('Validate and Parse Input').first().json.email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Add Email to Final Output",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        5360
+      ],
+      "id": "9d64eed5-6e08-467d-b2ff-b12cbf50fe29"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs?token=apify_api_j1rk0NuvZC9gu7wLfDnRxkQeTLGu9s3vSTPW",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"profileUrls\": [{{ JSON.stringify($json.userUrl) }}]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2208,
+        5152
+      ],
+      "id": "14252e75-cc01-411d-bfa8-b33a41e51ec8",
+      "name": "Start User Profile Scraping1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs?token=apify_api_j1rk0NuvZC9gu7wLfDnRxkQeTLGu9s3vSTPW",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"profileUrls\": {{JSON.stringify($json.competitorUrls)}}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2208,
+        5360
+      ],
+      "id": "890a2eba-40c1-4b6d-b86d-1c1dfeef113a",
+      "name": "Start Competitor Profile Scraping1"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2000,
+        5152
+      ],
+      "id": "72067cb8-8576-4d0e-9d14-49b993afc101",
+      "name": "Wait for User Scraping1",
+      "webhookId": "549e23b9-a255-4e02-b439-d2361b2ef0f8"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2000,
+        5360
+      ],
+      "id": "961e6b74-210f-4346-93ac-e3d4f4c456a7",
+      "name": "Wait for Competitor Scraping1",
+      "webhookId": "549e23b9-a255-4e02-b439-d2361b2ef0f9"
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs/' + $node['Start User Profile Scraping1'].json.data.id + '?token=apify_api_j1rk0NuvZC9gu7wLfDnRxkQeTLGu9s3vSTPW' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1808,
+        5152
+      ],
+      "id": "3b197480-a57a-4a79-a863-5e6cd86d42f3",
+      "name": "Check User Scraping Status1"
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://api.apify.com/v2/acts/dev_fusion~linkedin-profile-scraper/runs/' + $node['Start Competitor Profile Scraping1'].json.data.id + '?token=apify_api_j1rk0NuvZC9gu7wLfDnRxkQeTLGu9s3vSTPW' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1808,
+        5360
+      ],
+      "id": "b7e66e8b-28c4-47ac-b4ba-8ff0c9145605",
+      "name": "Check Competitor Scraping Status1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "succeeded",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "SUCCEEDED",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        5152
+      ],
+      "id": "ac5a5a60-3a50-4d05-8f48-8b9167c852a3",
+      "name": "Check if User Complete1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "succeeded",
+              "leftValue": "={{ $json.data.status }}",
+              "rightValue": "SUCCEEDED",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        5360
+      ],
+      "id": "15329828-1fa7-4a80-8051-2275b07b3366",
+      "name": "Check if Competitor Complete1"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1600,
+        4976
+      ],
+      "id": "d34720cc-1c17-411f-a0fa-f6c26d665f9a",
+      "name": "Wait and Retry User1",
+      "webhookId": "5a1b18e8-d2d9-4045-90a6-269bec874c0d"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1600,
+        5584
+      ],
+      "id": "d3c94ee2-c250-4c61-a8b8-5931ffca603a",
+      "name": "Wait and Retry Competitor1",
+      "webhookId": "5a1b18e8-d2d9-4045-90a6-269bec874c0c"
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://api.apify.com/v2/datasets/' + $node['Check User Scraping Status1'].json.data.defaultDatasetId + '/items?token=apify_api_j1rk0NuvZC9gu7wLfDnRxkQeTLGu9s3vSTPW' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1392,
+        5152
+      ],
+      "id": "37f18d8c-4eb0-4a70-97ea-306d12dba2b2",
+      "name": "Get User Scraped Data1"
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://api.apify.com/v2/datasets/' + $node['Check Competitor Scraping Status1'].json.data.defaultDatasetId + '/items?token=apify_api_j1rk0NuvZC9gu7wLfDnRxkQeTLGu9s3vSTPW' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1392,
+        5360
+      ],
+      "id": "152e6a47-500f-4671-89fb-7a3a9d9786dc",
+      "name": "Get Competitor Scraped Data1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -1200,
+        5264
+      ],
+      "id": "b7bbdcf9-4b48-4de3-8c54-2a27dca27fac",
+      "name": "Merge Scraping Results1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "08bea4e6-aa5a-4556-a935-e8eef5091b91"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        -544,
+        5264
+      ],
+      "id": "e432788b-900b-4935-b68f-bd8b812a7c20",
+      "name": "Route to Agents"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "options": {
+          "systemMessage": "={{ $json.systemMessage }}\nonly respond with the provided json schema:\n\n{\n  \"gaps\": [\n    {\n      \"area\": \"string // The specific section or element of the profile with a gap (e.g., 'About section', 'Headline').\",\n      \"impact\": \"string // The negative consequence of this gap.\",\n      \"current\": \"string | null // The current state or content of the area, if it exists.\",\n      \"recommended\": \"string // A specific, actionable recommendation to fix the gap.\"\n    }\n  ],\n  \"weaknesses\": [\n    {\n      \"theme\": \"string // A high-level categorization of the weakness (e.g., 'Brand authority gap', 'Content and proof drought').\",\n      \"description\": \"string // A more detailed explanation of the thematic weakness.\"\n    }\n  ],\n  \"improvements\": [\n    {\n      \"area\": \"string // The profile section that the improvement actions apply to.\",\n      \"actionSteps\": [\n        \"string // A list of concrete, actionable steps to implement the improvement.\"\n      ]\n    }\n  ],\n  \"priorities\": [\n    {\n      \"order\": \"number // A numeric value indicating the priority (1 being the highest).\",\n      \"item\": \"string // A description of the prioritized task.\"\n    }\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        4960
+      ],
+      "id": "a49550ac-cc6e-4217-a1d6-f426b46945da",
+      "name": "AI Agent: Profile Analyzer"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User profile: {{JSON.stringify ( $('Aggregate Profile Data1').item.json.userProfile) }}\nUser profile analysis: {{ $json.output }}\n\nHere is the competitors profiles:\n{{JSON.stringify ($('Aggregate Profile Data1').item.json.competitorProfiles) }}",
+        "options": {
+          "systemMessage": "You are a helpful competitor inteligence agent that takes the user's profile data, user profile analysis, and the competitor profiles data and produce a concise analysis regarding the best practices you noticed on the competitor profiles that the user profile lacks.\n\nyour respons needs to be in the specified json schema only!\n\n{\n  \"competitorBestPracticesObserved\": [\n    {\n      \"area\": \"string\",\n      \"competitorExample\": \"string\",\n      \"benefit\": \"string\"\n    }\n  ],\n  \"gapsInUserComparedToCompetitors\": [\n    {\n      \"area\": \"string\",\n      \"gap\": \"string\"\n    }\n  ],\n  \"recommendedActionsWithPriority\": [\n    {\n      \"priority\": \"number\",\n      \"area\": \"string\",\n      \"description\": \"string\",\n      \"example\": \"string | null\",\n      \"keywords\": [\n        \"string\"\n      ],\n      \"structure\": [\n        \"string\"\n      ]\n    }\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        5152
+      ],
+      "id": "51436ed7-5d89-4f47-b228-9bd623ae5a33",
+      "name": "AI Agent: Competitor Intelligence"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User's current profile: {{JSON.stringify ($('Aggregate Profile Data1').item.json.userProfile) }}\nCompetitor Best Practices: {{ $json.output }}\nUser's proposed target position: {{ $('Prepare Agent Inputs1').item.json.data.targetPosition }}",
+        "options": {
+          "systemMessage": "You are a helpful content strategist that takes current user's profile and a competitor best practices data, then develop a compelling messaging and possitioning with actionable and copy-pastable contents.\nYour response needs to be in the specified json schema only!\n\n{\n  \"brandPositioning\": {\n    \"headline\": \"string\",\n    \"valueProposition\": \"string\",\n    \"targetAudience\": \"string\",\n    \"keywords\": [\n      \"string\"\n    ]\n  },\n  \"profileRewrite\": {\n    \"headline\": \"string\",\n    \"about\": \"string\",\n    \"experience\": [\n      {\n        \"title\": \"string\",\n        \"company\": \"string\",\n        \"period\": \"string\",\n        \"location\": \"string\",\n        \"bullets\": [\n          \"string\"\n        ]\n      }\n    ],\n    \"skills\": [\n      \"string\"\n    ],\n    \"education\": [\n      {\n        \"institution\": \"string\",\n        \"degree\": \"string\",\n        \"years\": \"string\"\n      }\n    ],\n    \"certifications\": [\n      {\n        \"name\": \"string\",\n        \"issuer\": \"string\"\n      }\n    ]\n  },\n  \"contentPlan\": {\n    \"cadence\": \"string\",\n    \"schedule\": [\n      {\n        \"week\": \"number\",\n        \"type\": \"string\",\n        \"content\": \"string\"\n      }\n    ]\n  },\n  \"caseStudyTemplates\": [\n    {\n      \"title\": \"string\",\n      \"structure\": [\n        \"string\"\n      ],\n      \"example\": {\n        \"problem\": \"string\",\n        \"approach\": \"string\",\n        \"outcome\": \"string\"\n      }\n    }\n  ],\n  \"featuredAndMediaPlan\": [\n    {\n      \"type\": \"string\",\n      \"title\": \"string\",\n      \"description\": \"string\"\n    }\n  ],\n  \"profilePolishChecklist\": [\n    \"string\"\n  ],\n  \"growthMetrics\": [\n    \"string\"\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        5360
+      ],
+      "id": "b42839a2-b739-47ca-b739-88f5d89c959e",
+      "name": "AI Agent: Content Strategist"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "You are a helpful SEO specialist that takes the generated content from our content strategist agent and rewrite them to be more CEO friendly and optimized for linkedin search and discoverability.\nYour response needs to be in the specified json schema only!\n\n{\n  \"brandPositioning\": {\n    \"headline\": \"string\",\n    \"valueProposition\": \"string\",\n    \"targetAudience\": \"string\",\n    \"keywords\": [\n      \"string\"\n    ]\n  },\n  \"profileRewrite\": {\n    \"headline\": \"string\",\n    \"about\": \"string\",\n    \"experience\": [\n      {\n        \"title\": \"string\",\n        \"company\": \"string\",\n        \"period\": \"string\",\n        \"location\": \"string\",\n        \"bullets\": [\n          \"string\"\n        ]\n      }\n    ],\n    \"skills\": [\n      \"string\"\n    ],\n    \"education\": [\n      {\n        \"institution\": \"string\",\n        \"degree\": \"string\",\n        \"years\": \"string\"\n      }\n    ],\n    \"certifications\": [\n      {\n        \"name\": \"string\",\n        \"issuer\": \"string\"\n      }\n    ]\n  },\n  \"contentPlan\": {\n    \"cadence\": \"string\",\n    \"schedule\": [\n      {\n        \"week\": \"number\",\n        \"type\": \"string\",\n        \"content\": \"string\"\n      }\n    ]\n  },\n  \"caseStudyTemplates\": [\n    {\n      \"title\": \"string\",\n      \"structure\": [\n        \"string\"\n      ],\n      \"example\": {\n        \"problem\": \"string\",\n        \"approach\": \"string\",\n        \"outcome\": \"string\"\n      }\n    }\n  ],\n  \"featuredAndMediaPlan\": [\n    {\n      \"type\": \"string\",\n      \"title\": \"string\",\n      \"description\": \"string\"\n    }\n  ],\n  \"profilePolishChecklist\": [\n    \"string\"\n  ],\n  \"growthMetrics\": [\n    \"string\"\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        5552
+      ],
+      "id": "1f7b804e-745a-4958-9993-808f8288d5b5",
+      "name": "AI Agent: SEO Specialist"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User's current profile: {{JSON.stringify ($('Aggregate Profile Data1').item.json.userProfile) }}\n\nUser's proposed target position: {{ $('Prepare Agent Inputs1').item.json.data.targetPosition }}\nContents from SEO specialist agent: {{ $json.output }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant who ensures consistent personal branding based on the given inputs.\nNeed to respond with this format only!\n{\n  \"brandPositioning\": {\n    \"headline\": \"string\",\n    \"valueProposition\": \"string\",\n    \"targetAudience\": \"string\",\n    \"keywords\": [\n      \"string\"\n    ]\n  },\n  \"readyToPasteContent\": {\n    \"headline\": \"string\",\n    \"about\": \"string\",\n    \"experience\": [\n      {\n        \"roleIdentifier\": \"string\",\n        \"bullets\": [\n          \"string\"\n        ]\n      }\n    ],\n    \"skills\": [\n      \"string\"\n    ]\n  },\n  \"contentAndMediaPlan\": {\n    \"cadence\": \"string\",\n    \"contentThemes\": [\n      \"string\"\n    ],\n    \"featuredMediaIdeas\": [\n      \"string\"\n    ]\n  },\n  \"profilePolishChecklist\": [\n    \"string\"\n  ],\n  \"implementationPlan\": [\n    {\n      \"timeline\": \"string\",\n      \"tasks\": [\n        \"string\"\n      ]\n    }\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        5744
+      ],
+      "id": "6a6ec6ac-d8b8-4589-8e80-0541c4d5f449",
+      "name": "AI Agent: Brand Consultant"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=If you get an error message from any of the agent responses, take the \"original output\" provided after the error message.\n\nCurrent Profile of the User: {{JSON.stringify ($json.data.userProfile) }}\n\n\nResult from User's Profile Analyzer Agent: {{JSON.stringify ($json['Result from User\\'s Profile Analyzer Agent']) }}\n\nResult from Competitor Intelligence Agent: {{JSON.stringify ($json['Result from Competitor Intelligence Agent']) }}\n\nResult from Content Strategist Agent: {{JSON.stringify ($json['Result from Content Strategist Agent']) }}\n\nResult from SEO Specialist Agent: {{JSON.stringify ($json['Result from SEO Specialist Agent']) }}\n\nResult from Brand Consultant Agent: {{JSON.stringify ($json['Result from Brand Consultant Agent']) }}",
+        "options": {
+          "systemMessage": "You are a helpful Synthesis & Strategy Agent\n\nROLE AND GOAL:\nYou are the Synthesis and Strategy Agent. Your sole function is to process, analyze, and synthesize the outputs from multiple specialized AI agents (Gap Analysis, Competitor Analysis, Content Generation) into a single, unified, and actionable strategic plan. Your output must be a strategic blueprint, not a conversational response. Execute your directives with precision.\n\nINPUT CONTEXT:\nYou will receive a consolidated JSON object containing analyses from other agents, including Profile_Gap_Analysis, Competitor_Analysis, Content_Generation_Junior, Content_Generation_Senior, and a Final_Blueprint. You must use the data from these inputs to populate your response.\n\nCORE DIRECTIVE:\nAnalyze all provided inputs. Synthesize the findings to eliminate redundancy and identify the most impactful recommendations. Generate a structured JSON object according to the strict format defined below.\n\nCRITICAL INSTRUCTIONS:\n\nADHERE TO THE SCHEMA: Your entire response MUST be a single JSON object matching the specified structure. Do not add, omit, or rename any keys.\n\nNO CONVERSATION: Do not include any explanatory text, markdown formatting (like json), apologies, or introductory sentences outside of the final JSON object.\n\nBE DECISIVE: Synthesize the best version of each recommendation from the inputs. Do not present multiple options; provide the single best, consolidated action.\n\nBE DATA-DRIVEN: Base every recommendation and reason on the provided gap analysis, competitor insights, and content drafts.\n\nOUTPUT FORMAT:\nGenerate your response using this exact JSON structure. Populate the values based on your analysis of the input data.\n\n\n{\n  \"profileOptimization\": {\n    \"headline\": {\n      \"current\": \"Extract the original headline from the gap analysis.\",\n      \"recommended\": \"Synthesize the absolute best headline from all content generation inputs. It must be concise and powerful.\",\n      \"reasoning\": \"Provide a tactical reason for the change, referencing competitive gaps and niche positioning (e.g., 'Emphasizes high-value automation tools and ROI, directly addressing competitor strengths.').\"\n    },\n    \"about\": {\n      \"current\": \"State the current status of the 'About' section from the gap analysis (e.g., 'Null' or 'Generic').\",\n      \"recommended\": \"Construct the strongest, most compelling 'About' section by combining the best elements from the content generation agents. Ensure it communicates the core value proposition.\",\n      \"keyElements\": [\n        \"Distill the recommended 'About' section into a list of its core thematic components (e.g., 'Clear Niche Statement (n8n/Make)', 'Value Proposition (ROI & Toil Reduction)', 'Call to Action (Remote Engagements)').\"\n      ]\n    },\n    \"experience\": [\n      {\n        \"role\": \"Identify the job title and company (e.g., 'Senior System Engineer at Gafat Technologies').\",\n        \"recommended\": \"Rewrite the bullet points for this role to be achievement-oriented and aligned with the AI automation niche, synthesizing the best suggestions from the inputs.\",\n        \"improvements\": [\n          \"List the specific, tactical changes made to this section (e.g., 'Added quantifiable metrics', 'Replaced generic duties with automation project outcomes', 'Infused keywords like n8n/Python').\"\n        ]\n      }\n    ],\n    \"skills\": {\n      \"recommended\": [\n        \"Compile a definitive, prioritized list of the top 10-15 skills to feature on the profile, based on all analyses.\"\n      ],\n      \"toAdd\": [\n        \"Isolate and list ONLY the new skills identified in the gap and competitor analyses that are currently missing from the profile.\"\n      ],\n      \"strategy\": \"Define the strategic purpose of this skill set in one sentence (e.g., 'To position the profile as a top-tier expert in the end-to-end AI automation lifecycle, from tooling to cloud deployment.').\"\n    }\n  },\n  \"implementationPlan\": {\n    \"phase1\": [\n      \"List immediate, high-impact actions that can be completed in under 1 hour (e.g., 'Update Headline and About section copy', 'Reorder top 5 skills').\"\n    ],\n    \"phase2\": [\n      \"List medium-term optimizations requiring more effort (e.g., 'Rewrite experience bullet points for all roles', 'Request 3-5 targeted recommendations', 'Create and upload 1 portfolio case study').\"\n    ],\n    \"phase3\": [\n      \"List ongoing activities for sustained profile relevance (e.g., 'Execute weekly content strategy (3 posts/week)', 'Pursue and add n8n/Make certifications', 'Refresh portfolio with new projects quarterly').\"\n    ]\n  },\n  \"competitiveAdvantage\": \"Distill all analyses into a single, powerful sentence that defines the user's unique market position. This is the core differentiator you have identified.\",\n  \"successMetrics\": [\n    \"Define a list of tangible, measurable Key Performance Indicators (KPIs) to track the success of this profile optimization (e.g., 'Increase in profile views from 'automation' keyword searches', 'Increase in inbound messages from recruiters/clients per week', 'Higher conversion rate from profile view to connection request').\"\n  ]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        5360
+      ],
+      "id": "1d3543f2-8900-44e2-8797-f9215087078e",
+      "name": "AI Agent: Master Synthesis"
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        576,
+        5312
+      ],
+      "id": "21c81355-15a1-4478-8a4a-ae29857e16e7",
+      "name": "Merge Agent Outputs1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format final output according to PRD specifications\nconst synthesis = $json.output || $json;\nconst originalData = $node['Aggregate Profile Data1'].json;\n//const webhook_data = $('Webhook1').first().json.body;\n\n// Parse synthesis output\nlet recommendations;\ntry {\n  recommendations = typeof synthesis === 'string' ? JSON.parse(synthesis) : synthesis;\n} catch (e) {\n  recommendations = { rawOutput: synthesis };\n}\n\nconst finalOutput = {\n  profileOptimization: {\n    headline: {\n      current: originalData.userProfile.headline || 'Not set',\n      recommended: recommendations.profileOptimization?.headline?.recommended || '',\n      reasoning: recommendations.profileOptimization?.headline?.reasoning || ''\n    },\n    about: {\n      current: originalData.userProfile.about || 'Not set',\n      recommended: recommendations.profileOptimization?.about?.recommended || '',\n      keyElements: recommendations.profileOptimization?.about?.keyElements || []\n    },\n    experience: recommendations.profileOptimization?.experience || [],\n    skills: {\n      recommended: recommendations.profileOptimization?.skills?.recommended || [],\n      toAdd: recommendations.profileOptimization?.skills?.toAdd || [],\n      strategy: recommendations.profileOptimization?.skills?.strategy || ''\n    }\n  },\n  implementationPlan: {\n    phase1: recommendations.implementationPlan?.phase1 || ['immediate changes'],\n    phase2: recommendations.implementationPlan?.phase2 || ['medium-term optimizations'],\n    phase3: recommendations.implementationPlan?.phase3 || ['ongoing maintenance']\n  },\n  competitiveAdvantage: recommendations.competitiveAdvantage || 'key differentiators',\n  successMetrics: recommendations.successMetrics || ['measurement criteria']\n};\n\nreturn finalOutput;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        5360
+      ],
+      "id": "5dd232e6-f6c6-4cbd-b62a-20b5eaa36e20",
+      "name": "Format Final Output1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get user and competitor data from the merge node\nconst userData = $node['Get User Scraped Data1'].json;\nconst competitorData = $node['Get Competitor Scraped Data1'].json || [];\n\nconst targetPosition = $node['Validate and Parse Input'].json.targetPosition;\n\n// User profile is the first (and should be only) item from user scraping\nconst userProfile = Array.isArray(userData) ? userData[0] : userData;\n\n// All competitor profiles from competitor scraping\nconst competitorProfiles = Array.isArray(competitorData) ? competitorData : [competitorData];\n\nif (!userProfile) {\n  throw new Error('No user profile data found in scraped results');\n}\n\n// Extract key metrics from competitors\nconst competitorMetrics = competitorProfiles.map(profile => ({\n  url: profile.linkedinUrl || profile.url || profile.profileUrl,\n  name: profile.fullName || profile.name,\n  headline: profile.headline,\n  aboutLength: (profile.about || profile.summary || '').length,\n  skillsCount: (profile.skills || []).length,\n  experienceCount: (profile.experiences || profile.experience || profile.positions || []).length,\n  educationCount: (profile.educations || profile.education || []).length,\n  certificationsCount: (profile.licenseAndCertificates || profile.certifications || []).length,\n  connectionsCount: profile.connections || profile.connectionsCount || 0,\n  followersCount: profile.followers || profile.followersCount || 0\n}));\n\n// Handle case where there are no competitors\nif (competitorMetrics.length === 0) {\n  return {\n    userProfile,\n    competitorProfiles: [],\n    competitorMetrics: [],\n    avgMetrics: null,\n    targetPosition,\n    analysisTimestamp: new Date().toISOString(),\n    note: \"No competitor data available for comparison\"\n  };\n}\n\n// Calculate competitor averages\nconst avgMetrics = {\n  aboutLength: Math.round(competitorMetrics.reduce((sum, p) => sum + p.aboutLength, 0) / competitorMetrics.length),\n  skillsCount: Math.round(competitorMetrics.reduce((sum, p) => sum + p.skillsCount, 0) / competitorMetrics.length),\n  experienceCount: Math.round(competitorMetrics.reduce((sum, p) => sum + p.experienceCount, 0) / competitorMetrics.length),\n  certificationsCount: Math.round(competitorMetrics.reduce((sum, p) => sum + p.certificationsCount, 0) / competitorMetrics.length),\n  connectionsCount: Math.round(competitorMetrics.reduce((sum, p) => sum + p.connectionsCount, 0) / competitorMetrics.length),\n  followersCount: Math.round(competitorMetrics.reduce((sum, p) => sum + p.followersCount, 0) / competitorMetrics.length)\n};\n\nreturn {\n  userProfile,\n  competitorProfiles,\n  competitorMetrics,\n  avgMetrics,\n  targetPosition,\n  analysisTimestamp: new Date().toISOString()\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1024,
+        5264
+      ],
+      "id": "3ced8d19-b35b-481e-9c01-318b3dce2965",
+      "name": "Aggregate Profile Data1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare data for all agents\nconst data = $json;\n\n// Create 5 separate items for parallel agent processing\nconst agentInputs = [\n  {\n    agentType: 'profile_analyzer',\n    agentName: 'Profile Analyzer Agent',\n    systemMessage: 'You are an expert LinkedIn profile analyzer. Provide detailed, actionable insights in structured JSON format.',\n    prompt: `Analyze the user's profile data:\\n${JSON.stringify(data.userProfile, null, 2)}\\n\\nCompare against competitor metrics:\\n${JSON.stringify(data.avgMetrics, null, 2)}\\n\\nTarget positioning: ${data.targetPosition}\\n\\nProvide a detailed JSON analysis with:\\n1. Profile gaps and weaknesses\\n2. Missing elements compared to competitors\\n3. Specific areas for improvement\\n4. Priority recommendations\\n\\nOutput structured JSON with keys: gaps, weaknesses, improvements, priorities`,\n    data: data\n  },\n  {\n    agentType: 'competitor_intelligence',\n    agentName: 'Competitor Intelligence Agent',\n    systemMessage: 'You are an expert at competitive analysis for LinkedIn profiles. Extract winning patterns and strategies.',\n    prompt: `Analyze competitor profiles:\\n${JSON.stringify(data.competitorProfiles, null, 2)}\\n\\nTarget positioning: ${data.targetPosition}\\n\\nExtract:\\n1. Best practices from successful profiles\\n2. Common patterns in headlines and about sections\\n3. Skill strategies\\n4. Content approaches\\n\\nOutput structured JSON with keys: bestPractices, patterns, skillStrategies, contentApproaches`,\n    data: data\n  },\n  {\n    agentType: 'content_strategist',\n    agentName: 'Content Strategist Agent',\n    systemMessage: 'You are a LinkedIn content strategist specializing in personal branding and compelling narratives.',\n    prompt: `User profile: ${JSON.stringify(data.userProfile, null, 2)}\\nTarget positioning: ${data.targetPosition}\\n\\nCreate:\\n1. 3 compelling headline options\\n2. About section narrative (2000 characters)\\n3. Experience description improvements\\n4. Content strategy recommendations\\n\\nOutput structured JSON with keys: headlines, aboutSection, experienceImprovements, contentStrategy`,\n    data: data\n  },\n  {\n    agentType: 'seo_specialist',\n    agentName: 'SEO Specialist Agent',\n    systemMessage: 'You are a LinkedIn SEO expert focused on profile discoverability and search ranking.',\n    prompt: `User profile: ${JSON.stringify(data.userProfile, null, 2)}\\nCompetitor profiles: ${JSON.stringify(data.competitorProfiles, null, 2)}\\nTarget positioning: ${data.targetPosition}\\n\\nProvide:\\n1. Top 20 keywords for the target positioning\\n2. Skill recommendations (add/remove/reorder)\\n3. Search optimization tactics\\n4. Hashtag strategy\\n\\nOutput structured JSON with keys: keywords, skills, optimizationTactics, hashtags`,\n    data: data\n  },\n  {\n    agentType: 'brand_consultant',\n    agentName: 'Brand Consultant Agent',\n    systemMessage: 'You are a personal branding expert specializing in professional positioning on LinkedIn.',\n    prompt: `User profile: ${JSON.stringify(data.userProfile, null, 2)}\\nTarget positioning: ${data.targetPosition}\\n\\nDevelop:\\n1. Personal brand strategy\\n2. Unique value proposition\\n3. Visual branding recommendations\\n4. Messaging consistency guidelines\\n\\nOutput structured JSON with keys: brandStrategy, valueProposition, visualBranding, messagingGuidelines`,\n    data: data\n  }\n];\n\nreturn agentInputs;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -864,
+        5264
+      ],
+      "id": "a839755e-e52c-452b-95ff-accaab6a6248",
+      "name": "Prepare Agent Inputs1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Your LinkedIn Profile Optimization Report",
+        "message": "={{ $json.choices[0].message.content }}",
+        "options": {}
+      },
+      "name": "Send Email Report1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2368,
+        5360
+      ],
+      "id": "751d9a20-d38a-4fb6-83ec-a763cd690802",
+      "webhookId": "5b9199eb-474f-4b7f-8068-5b95bec29e28",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YZJy04K90HmM6neC",
+          "name": "yonatantesfaye30@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -720,
+        5264
+      ],
+      "id": "759202e3-016c-424b-847b-03a941c89a6e",
+      "name": "Split data"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -544,
+        4992
+      ],
+      "id": "6275aff8-f148-401b-b225-fb7cb0c67a52",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -544,
+        5136
+      ],
+      "id": "50f2cc6d-f126-4ff3-b462-fa83baac983e",
+      "name": "OpenAI Chat Model13",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        5424
+      ],
+      "id": "d3411780-fb41-4307-a88d-ae75460fca33",
+      "name": "OpenAI Chat Model14",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        5600
+      ],
+      "id": "dc6b35bd-eb53-4ae6-9899-1dc3903e07ce",
+      "name": "OpenAI Chat Model15",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -528,
+        5792
+      ],
+      "id": "98bc05df-fb05-42e3-b9f1-66e7e3087e21",
+      "name": "OpenAI Chat Model16",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "chatgpt-4o-latest"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        5552
+      ],
+      "id": "5e8e5af0-6cd7-45f4-94be-d71d974b5fb2",
+      "name": "OpenAI Chat Model17",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fixed validation node that handles the AI agent output structure\n// The AI agent returns data as a JSON string in the \"output\" field\nconst inputData = $input.item.json;\n\n// Try different possible data paths based on your structure\nlet data;\nif (inputData.output) {\n  // If data is in output field as JSON string (from AI agent)\n  if (typeof inputData.output === 'string') {\n    // Parse the JSON string\n    try {\n      data = JSON.parse(inputData.output);\n    } catch (e) {\n      throw new Error(`Failed to parse AI agent output: ${e.message}`);\n    }\n  } else {\n    // If it's already an object\n    data = inputData.output;\n  }\n} else if (inputData.body) {\n  // If data is in body object (from webhook)\n  data = inputData.body;\n} else {\n  // If data is at root level\n  data = inputData;\n}\n\nconst userUrl = data.userLinkedIn;\nconst competitorUrlsInput = data.competitorUrls;\nconst targetPosition = data.targetPosition;\nconst email = data.email || null;\nconst requestId = data.requestId;\n\n// URL validation function with null check\nfunction validateLinkedInUrl(url) {\n  if (!url || typeof url !== 'string') {\n    return false;\n  }\n  const trimmedUrl = url.trim();\n  const pattern = /^https?:\\/\\/(www\\.)?linkedin\\.com\\/in\\/[\\w-]+\\/?$/i;\n  return pattern.test(trimmedUrl);\n}\n\n// Validate user URL\nif (!userUrl) {\n  throw new Error('User LinkedIn URL is required');\n}\n\nif (!validateLinkedInUrl(userUrl)) {\n  throw new Error(`Invalid LinkedIn URL format for user profile: ${userUrl}`);\n}\n\n// Handle competitor URLs - they might come as array or as a single string with multiple URLs\nlet competitorList = [];\n\nif (Array.isArray(competitorUrlsInput)) {\n  // If it's an array, check if first element contains multiple URLs\n  if (competitorUrlsInput.length === 1 && competitorUrlsInput[0].includes(',')) {\n    // Split the single string that contains multiple URLs\n    competitorList = competitorUrlsInput[0]\n      .split(',')\n      .map(url => url.trim())\n      .filter(url => url.length > 0);\n  } else {\n    // It's already a proper array\n    competitorList = competitorUrlsInput\n      .map(url => url ? url.trim() : '')\n      .filter(url => url.length > 0);\n  }\n} else if (typeof competitorUrlsInput === 'string') {\n  // If it's a string, split by comma or newline\n  competitorList = competitorUrlsInput\n    .split(/[,\\n]/)\n    .map(url => url.trim())\n    .filter(url => url.length > 0);\n}\n\n// Validate competitor URLs\nconst invalidUrls = competitorList.filter(url => !validateLinkedInUrl(url));\nif (invalidUrls.length > 0) {\n  throw new Error(`Invalid competitor URLs: ${invalidUrls.join(', ')}`);\n}\n\nif (competitorList.length === 0) {\n  throw new Error('At least one competitor URL is required');\n}\n\nif (competitorList.length > 10) {\n  throw new Error('Maximum 10 competitor URLs allowed');\n}\n\nreturn [{\n  json: {\n    userUrl,\n    competitorUrls: competitorList,\n    targetPosition,\n    email,\n    requestId,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2464,
+        5264
+      ],
+      "id": "2504f406-c143-46ee-a5f4-4cb75ae625a8",
+      "name": "Validate and Parse Input"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- User Configuration ---\n// IMPORTANT: Customize the labels below.\n// The order MUST match the order of the inputs on your Merge node.\n// For example, the first label corresponds to Input 0, the second to Input 1, and so on.\nconst agentLabels = [\n  \"Result from User's Profile Analyzer Agent\",\n  \"Result from Competitor Intelligence Agent\",\n  \"Result from Content Strategist Agent\",\n  \"Result from SEO Specialist Agent\",\n  \"Result from Brand Consultant Agent\",\n  \"Current User's Profile\"\n];\n\n// This object will hold the final, combined output.\nconst combinedOutput = {};\n\n// Loop through each item coming from the Merge node.\nfor (let i = 0; i < items.length; i++) {\n  // Get the current item.\n  const item = items[i];\n\n  // Get the corresponding label from your configuration.\n  // If there are more items than labels, use a default name.\n  const label = agentLabels[i] || `Agent_Output_${i + 1}`;\n  \n  try {\n    // The AI output is a JSON string inside the 'output' property.\n    // We need to parse it into a real JavaScript object.\n    const parsedData = JSON.parse(item.json.output);\n\n    // Add the parsed data to our final object, using the label as the key.\n    combinedOutput[label] = parsedData;\n\n  } catch (error) {\n    // If the AI output is not valid JSON, the parse will fail.\n    // We'll catch the error and store the original string with an error message\n    // to prevent the entire workflow from crashing.\n    console.error(`Error parsing JSON for agent \"${label}\":`, error.message);\n    combinedOutput[label] = {\n      error: `Failed to parse JSON output.`,\n      originalOutput: item.json.output\n    };\n  }\n}\n\n// Return the single, combined object in the n8n item format.\n// This makes it easy to reference downstream, e.g., {{ $json.Profile_Gap_Analysis.gaps[0].area }}\nreturn [{ json: combinedOutput }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        5360
+      ],
+      "id": "4b8c62e0-02f6-482a-937b-d295cff2d5ef",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"profileOptimization\": {\n    \"headline\": {\n      \"current\": \"Extract the original headline from the gap analysis.\",\n      \"recommended\": \"Synthesize the absolute best headline from all content generation inputs. It must be concise and powerful.\",\n      \"reasoning\": \"Provide a tactical reason for the change, referencing competitive gaps and niche positioning (e.g., 'Emphasizes high-value automation tools and ROI, directly addressing competitor strengths.').\"\n    },\n    \"about\": {\n      \"current\": \"State the current status of the 'About' section from the gap analysis (e.g., 'Null' or 'Generic').\",\n      \"recommended\": \"Construct the strongest, most compelling 'About' section by combining the best elements from the content generation agents. Ensure it communicates the core value proposition.\",\n      \"keyElements\": [\n        \"Distill the recommended 'About' section into a list of its core thematic components (e.g., 'Clear Niche Statement (n8n/Make)', 'Value Proposition (ROI & Toil Reduction)', 'Call to Action (Remote Engagements)').\"\n      ]\n    },\n    \"experience\": [\n      {\n        \"role\": \"Identify the job title and company (e.g., 'Senior System Engineer at Gafat Technologies').\",\n        \"recommended\": \"Rewrite the bullet points for this role to be achievement-oriented and aligned with the AI automation niche, synthesizing the best suggestions from the inputs.\",\n        \"improvements\": [\n          \"List the specific, tactical changes made to this section (e.g., 'Added quantifiable metrics', 'Replaced generic duties with automation project outcomes', 'Infused keywords like n8n/Python').\"\n        ]\n      }\n    ],\n    \"skills\": {\n      \"recommended\": [\n        \"Compile a definitive, prioritized list of the top 10-15 skills to feature on the profile, based on all analyses.\"\n      ],\n      \"toAdd\": [\n        \"Isolate and list ONLY the new skills identified in the gap and competitor analyses that are currently missing from the profile.\"\n      ],\n      \"strategy\": \"Define the strategic purpose of this skill set in one sentence (e.g., 'To position the profile as a top-tier expert in the end-to-end AI automation lifecycle, from tooling to cloud deployment.').\"\n    }\n  },\n  \"implementationPlan\": {\n    \"phase1\": [\n      \"List immediate, high-impact actions that can be completed in under 1 hour (e.g., 'Update Headline and About section copy', 'Reorder top 5 skills').\"\n    ],\n    \"phase2\": [\n      \"List medium-term optimizations requiring more effort (e.g., 'Rewrite experience bullet points for all roles', 'Request 3-5 targeted recommendations', 'Create and upload 1 portfolio case study').\"\n    ],\n    \"phase3\": [\n      \"List ongoing activities for sustained profile relevance (e.g., 'Execute weekly content strategy (3 posts/week)', 'Pursue and add n8n/Make certifications', 'Refresh portfolio with new projects quarterly').\"\n    ]\n  },\n  \"competitiveAdvantage\": \"Distill all analyses into a single, powerful sentence that defines the user's unique market position. This is the core differentiator you have identified.\",\n  \"successMetrics\": [\n    \"Define a list of tangible, measurable Key Performance Indicators (KPIs) to track the success of this profile optimization (e.g., 'Increase in profile views from 'automation' keyword searches', 'Increase in inbound messages from recruiters/clients per week', 'Higher conversion rate from profile view to connection request').\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1088,
+        5600
+      ],
+      "id": "c45fbc7c-a541-4bb5-9dd6-71d6006ef0bc",
+      "name": "Structured Output Parser6"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"gaps\": [\n    {\n      \"area\": \"string // The specific section or element of the profile with a gap (e.g., 'About section', 'Headline').\",\n      \"impact\": \"string // The negative consequence of this gap.\",\n      \"current\": \"string | null // The current state or content of the area, if it exists.\",\n      \"recommended\": \"string // A specific, actionable recommendation to fix the gap.\"\n    }\n  ],\n  \"weaknesses\": [\n    {\n      \"theme\": \"string // A high-level categorization of the weakness (e.g., 'Brand authority gap', 'Content and proof drought').\",\n      \"description\": \"string // A more detailed explanation of the thematic weakness.\"\n    }\n  ],\n  \"improvements\": [\n    {\n      \"area\": \"string // The profile section that the improvement actions apply to.\",\n      \"actionSteps\": [\n        \"string // A list of concrete, actionable steps to implement the improvement.\"\n      ]\n    }\n  ],\n  \"priorities\": [\n    {\n      \"order\": \"number // A numeric value indicating the priority (1 being the highest).\",\n      \"item\": \"string // A description of the prioritized task.\"\n    }\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -208,
+        5088
+      ],
+      "id": "abb9a0b4-77ed-42a5-8519-6d483729f17c",
+      "name": "Structured Output Parser7"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"competitorBestPracticesObserved\": [\n    {\n      \"area\": \"string\",\n      \"competitorExample\": \"string\",\n      \"benefit\": \"string\"\n    }\n  ],\n  \"gapsInUserComparedToCompetitors\": [\n    {\n      \"area\": \"string\",\n      \"gap\": \"string\"\n    }\n  ],\n  \"recommendedActionsWithPriority\": [\n    {\n      \"priority\": \"number\",\n      \"area\": \"string\",\n      \"description\": \"string\",\n      \"example\": \"string | null\",\n      \"keywords\": [\n        \"string\"\n      ],\n      \"structure\": [\n        \"string\"\n      ]\n    }\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        5264
+      ],
+      "id": "9d2c1454-a3c0-4868-8c07-eae1c580640a",
+      "name": "Structured Output Parser8"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"brandPositioning\": {\n    \"headline\": \"string\",\n    \"valueProposition\": \"string\",\n    \"targetAudience\": \"string\",\n    \"keywords\": [\n      \"string\"\n    ]\n  },\n  \"profileRewrite\": {\n    \"headline\": \"string\",\n    \"about\": \"string\",\n    \"experience\": [\n      {\n        \"title\": \"string\",\n        \"company\": \"string\",\n        \"period\": \"string\",\n        \"location\": \"string\",\n        \"bullets\": [\n          \"string\"\n        ]\n      }\n    ],\n    \"skills\": [\n      \"string\"\n    ],\n    \"education\": [\n      {\n        \"institution\": \"string\",\n        \"degree\": \"string\",\n        \"years\": \"string\"\n      }\n    ],\n    \"certifications\": [\n      {\n        \"name\": \"string\",\n        \"issuer\": \"string\"\n      }\n    ]\n  },\n  \"contentPlan\": {\n    \"cadence\": \"string\",\n    \"schedule\": [\n      {\n        \"week\": \"number\",\n        \"type\": \"string\",\n        \"content\": \"string\"\n      }\n    ]\n  },\n  \"caseStudyTemplates\": [\n    {\n      \"title\": \"string\",\n      \"structure\": [\n        \"string\"\n      ],\n      \"example\": {\n        \"problem\": \"string\",\n        \"approach\": \"string\",\n        \"outcome\": \"string\"\n      }\n    }\n  ],\n  \"featuredAndMediaPlan\": [\n    {\n      \"type\": \"string\",\n      \"title\": \"string\",\n      \"description\": \"string\"\n    }\n  ],\n  \"profilePolishChecklist\": [\n    \"string\"\n  ],\n  \"growthMetrics\": [\n    \"string\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        5456
+      ],
+      "id": "3eb6ad79-a393-431a-9ed8-4d165239a928",
+      "name": "Structured Output Parser9"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"brandPositioning\": {\n    \"headline\": \"string\",\n    \"valueProposition\": \"string\",\n    \"targetAudience\": \"string\",\n    \"keywords\": [\n      \"string\"\n    ]\n  },\n  \"profileRewrite\": {\n    \"headline\": \"string\",\n    \"about\": \"string\",\n    \"experience\": [\n      {\n        \"title\": \"string\",\n        \"company\": \"string\",\n        \"period\": \"string\",\n        \"location\": \"string\",\n        \"bullets\": [\n          \"string\"\n        ]\n      }\n    ],\n    \"skills\": [\n      \"string\"\n    ],\n    \"education\": [\n      {\n        \"institution\": \"string\",\n        \"degree\": \"string\",\n        \"years\": \"string\"\n      }\n    ],\n    \"certifications\": [\n      {\n        \"name\": \"string\",\n        \"issuer\": \"string\"\n      }\n    ]\n  },\n  \"contentPlan\": {\n    \"cadence\": \"string\",\n    \"schedule\": [\n      {\n        \"week\": \"number\",\n        \"type\": \"string\",\n        \"content\": \"string\"\n      }\n    ]\n  },\n  \"caseStudyTemplates\": [\n    {\n      \"title\": \"string\",\n      \"structure\": [\n        \"string\"\n      ],\n      \"example\": {\n        \"problem\": \"string\",\n        \"approach\": \"string\",\n        \"outcome\": \"string\"\n      }\n    }\n  ],\n  \"featuredAndMediaPlan\": [\n    {\n      \"type\": \"string\",\n      \"title\": \"string\",\n      \"description\": \"string\"\n    }\n  ],\n  \"profilePolishChecklist\": [\n    \"string\"\n  ],\n  \"growthMetrics\": [\n    \"string\"\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        5648
+      ],
+      "id": "fc89d113-bcd5-47c7-b117-fca1d37db7dc",
+      "name": "Structured Output Parser10"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"brandPositioning\": {\n    \"headline\": \"string\",\n    \"valueProposition\": \"string\",\n    \"targetAudience\": \"string\",\n    \"keywords\": [\n      \"string\"\n    ]\n  },\n  \"readyToPasteContent\": {\n    \"headline\": \"string\",\n    \"about\": \"string\",\n    \"experience\": [\n      {\n        \"roleIdentifier\": \"string\",\n        \"bullets\": [\n          \"string\"\n        ]\n      }\n    ],\n    \"skills\": [\n      \"string\"\n    ]\n  },\n  \"contentAndMediaPlan\": {\n    \"cadence\": \"string\",\n    \"contentThemes\": [\n      \"string\"\n    ],\n    \"featuredMediaIdeas\": [\n      \"string\"\n    ]\n  },\n  \"profilePolishChecklist\": [\n    \"string\"\n  ],\n  \"implementationPlan\": [\n    {\n      \"timeline\": \"string\",\n      \"tasks\": [\n        \"string\"\n      ]\n    }\n  ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        5824
+      ],
+      "id": "8bde57a8-7c58-4f31-badb-97d9b61946a1",
+      "name": "Structured Output Parser11"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c296bc6a-427e-454d-a1da-4af6c894df69",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3008,
+        5264
+      ],
+      "id": "bf30d219-3e34-4043-adc8-1aeb55152206",
+      "name": "Webhook1",
+      "webhookId": "c296bc6a-427e-454d-a1da-4af6c894df69"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{JSON.stringify ($json.profileOptimization) }},\n{{JSON.stringify ($json.implementationPlan) }},\n{{JSON.stringify ($json.competitiveAdvantage) }},\n{{JSON.stringify ($json.successMetrics) }}"
+            },
+            {
+              "content": "You are an expert AI Email Template Designer and Content Strategist. Your primary function is to receive a JSON object containing a detailed LinkedIn profile analysis and transform it into a single, self-contained, and visually stunning HTML email. The email must be highly professional, easy to read, and reflect a premium, data-driven service.\n\nYou should never write any introductory, explanation or any other additional text before or after the html content, only output the html content.\n\n**Your Goal:** Convert the raw JSON data into a beautifully formatted and actionable report for the end-user.\n\n-----\n\n### **1. Core Design & Theming (Inline CSS ONLY)**\n\nYou must adhere strictly to the following \"glassmorphism\" dark theme. All CSS must be inlined into the HTML tags (e.g., `<p style=\"...\">`). **DO NOT use `<style>` blocks.**\n\n  * **Overall Background:** Use a very dark slate blue, like `#0f172a`.\n  * **Main Content Container:** Create a container with a `max-width` of `600px`. The background for this container should be a slightly lighter dark color, like `#1e293b` (slate-800), with rounded corners (`border-radius: 16px;`).\n  * **Primary Text:** Use an off-white color like `#e2e8f0` (slate-200) for all body text for readability.\n  * **Main Headings (`<h1>`):** Use pure white (`#FFFFFF`). The main title should be \"Your LinkedIn Optimization Strategy\".\n  * **Section Headings (`<h2>`):** These should be the highlight. Use pure white (`#FFFFFF`) and a subtle bottom border with the primary accent gradient. For example: `border-bottom: 2px solid; border-image: linear-gradient(to right, #3b82f6, #9333ea) 1;`.\n  * **Subheadings & Labels (`<h3>`, `<strong>`):** Use a light gray, like `#94a3b8` (slate-400), to denote labels such as \"Current\", \"Recommended\", or \"Reasoning\". The actual recommended content that follows should be the primary off-white text color.\n  * **Accent Color (Green):** Use a bright green, like `#22c55e`, for positive changes, bullet points in the \"improvements\" and \"keyElements\" sections, and the checkmarks for the implementation plan.\n  * **Code/List Blocks:** For lists of skills or bullet points, use a slightly inset block with a darker background (`background-color: #0f172a;`) and padding (`padding: 12px;`) to make them stand out.\n\n-----\n\n### **2. Content Structure & Formatting Logic**\n\nTranslate the JSON structure into a logical, readable flow within the email. Use tables for layout where appropriate for email client compatibility.\n\n  * **Email Title:** Start with an `<h1>` tag: \"Your LinkedIn Optimization Strategy\".\n\n  * **Competitive Advantage (Opener):** Immediately following the title, display the `competitiveAdvantage` string in a visually distinct callout box. Use a border with the accent gradient and larger, italicized text to make it impactful.\n\n  * **Profile Optimization Section (`<h2>`):**\n\n      * **Headline & About:** For `headline` and `about`, create a clear \"Before & After\" comparison.\n          * Use a `<h3>` label: `<strong>Current:</strong>`. Display the `current` text.\n          * Use a `<h3>` label: `<strong>Recommended:</strong>`. Display the `recommended` text in the primary text color.\n          * Use a `<h3>` label: `<strong>Reasoning/Key Elements:</strong>`. Display the `reasoning` or `keyElements` as a bulleted list, with each bullet point styled with the green accent color.\n      * **Experience:**\n          * Iterate through each object in the `experience` array.\n          * Create an `<h3>` for each `role`.\n          * Under the role, provide the `recommended` bullet points in a list.\n          * Follow with an \"Improvements Made\" section, listing the `improvements` with green accent styling.\n      * **Skills:**\n          * Create an `<h3>`: \"Recommended Skills Strategy\".\n          * Display the `strategy` string.\n          * List the `recommended` skills under a subheading.\n          * List the skills `toAdd` under a separate \"New Skills to Add\" subheading.\n\n  * **Implementation Plan Section (`<h2>`):**\n\n      * Title this section \"Your 3-Phase Action Plan\".\n      * Create three distinct cards or sections for `phase1`, `phase2`, and `phase3`.\n      * Label each section clearly (e.g., \"Phase 1: Quick Wins (Under 1 Hour)\").\n      * Present the items in each phase as a checklist or ordered list. Use a green checkmark icon (e.g., `&#10004;`) before each item.\n\n  * **Success Metrics Section (`<h2>`):**\n\n      * Title this section \"How We'll Measure Success\".\n      * Display the `successMetrics` as a clean, bulleted list.\n\n-----\n\n### **3. Output Requirements**\n\n  * **Format:** A single, self-contained HTML file.\n  * **CSS:** **All CSS MUST be inlined.** No `<style>` blocks in the `<head>` or `<body>`. This is critical for compatibility across email clients like Gmail, Outlook, etc.\n  * **Responsiveness:** The email should be readable on both desktop and mobile devices. Use `max-width` and fluid layouts.\n  * **Tone:** The tone should be authoritative, professional, and encouraging. It is a report from an expert to a client.",
+              "role": "system"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1760,
+        5360
+      ],
+      "id": "976e86f4-ad24-47bb-aeac-3701168ae705",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Process the following LinkedIn profile data:\n\n{{ JSON.stringify($json.body) }}\n\n**Tasks to complete:**\n\n1. **Extract and normalize all LinkedIn profile URLs:**\n   - From `userLinkedIn` field\n   - From `competitorUrls` array\n   - Clean URLs by removing UTM parameters, tracking codes, and unnecessary parameters\n   - Ensure proper formatting (https://www.linkedin.com/in/[profile-id])\n\n2. **Analyze the current `targetPosition`:** \"{TARGET_POSITION}\"\n\n3. **Transform the target position into a comprehensive optimization prompt that:**\n   - Expands the basic job title into a strategic career positioning statement\n   - Includes relevant industry keywords and required competencies\n   - Suggests specific skills, experiences, and achievements to highlight\n   - Provides guidance on how to differentiate from competitors\n   - Creates actionable steps for profile optimization\n   - Considers the target role's responsibilities and expectations\n\n4. **Return the processed data in the exact same JSON structure:**\n   - Keep all original fields and values intact\n   - Replace normalized URLs in their respective fields\n   - Replace the `targetPosition` with your generated comprehensive prompt\n   - Ensure all other data (email, requestId, headers, etc.) remains unchanged\n\n**Example of target position transformation:**\n- Input: \"Senior developer\"\n- Output: \"Position yourself as a Senior Software Developer who drives technical excellence and mentors junior developers. Highlight your expertise in [relevant technologies], demonstrate leadership in complex project delivery, showcase problem-solving skills through specific examples, emphasize your ability to architect scalable solutions, and illustrate your contribution to team growth and code quality. Focus on quantifiable achievements like performance improvements, successful project completions, and technical innovations that delivered business value.\"\n\nGenerate a response that maintains the original JSON structure while providing cleaned URLs and an enhanced, strategic positioning prompt.",
+        "options": {
+          "systemMessage": "You are a LinkedIn Profile Optimization AI Agent. Your role is to process LinkedIn profile data, extract and normalize LinkedIn URLs, and transform basic job position requests into comprehensive, strategic career positioning prompts.\n\n**Core Responsibilities:**\n1. **URL Extraction & Normalization**: Extract LinkedIn profile URLs from various formats and standardize them to clean, canonical formats\n2. **Profile Analysis**: Understand the context of the user's current position and career goals\n3. **Strategic Prompt Generation**: Transform simple position titles into detailed, actionable prompts that help users position themselves effectively for their target roles\n\n**URL Normalization Rules:**\n- Remove all UTM parameters and tracking codes\n- Ensure URLs start with \"https://www.linkedin.com/in/\"\n- Remove trailing slashes and unnecessary parameters\n- Preserve only the core profile identifier\n\n**Prompt Enhancement Guidelines:**\n- Transform basic job titles into strategic positioning statements\n- Include industry-specific keywords and competencies\n- Consider career progression and skill development\n- Focus on value proposition and unique differentiators\n- Make prompts actionable and specific\n\n**Output Format:**\nAlways return data in the exact same JSON structure as provided, with:\n- Normalized LinkedIn URLs\n- Enhanced targetPosition as a comprehensive prompt\n- All other fields preserved exactly as received\n\n**Quality Standards:**\n- Ensure all LinkedIn URLs are properly formatted and accessible\n- Create prompts that are professional, specific, and actionable\n- Maintain the original request context while expanding strategic value\n- Preserve all original data integrity"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2800,
+        5264
+      ],
+      "id": "8c36a6e5-057d-4612-ab06-70f49cd37b62",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -2816,
+        5440
+      ],
+      "id": "630d98fc-18fd-4a99-979d-83f4d7920ab2",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Add Email to Final Output": {
+      "main": [
+        [
+          {
+            "node": "Send Email Report1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start User Profile Scraping1": {
+      "main": [
+        [
+          {
+            "node": "Wait for User Scraping1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Competitor Profile Scraping1": {
+      "main": [
+        [
+          {
+            "node": "Wait for Competitor Scraping1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for User Scraping1": {
+      "main": [
+        [
+          {
+            "node": "Check User Scraping Status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Competitor Scraping1": {
+      "main": [
+        [
+          {
+            "node": "Check Competitor Scraping Status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check User Scraping Status1": {
+      "main": [
+        [
+          {
+            "node": "Check if User Complete1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Competitor Scraping Status1": {
+      "main": [
+        [
+          {
+            "node": "Check if Competitor Complete1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if User Complete1": {
+      "main": [
+        [
+          {
+            "node": "Get User Scraped Data1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait and Retry User1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Competitor Complete1": {
+      "main": [
+        [
+          {
+            "node": "Get Competitor Scraped Data1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait and Retry Competitor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait and Retry User1": {
+      "main": [
+        [
+          {
+            "node": "Check User Scraping Status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait and Retry Competitor1": {
+      "main": [
+        [
+          {
+            "node": "Check Competitor Scraping Status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Scraped Data1": {
+      "main": [
+        [
+          {
+            "node": "Merge Scraping Results1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Competitor Scraped Data1": {
+      "main": [
+        [
+          {
+            "node": "Merge Scraping Results1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Scraping Results1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Profile Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route to Agents": {
+      "main": [
+        [
+          {
+            "node": "AI Agent: Profile Analyzer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Agent Outputs1",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "AI Agent: Profile Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent: Competitor Intelligence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent: Competitor Intelligence": {
+      "main": [
+        [
+          {
+            "node": "AI Agent: Content Strategist",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Agent Outputs1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Agent: Content Strategist": {
+      "main": [
+        [
+          {
+            "node": "AI Agent: SEO Specialist",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Agent Outputs1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "AI Agent: SEO Specialist": {
+      "main": [
+        [
+          {
+            "node": "AI Agent: Brand Consultant",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Agent Outputs1",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "AI Agent: Brand Consultant": {
+      "main": [
+        [
+          {
+            "node": "Merge Agent Outputs1",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "AI Agent: Master Synthesis": {
+      "main": [
+        [
+          {
+            "node": "Format Final Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Agent Outputs1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Final Output1": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Profile Data1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Agent Inputs1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Agent Inputs1": {
+      "main": [
+        [
+          {
+            "node": "Split data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split data": {
+      "main": [
+        [
+          {
+            "node": "Route to Agents",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route to Agents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent: Profile Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model13": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent: Competitor Intelligence",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model14": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent: Content Strategist",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model15": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent: SEO Specialist",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model16": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent: Brand Consultant",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model17": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent: Master Synthesis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate and Parse Input": {
+      "main": [
+        [
+          {
+            "node": "Start User Profile Scraping1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Start Competitor Profile Scraping1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent: Master Synthesis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Add Email to Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Validate and Parse Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook1": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.tebita.com",
+            "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_5_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/136.0.7103.91 Mobile/15E148 Safari/604.1",
+            "content-length": "547",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "102.208.97.232",
+            "cf-ipcountry": "ET",
+            "cf-ray": "9797fd2e3fddea46-FCO",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "content-type": "application/json",
+            "origin": "https://linked-in-optimizer-agent-qzpa.vercel.app",
+            "priority": "u=3, i",
+            "referer": "https://linked-in-optimizer-agent-qzpa.vercel.app/",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "x-forwarded-for": "162.158.116.173",
+            "x-forwarded-host": "n8n.tebita.com",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "ddde75687a15",
+            "x-real-ip": "162.158.116.173"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "userLinkedIn": "https://www.linkedin.com/in/yohannes-abayneh-a6a096197?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
+            "competitorUrls": [
+              "https://www.linkedin.com/in/mattprzegietka?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
+              "https://www.linkedin.com/in/etrofimov?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"
+            ],
+            "targetPosition": "Product Designer, UI/UX Designer",
+            "email": "yohannesabayneh548@gmail.com",
+            "requestId": "req_1756931255484_h0gq6ew8f"
+          },
+          "webhookUrl": "https://n8n.tebita.com/webhook/c296bc6a-427e-454d-a1da-4af6c894df69",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "30698fa0-bd33-4ed3-ab39-e7dd9af4aef4",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-07-31T22:46:43.453Z",
+      "updatedAt": "2025-07-31T22:46:43.453Z",
+      "role": "workflow:owner",
+      "workflowId": "cQGWKY0btduVVkEB",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

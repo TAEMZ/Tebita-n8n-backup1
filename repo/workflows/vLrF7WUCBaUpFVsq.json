@@ -1,0 +1,259 @@
+{
+  "createdAt": "2025-09-09T08:43:17.122Z",
+  "updatedAt": "2025-09-29T07:50:40.523Z",
+  "id": "vLrF7WUCBaUpFVsq",
+  "name": "weekly digest",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are a client intelligence assistant.\nYour task is to generate a clear and structured weekly summary of all client interactions using the Supabase tool to fetch relevant data(from this week).\n\nInstructions:\n\nQuery Supabase for all data from the specified week.\n\nSources can include:\n\nSlack messages\n\nEmails\n\nMeeting notes\n\nChat logs\n\nWhen summarizing:\n\nAlways include the client/sender’s name.\n\nAlways include the date (from metadata) of when each message/note/email occurred.\n\nOptionally mention the source type (e.g., Slack, Email) if it helps provide clarity.\n\nPhrase summaries in second person, as if reporting directly to the user (“You discussed…” / “Your client requested…”).\n\nNever use detached phrasing like “the recipient” or “the user.”\n\nStructure the summary in chronological order by date within the week.\n\nProvide a concise overview of key topics, decisions, requests, or follow-ups.\n\nThe ones from fyxer are meeting notes, don't count fyxer as a client but as an ai tool that recorded the meeting and returned it. look for client name inside the fyxer meeting note then use that as client name.\n\nMake sure to get all the clients that interacted in the past week before summarizing \n\nIf no interactions are found for that week, politely state that no relevant activity was recorded.\n\nAlso add the type like \"via email\", \"via meeting notes\"\n\noutput should be:\n{\n   \"weekly_summary\":{\n      \"client1\":\"<summary>\",\n      \"client2\":\"<summary>\",\n      \"client2\":\"<summary>\"\n    } \n}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5a1bf260-7198-436c-b338-9170cd7ef7f0",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        256
+      ],
+      "id": "28662c41-6c56-428a-9224-14743474f38a",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTimeTool",
+      "typeVersion": 2,
+      "position": [
+        96,
+        304
+      ],
+      "id": "5b695eab-69d6-4455-8b37-766266ec41e0",
+      "name": "Date & Time1"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "client information stored here",
+        "tableName": {
+          "__rl": true,
+          "value": "cis",
+          "mode": "list",
+          "cachedResultName": "cis"
+        },
+        "options": {
+          "queryName": "match_cis"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        176
+      ],
+      "id": "5176a770-16e9-4790-9692-62483f757c72",
+      "name": "Supabase Vector Store2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "hh3dnHsjI82CZcfO",
+          "name": "Unnamed credential Yo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        368
+      ],
+      "id": "8350bf3a-7ad8-46a9-8e2b-a809257ae59f",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ]
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -208,
+        0
+      ],
+      "id": "8deee692-000c-4faa-a82f-02d84d397ab4",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"weekly_summary\":{\n      \"client1\":\"<summary>\",\n      \"client2\":\"<summary>\"\n    } \n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        400
+      ],
+      "id": "6b2cc718-a8f9-4fb1-ba10-5444e2070e6c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: items array like you showed\n// Output: formatted JSON with weekly_summary object\n\nreturn items.map(item => {\n  let parsed;\n\n  try {\n    // Parse the \"output\" string into JSON\n    parsed = JSON.parse(item.json.output);\n  } catch (e) {\n    parsed = { weekly_summary: {} };\n  }\n\n  // Ensure we only return a clean structure\n  return {\n    json: {\n      weekly_summary: parsed.weekly_summary || {}\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        0
+      ],
+      "id": "a353e5f9-105c-49ce-ae2f-d567055aca37",
+      "name": "Code"
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "10611f33-829f-41f4-a9f7-1bdf25d5e930",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-09-09T08:43:17.122Z",
+      "updatedAt": "2025-09-09T08:43:17.122Z",
+      "role": "workflow:owner",
+      "workflowId": "vLrF7WUCBaUpFVsq",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

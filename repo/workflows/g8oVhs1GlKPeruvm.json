@@ -1,0 +1,92 @@
+{
+  "createdAt": "2025-04-29T22:00:04.860Z",
+  "updatedAt": "2025-08-27T07:30:15.318Z",
+  "id": "g8oVhs1GlKPeruvm",
+  "name": "Error Handler (old)",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "43291895-2848-4394-bb42-fa05ada13b4a",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C08QC7ZR8KD",
+          "mode": "list",
+          "cachedResultName": "box-rag"
+        },
+        "text": "=🚨 *Error in RAG Workflow*\n\n*Workflow:* {{$json.workflow.name}}  \n*Execution:* {{$json.execution.url}}  \n*Node:* {{$json.execution.error.node.name}}  \n*Error Type:* {{$json.execution.error.name}}  \n*Message:* {{$json.execution.error.message}}  \n*Time:* {{new Date($json.execution.error.timestamp).toLocaleString()}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "24f91311-4853-4236-966b-477d8fe8930c",
+      "name": "Slack",
+      "webhookId": "09b484a6-39d8-4f91-983d-e7e019ea4ea7",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "vcv6r674EVNMorsX",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "200944e5-6f3b-4946-8173-d98033263c7a",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-04-29T22:00:04.860Z",
+      "updatedAt": "2025-04-29T22:00:04.860Z",
+      "role": "workflow:owner",
+      "workflowId": "g8oVhs1GlKPeruvm",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

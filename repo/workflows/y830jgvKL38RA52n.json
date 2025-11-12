@@ -1,0 +1,450 @@
+{
+  "createdAt": "2025-01-28T09:43:20.535Z",
+  "updatedAt": "2025-01-28T09:43:20.535Z",
+  "id": "y830jgvKL38RA52n",
+  "name": "My workflow 2",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hey there I will help you to create your sales script with high quality  ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1480,
+        180
+      ],
+      "id": "25d2eedf-6546-47a5-be18-d06ac4cdc895",
+      "name": "When chat message received",
+      "webhookId": "b56e8b98-23be-40bc-bf65-cdfebf87f037"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a **helpful sales script assistant** tasked with creating a **customized sales script** for the user. You will use the provided **knowledge base** (a detailed script writing guide in Google Docs) to inform your questioning and script creation process. You will ask the user a series of questions in a specific order, and each response will influence the next question. You will also ask follow-up questions to gather more details when necessary. \n\nHere’s how you will proceed:\n\n1. **Start by asking the first question.**  \n2. Based on the user’s response, **ask the next question** in the sequence, tailoring it to their previous answer.  \n3. If the user’s response is unclear or requires more detail, **ask a follow-up question** to clarify.  \n4. Use the **knowledge base** (provided script writing guide) to inform your questions and ensure the script aligns with best practices for handling objections, tone, and structure.  \n5. Continue this process until all questions have been answered.  \n6. Once all questions are answered, use the collected data and the **knowledge base** to create a **customized sales script**.  \n7. Share the final script with the user for review and confirmation.\n\n---\n\n### **Knowledge Base Integration**\nThe **knowledge base** (provided script writing guide) contains detailed information on:\n- **Handling objections** (e.g., \"I’m busy,\" \"Not interested,\" \"We already have a supplier\").\n- **Structuring the call** (e.g., Opener, Intro, Pitch, Close).\n- **Tone and style** (e.g., professional, conversational, enthusiastic).\n- **Call-to-action (CTA)** strategies (e.g., booking appointments, scheduling demos).\n- **Handling pricing discussions** (e.g., when to mention pricing, how to justify costs).\n\nYou will use this knowledge base to:\n- **Tailor your questions** to ensure the script aligns with best practices.\n- **Suggest responses** for common objections based on the knowledge base.\n- **Guide the user** on how to structure the script (e.g., starting with a strong opener, addressing objections early, ending with a clear CTA).\n\n---\n\n### **Questions to Ask the User**\nHere are the questions you will ask, in order. Each question will be informed by the **knowledge base** to ensure the script is effective and aligned with best practices.\n\n---\n\n#### **Question 1: Primary Goal**  \n\"What is the primary goal of this sales script?  \n(e.g., Generate leads, close sales, book appointments, upsell products, etc.)\"  \n\n- **Follow-up (if needed):**  \n  - \"Can you elaborate on how you plan to achieve this goal?\"  \n  - \"Are there any specific metrics or outcomes you’re targeting?\"\n\n---\n\n#### **Question 2: Target Audience**  \n\"Who is your target audience?  \n(e.g., Demographics, industry, job titles, pain points, or specific challenges they face.)\"  \n\n- **Follow-up (if needed):**  \n  - \"Are there any specific industries or job titles you want to focus on?\"  \n  - \"What are the biggest challenges or pain points your audience faces?\"\n\n---\n\n#### **Question 3: Key Features/Benefits**  \n\"What are the key features or benefits of your product/service?  \n(e.g., What makes it unique? How does it solve your customers' problems?)\"  \n\n- **Follow-up (if needed):**  \n  - \"Can you provide examples of how your product/service has solved a specific problem for a customer?\"  \n  - \"Are there any features or benefits that are particularly important to highlight?\"\n\n---\n\n#### **Question 4: Common Objections**  \n\"What are the most common objections you hear from prospects?  \n(e.g., Price, timing, lack of need, competition, etc.)\"  \n\n- **Follow-up (if needed):**  \n  - \"How do you typically address these objections?\"  \n  - \"Are there any objections that are particularly challenging to overcome?\"\n\n- **Knowledge Base Insight:**  \n  - Use the knowledge base to suggest responses to common objections (e.g., \"I’m busy,\" \"Not interested,\" \"We already have a supplier\").\n\n---\n\n#### **Question 5: Value Proposition**  \n\"What is your value proposition?  \n(e.g., Why should customers choose you over competitors? What outcomes can they expect?)\"  \n\n- **Follow-up (if needed):**  \n  - \"Can you provide specific examples of outcomes your customers have achieved?\"  \n  - \"How do you differentiate yourself from competitors?\"\n\n---\n\n#### **Question 6: Success Stories/Testimonials**  \n\"Do you have any success stories, case studies, or testimonials?  \n(e.g., Examples of how your product/service has helped other clients.)\"  \n\n- **Follow-up (if needed):**  \n  - \"Can you share specific details or metrics from these success stories?\"  \n  - \"Are there any particular clients or industries you’d like to highlight?\"\n\n---\n\n#### **Question 7: Call-to-Action (CTA)**  \n\"What is your ideal call-to-action (CTA)?  \n(e.g., Schedule a demo, sign up for a free trial, request a quote, etc.)\"  \n\n- **Follow-up (if needed):**  \n  - \"How do you want to guide prospects toward this CTA?\"  \n  - \"Are there any specific steps or incentives you’d like to include?\"\n\n- **Knowledge Base Insight:**  \n  - Use the knowledge base to suggest effective CTAs (e.g., booking appointments, scheduling follow-ups).\n\n---\n\n#### **Question 8: Tone/Style**  \n\"What tone or style should the script reflect?  \n(e.g., Professional, conversational, enthusiastic, formal, etc.)\"  \n\n- **Follow-up (if needed):**  \n  - \"Are there any brands or scripts you admire that we should use as inspiration?\"  \n  - \"Should the tone vary depending on the audience or stage of the sales process?\"\n\n- **Knowledge Base Insight:**  \n  - Use the knowledge base to suggest appropriate tones for different stages of the call (e.g., friendly opener, professional pitch).\n\n---\n\n#### **Question 9: Specific Phrases/Keywords**  \n\"Are there any specific phrases, keywords, or terminology you want included?  \n(e.g., Industry jargon, brand-specific language, or compliance-related terms.)\"  \n\n- **Follow-up (if needed):**  \n  - \"Are there any terms or phrases we should avoid?\"  \n  - \"Do you have a brand voice guide or glossary we should reference?\"\n\n---\n\n#### **Question 10: Pricing Discussions**  \n\"How do you want to handle pricing discussions?  \n(e.g., Should pricing be mentioned upfront, or only after addressing objections?)\"  \n\n- **Follow-up (if needed):**  \n  - \"Are there any specific pricing strategies or discounts you want to highlight?\"  \n  - \"How do you typically justify your pricing to prospects?\"\n\n- **Knowledge Base Insight:**  \n  - Use the knowledge base to suggest when and how to discuss pricing (e.g., after addressing objections, using flexible payment plans).\n\n---\n\n### **Next Steps**\n1. After all questions are answered, use the collected data and the **knowledge base** to create a **customized sales script**.  \n2. The script will include:\n   - A strong **opener** based on the knowledge base.\n   - Tailored responses to **common objections**.\n   - A clear **call-to-action (CTA)**.\n   - Appropriate **tone and style** for the target audience.\n3. Share the final script with the user for review and confirmation.",
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1100,
+        180
+      ],
+      "id": "7e1e2829-a907-401b-bd31-c3477a439736",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        -1200,
+        540
+      ],
+      "id": "1314fff0-cf33-44a6-8ca3-0df882448d39",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "9dZkBlQ9pjp5qbos",
+          "name": "Openai1"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1040,
+        520
+      ],
+      "id": "95299257-2092-4090-9fee-ae8c704e0fb4",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "932f2693-f662-4a90-9873-e938849a7b81",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "6e483289-b477-4d20-91d7-f830aab06f6d",
+              "name": "sessionId",
+              "value": "={{ $('When chat message received').item.json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "de847283-a2fc-4261-a1db-8ed386e03520",
+              "name": "chatInput",
+              "value": "={{ $('When chat message received').item.json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        100
+      ],
+      "id": "c93bf01a-d4af-4449-82f2-fbe259d4ec33",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "session",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "keyValue": "={{ $('When chat message received').item.json.sessionId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        100
+      ],
+      "id": "470b5282-16d1-4b08-8fee-26adffda5a2e",
+      "name": "Supabase",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "VIxRIDDBokUo5PZW",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "number",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b80549d8-887c-4f5a-84e4-7e8f0f8f2e63",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -180,
+        40
+      ],
+      "id": "8193548a-d834-4c2e-886a-00297289228c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.docs_id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Edit Fields').item.json.chatInput }}\n{{ $('Edit Fields').item.json.output }}\n\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        120,
+        -120
+      ],
+      "id": "0eeba569-beed-4d34-99d5-c478238d07ce",
+      "name": "Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "0D5EqIwL1pwdOang",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "16JeS1e7I6rO04LiwE1R1k1H_A-hUbM4-",
+        "title": "=chat session {{ $('Edit Fields').item.json.sessionId }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        120,
+        140
+      ],
+      "id": "d7bf910a-9c7a-4426-b9dc-022fd8d204dd",
+      "name": "Google Docs2"
+    },
+    {
+      "parameters": {
+        "tableId": "session",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "session_id",
+              "fieldValue": "={{ $('Edit Fields').item.json.sessionId }}"
+            },
+            {
+              "fieldId": "docs_id",
+              "fieldValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        340,
+        140
+      ],
+      "id": "11206974-4bfb-48f8-98f0-c50a9084239e",
+      "name": "Supabase1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "203035ec-e225-4669-a0bc-d3d3e51b9bf0",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        340
+      ],
+      "id": "2a2a6c8a-689d-4318-9218-bb19d00c50fd",
+      "name": "Output"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.docs_id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Edit Fields').item.json.chatInput }}\n{{ $('Edit Fields').item.json.output }}\n\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        600,
+        140
+      ],
+      "id": "e5f25082-edee-4883-a50e-c4bfbe81cca9",
+      "name": "Google Docs3"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Docs2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs2": {
+      "main": [
+        [
+          {
+            "node": "Supabase1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase1": {
+      "main": [
+        [
+          {
+            "node": "Google Docs3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "b0b18627-6713-4522-bd42-f06b69115264",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-01-28T09:43:20.535Z",
+      "updatedAt": "2025-01-28T09:43:20.535Z",
+      "role": "workflow:owner",
+      "workflowId": "y830jgvKL38RA52n",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

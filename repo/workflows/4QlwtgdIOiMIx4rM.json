@@ -1,0 +1,700 @@
+{
+  "createdAt": "2025-02-05T23:07:01.773Z",
+  "updatedAt": "2025-02-05T23:07:01.773Z",
+  "id": "4QlwtgdIOiMIx4rM",
+  "name": "Scrape and store data from multiple website pages",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "On clicking 'execute'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        380,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "e0b0b80d-8559-46ab-853a-ef3d7ca3abce"
+    },
+    {
+      "parameters": {
+        "url": "https://www.theswiftcodes.com/browse-by-country/",
+        "responseFormat": "string",
+        "options": {}
+      },
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        840,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "7f3c72a1-fbd5-4388-9588-7b0fe39e2870"
+    },
+    {
+      "parameters": {
+        "extractionValues": {
+          "values": [
+            {
+              "key": "countries",
+              "cssSelector": "ol > li > a",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "HTML Extract",
+      "type": "n8n-nodes-base.htmlExtract",
+      "position": [
+        1040,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "cfe7127c-7194-4798-995c-36f726f67f66"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "name": "SplitInBatches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        1440,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "21d601c8-f51d-4cfb-8a61-85ac6dfc5170"
+    },
+    {
+      "parameters": {
+        "url": "={{$node[\"Set\"].json[\"url\"]}}",
+        "responseFormat": "file",
+        "options": {}
+      },
+      "name": "HTTP Request1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2780,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "c6a007ef-e064-4115-8fdf-dfe68900e8d8"
+    },
+    {
+      "parameters": {
+        "sourceData": "binary",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "next_button",
+              "cssSelector": "span.next > a",
+              "returnValue": "attribute",
+              "attribute": "href"
+            },
+            {
+              "key": "names",
+              "cssSelector": "td.table-name",
+              "returnArray": true
+            },
+            {
+              "key": "swifts",
+              "cssSelector": "td.table-swift",
+              "returnArray": true
+            },
+            {
+              "key": "cities",
+              "cssSelector": "td.table-city",
+              "returnArray": true
+            },
+            {
+              "key": "branches",
+              "cssSelector": "td.table-branch",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "HTML Extract1",
+      "type": "n8n-nodes-base.htmlExtract",
+      "position": [
+        3280,
+        20
+      ],
+      "typeVersion": 1,
+      "id": "e038f564-1eb9-4149-ad5d-5c105ace4c0c"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "collection": "swifts.meetup",
+        "fields": "iso_code,country,page,name,branch,city,swift_code,createdAt,updatedAt",
+        "options": {
+          "dateFields": "createdAt,updatedAt"
+        }
+      },
+      "name": "MongoDB1",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        3800,
+        20
+      ],
+      "typeVersion": 1,
+      "id": "a26b4f14-bcca-4184-9665-3869d74fd413"
+    },
+    {
+      "parameters": {
+        "group": "geographic",
+        "tool": "getCountryNormalized",
+        "country": "={{$node[\"SplitInBatches\"].json[\"country\"].replace(/[\\/0-9]/g, \"\")}}",
+        "additionalOptions": {}
+      },
+      "name": "uProc",
+      "type": "n8n-nodes-base.uproc",
+      "position": [
+        1620,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "616f044b-8787-4198-ab67-e207e3f4d37a"
+    },
+    {
+      "parameters": {
+        "functionCode": "var newItems = [];\n\nfor (i = 0; i < items[0].json.swifts.length; i++) {\n  var item = {\n    iso_code: $node['uProc'].json.message.code,\n    country: $node['SplitInBatches'].json.country.replace(/[-\\/0-9]/g, \"\"),\n    page: $node['Set Page to Scrape'].json.page,\n    name: items[0].json.names[i],\n    city: items[0].json.cities[i],\n    branch: items[0].json.branches[i],\n    swift_code: items[0].json.swifts[i],\n    createdAt: new Date(),\n    updatedAt: new Date()\n  }\n  newItems.push({json: item});\n}\n\nreturn newItems;\n\n"
+      },
+      "name": "Prepare Documents",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        3460,
+        20
+      ],
+      "typeVersion": 1,
+      "id": "b5f2710b-71b3-4554-b9dc-12390bee7968"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"SplitInBatches\"].context[\"noItemsLeft\"] + \"\"}}",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "name": "More Countries",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        3340,
+        520
+      ],
+      "typeVersion": 1,
+      "id": "832b8424-26d5-42ff-b688-9a437c4ddad9"
+    },
+    {
+      "parameters": {
+        "functionCode": "const staticData = getWorkflowStaticData('global');\n\nitem.page = \"\";\nif (staticData.page && staticData.page.length) {\n  item.page = staticData.page;\n} else {\n  item.page = $node['SplitInBatches'].json.country;\n}\nreturn item;\n"
+      },
+      "name": "Set Page to Scrape",
+      "type": "n8n-nodes-base.functionItem",
+      "position": [
+        1820,
+        100
+      ],
+      "typeVersion": 1,
+      "id": "c9f9f177-50f4-4919-bae0-9de30a373e0c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"more_pages\"] + \"\"}}",
+              "value2": "true"
+            }
+          ]
+        }
+      },
+      "name": "More Pages",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        3600,
+        440
+      ],
+      "typeVersion": 1,
+      "id": "a257938a-fdfd-4bdd-8fa0-40d01fe7065c"
+    },
+    {
+      "parameters": {
+        "functionCode": "var next_page = $node['HTML Extract1'].json.next_button && $node['HTML Extract1'].json.next_button.length ? $node['HTML Extract1'].json.next_button : \"\";\nvar more_pages = next_page.length > 0;\nconst staticData = getWorkflowStaticData('global');\n\n//all current items are after date: needs pagination\nif (more_pages) {\n  staticData.page = next_page;\n} else {\n  //don't check more items in previous pages;\n  delete staticData.page;\n}\n\nreturn [\n  {\n    json: {\n      more_pages: more_pages\n    }\n  }\n];\n"
+      },
+      "name": "Set More Pages",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        4000,
+        20
+      ],
+      "typeVersion": 1,
+      "id": "90750b10-2c24-4fc9-8f3c-08bbd5fe2291"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "url",
+              "value": "=https://www.theswiftcodes.com{{$node[\"Set Page to Scrape\"].json[\"page\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1960,
+        100
+      ],
+      "typeVersion": 1,
+      "id": "6b6ea182-35a8-4031-98a0-660b1acbf615"
+    },
+    {
+      "parameters": {
+        "functionCode": "var generateNameFromUrl = function(url){\n    return url.replace(/[^a-z0-9]/gi, \"_\");\n}\n\nitem.file = generateNameFromUrl(item.url) + \".html\"\nreturn item;"
+      },
+      "name": "Generate filename",
+      "type": "n8n-nodes-base.functionItem",
+      "position": [
+        2120,
+        40
+      ],
+      "typeVersion": 1,
+      "id": "7f48589c-42ec-4dbc-9079-30cdbb689520"
+    },
+    {
+      "parameters": {
+        "filePath": "=/home/node/.cache/scrapper/{{$json[\"file\"]}}"
+      },
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "position": [
+        2300,
+        40
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "id": "81ef9ce3-736e-425b-9528-2b4623c985c4",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$node[\"Read Binary File\"].binary.data.mimeType}}",
+              "value2": "text/html"
+            }
+          ]
+        }
+      },
+      "name": "File exists?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        2480,
+        40
+      ],
+      "typeVersion": 1,
+      "id": "5ec80122-91c8-4ad3-8bef-f5b60927f5d6"
+    },
+    {
+      "parameters": {
+        "fileName": "=/home/node/.cache/scrapper/{{$node[\"Generate filename\"].json[\"file\"]}}",
+        "dataPropertyName": "=data",
+        "options": {}
+      },
+      "name": "Write Binary File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "position": [
+        2920,
+        160
+      ],
+      "typeVersion": 1,
+      "id": "af957c27-9684-408f-aa23-3982f6aa1a8a"
+    },
+    {
+      "parameters": {
+        "filePath": "=/home/node/.cache/scrapper/{{$json[\"file\"]}}"
+      },
+      "name": "Read Binary File1",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "position": [
+        3100,
+        20
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "id": "40101e63-8c0c-4b77-93e1-6bdf6e43a136",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const waitTimeSeconds = 1;\n\nreturn new Promise((resolve) => {\n  setTimeout(() => {\n    resolve([]);\n  }, waitTimeSeconds * 1000);\n});\n"
+      },
+      "name": "Wait",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        2620,
+        160
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "id": "695054a2-b280-420a-b3b5-da5faa5b2a41",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "functionCode": "return items[0].json.countries.map(function(country) {\n  return {\n  json: {country: country}\n  }\n});"
+      },
+      "name": "Prepare countries",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        1220,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "c9014b2a-4190-48c1-8f7a-858f5d6327c4"
+    },
+    {
+      "parameters": {
+        "command": "mkdir -p  /home/node/.cache/scrapper/"
+      },
+      "name": "Create Directory",
+      "type": "n8n-nodes-base.executeCommand",
+      "position": [
+        600,
+        240
+      ],
+      "typeVersion": 1,
+      "id": "3c289afe-f5ea-4047-a41d-4c6c5bcdf4ab",
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "collection": "swifts.meetup",
+        "options": {},
+        "query": "={\"swift_code\": \"{{$json[\"swift_code\"]}}\"}"
+      },
+      "name": "MongoDB",
+      "type": "n8n-nodes-base.mongoDb",
+      "position": [
+        3620,
+        -60
+      ],
+      "executeOnce": false,
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "id": "83241168-ffb4-4a6f-8c49-2046449e1aa4",
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Generate filename",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "uProc": {
+      "main": [
+        [
+          {
+            "node": "Set Page to Scrape",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MongoDB": {
+      "main": [
+        []
+      ]
+    },
+    "MongoDB1": {
+      "main": [
+        [
+          {
+            "node": "Set More Pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "More Pages": {
+      "main": [
+        [
+          {
+            "node": "Set Page to Scrape",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "More Countries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File exists?": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML Extract": {
+      "main": [
+        [
+          {
+            "node": "Prepare countries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML Extract1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Write Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "More Countries": {
+      "main": [
+        [],
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set More Pages": {
+      "main": [
+        [
+          {
+            "node": "More Pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SplitInBatches": {
+      "main": [
+        [
+          {
+            "node": "uProc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Directory": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "File exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate filename": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Documents": {
+      "main": [
+        [
+          {
+            "node": "MongoDB1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare countries": {
+      "main": [
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File1": {
+      "main": [
+        [
+          {
+            "node": "HTML Extract1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Binary File": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Page to Scrape": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On clicking 'execute'": {
+      "main": [
+        [
+          {
+            "node": "Create Directory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateId": "1073"
+  },
+  "pinData": {},
+  "versionId": "a74eaf63-86a5-467a-8db0-5691b0bf5d9b",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-05T23:07:01.773Z",
+      "updatedAt": "2025-02-05T23:07:01.773Z",
+      "role": "workflow:owner",
+      "workflowId": "4QlwtgdIOiMIx4rM",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

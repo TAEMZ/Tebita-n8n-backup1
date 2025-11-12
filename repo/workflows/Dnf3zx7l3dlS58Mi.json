@@ -1,0 +1,43 @@
+{
+  "createdAt": "2025-02-20T20:18:58.307Z",
+  "updatedAt": "2025-06-21T08:57:25.975Z",
+  "id": "Dnf3zx7l3dlS58Mi",
+  "name": "My workflow 11",
+  "active": false,
+  "isArchived": true,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Google Calendar Trigger": {
+      "lastTimeChecked": "2025-06-18T13:11:37Z"
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "debe27c5-2fc8-4644-b193-40f4b77e2c2a",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-20T20:18:58.307Z",
+      "updatedAt": "2025-02-20T20:18:58.307Z",
+      "role": "workflow:owner",
+      "workflowId": "Dnf3zx7l3dlS58Mi",
+      "projectId": "MTPUFilnnvm8kPA5",
+      "project": {
+        "createdAt": "2025-02-20T13:21:42.278Z",
+        "updatedAt": "2025-02-20T19:31:32.728Z",
+        "id": "MTPUFilnnvm8kPA5",
+        "name": "yonas sisay <yonimelkamu357@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

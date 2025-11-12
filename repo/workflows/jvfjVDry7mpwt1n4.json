@@ -1,0 +1,2045 @@
+{
+  "createdAt": "2025-08-21T05:58:48.974Z",
+  "updatedAt": "2025-08-26T13:48:30.666Z",
+  "id": "jvfjVDry7mpwt1n4",
+  "name": "google_map_lead",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "de93371c-ce51-4820-a8d9-b87303a55897",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        1600
+      ],
+      "notes": "Start workflow manually for testing. Change to Schedule Trigger for production (every 20 minutes)"
+    },
+    {
+      "parameters": {
+        "amount": 120
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        1712
+      ],
+      "id": "4287b951-1617-498e-95a3-768e333443d6",
+      "name": "Wait1",
+      "webhookId": "16f9e06b-fbd4-44c8-ade1-b0ab2c9c2d52"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.apify.com/v2/acts/tXAvbR5fC2DPEf2sP/runs?token=apify_api_ATufEI4qxiAYZ81AxPpnnsXz0YTMTU1KLmYU",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"startUrls\": [\n    { \"url\": \"https://{{ $json.body.companyUrl }}\" }\n  ],\n  \"maxPagesPerDomain\": 10\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -528,
+        1312
+      ],
+      "id": "c1fbf4bd-5a03-4385-8a29-1aaa1e5fcced",
+      "name": "Run Contact Scraper"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/actor-runs/{{ $('Run Contact Scraper').item.json.data.id }}/dataset/items?token=YOUR_API_TOKEN_HERE",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -272,
+        1712
+      ],
+      "id": "73953655-8e9c-4b29-955d-968a37261e0b",
+      "name": "Get Scraper Results"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1hAWN110OKHIo9BttdvVNOUpI6BGrETM0s7TBx4lV0Ig",
+          "mode": "list",
+          "cachedResultName": "leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hAWN110OKHIo9BttdvVNOUpI6BGrETM0s7TBx4lV0Ig/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1526049668,
+          "mode": "list",
+          "cachedResultName": "Leads from Apify - 2025-08-25T12:39:51.622Z",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hAWN110OKHIo9BttdvVNOUpI6BGrETM0s7TBx4lV0Ig/edit#gid=1526049668"
+        },
+        "options": {}
+      },
+      "id": "47c67945-143d-4bbe-8560-f3dbff21fd58",
+      "name": "Google Sheets - Read Unenriched Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -144,
+        2192
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "d7DkUmAwLIwnX2ws",
+          "name": "erm_google_sheets"
+        }
+      },
+      "notes": "Fetches all rows where 'enriched' column is empty"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "4e5970e6-7a0a-444f-b671-9c9bf9ec2ece",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        736,
+        2496
+      ],
+      "notes": "Process one lead at a time to avoid rate limits"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Clean website URL to extract root domain for Anymail Finder API\nconst website = $input.item.json.website;\n\nif (!website) {\n  return { domain: '' };\n}\n\ntry {\n  const url = new URL(website);\n  \n  // Remove www. and extract hostname\n  let hostname = url.hostname.toLowerCase();\n  hostname = hostname.replace(/^www\\./i, '');\n  \n  // Extract root domain (last two parts)\n  const parts = hostname.split('.');\n  const domain = parts.slice(-2).join('.');\n  \n  return { \n    domain: domain,\n    original_website: website,\n    row_number: $input.item.json.row_number,\n    companyName: $input.item.json.companyName,\n    phone: $input.item.json.phone\n  };\n} catch (error) {\n  return { \n    domain: '',\n    error: 'Invalid URL',\n    original_website: website \n  };\n}"
+      },
+      "id": "7a4fd057-71b1-4ba9-bd93-9d2a9b350d1f",
+      "name": "Clean Website URL",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        2320
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anymailfinder.com/v5.1/search/decision-maker",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerTokenAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"domain\": \"{{ $json.domain }}\",\n  \"decision_maker_category\": \"ceo\"\n}",
+        "options": {
+          "timeout": 180000
+        }
+      },
+      "id": "80ea6973-7765-46d8-9f59-f13a9c984781",
+      "name": "Anymail Finder - Get Decision Maker Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        1680
+      ],
+      "notes": "Find CEO/decision-maker email. Costs 2 credits per successful lookup"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond1",
+              "leftValue": "={{ $json.result.emailVerified }}",
+              "rightValue": "={{ true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "e3733e0a-4ecb-4083-8cf3-c7107aa78553",
+      "name": "If - Email Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        2496
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1Yv3exZXF7B37WHZj8yxejJO9Q8LOVgGw5hWEVY2UndE",
+          "mode": "list",
+          "cachedResultName": "Google Maps Lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Yv3exZXF7B37WHZj8yxejJO9Q8LOVgGw5hWEVY2UndE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1637240241,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Yv3exZXF7B37WHZj8yxejJO9Q8LOVgGw5hWEVY2UndE/edit#gid=1637240241"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "price",
+              "displayName": "price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "categoryName",
+              "displayName": "categoryName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "neighborhood",
+              "displayName": "neighborhood",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "street",
+              "displayName": "street",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "postalCode",
+              "displayName": "postalCode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "countryCode",
+              "displayName": "countryCode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phoneUnformatted",
+              "displayName": "phoneUnformatted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "claimThisBusiness",
+              "displayName": "claimThisBusiness",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "location",
+              "displayName": "location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "totalScore",
+              "displayName": "totalScore",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "permanentlyClosed",
+              "displayName": "permanentlyClosed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "temporarilyClosed",
+              "displayName": "temporarilyClosed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "placeId",
+              "displayName": "placeId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "categories",
+              "displayName": "categories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fid",
+              "displayName": "fid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cid",
+              "displayName": "cid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reviewsCount",
+              "displayName": "reviewsCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "imagesCount",
+              "displayName": "imagesCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "imageCategories",
+              "displayName": "imageCategories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scrapedAt",
+              "displayName": "scrapedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "googleFoodUrl",
+              "displayName": "googleFoodUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hotelAds",
+              "displayName": "hotelAds",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "openingHours",
+              "displayName": "openingHours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "peopleAlsoSearch",
+              "displayName": "peopleAlsoSearch",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "placesTags",
+              "displayName": "placesTags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reviewsTags",
+              "displayName": "reviewsTags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "gasPrices",
+              "displayName": "gasPrices",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "searchPageUrl",
+              "displayName": "searchPageUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "searchString",
+              "displayName": "searchString",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "rank",
+              "displayName": "rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "isAdvertisement",
+              "displayName": "isAdvertisement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "imageUrl",
+              "displayName": "imageUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "kgmid",
+              "displayName": "kgmid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "additionalOpeningHours",
+              "displayName": "additionalOpeningHours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "additionalInfo",
+              "displayName": "additionalInfo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reviewsDistribution",
+              "displayName": "reviewsDistribution",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "has email?",
+              "displayName": "has email?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "474ccb47-7a12-4a9a-8f40-ad6ec5511684",
+      "name": "Update Google Sheets - No Email Found",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2144,
+        2704
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "d7DkUmAwLIwnX2ws",
+          "name": "erm_google_sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Loop Over Items').item.json.website }}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "ee8dea25-808f-4857-b919-4010c3fd354a",
+      "name": "Scrape Company Website",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2144,
+        2400
+      ],
+      "notes": "Get homepage HTML content"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Remove HTML tags and extract plain text\nconst items = [];\n\nfor (const item of $input.all()) {\n  let htmlContent = item.json.data || '';\n  \n  // Remove script and style elements\n  htmlContent = htmlContent.replace(/<script\\b[^<]*(?:(?!<\\/script>)<[^<]*)*<\\/script>/gi, '');\n  htmlContent = htmlContent.replace(/<style\\b[^<]*(?:(?!<\\/style>)<[^<]*)*<\\/style>/gi, '');\n  \n  // Remove HTML comments\n  htmlContent = htmlContent.replace(/<!--[\\s\\S]*?-->/g, '');\n  \n  // Remove all remaining HTML tags\n  let plainText = htmlContent.replace(/<[^>]+>/g, ' ');\n  \n  // Clean up whitespace\n  plainText = plainText.replace(/\\s+/g, ' ').trim();\n  \n  // Limit text length for API efficiency\n  plainText = plainText.substring(0, 5000);\n  \n  // Pass through all needed data\n  items.push({\n    json: {\n      plainText: plainText,\n      email: $('Anymail Finder - Get Decision Maker Email').item.json.result.email,\n      personFullName: $('Anymail Finder - Get Decision Maker Email').item.json.result.personFullName,\n      companyName: $('Loop Over Items').item.json.companyName,\n      website: $('Loop Over Items').item.json.website,\n      phone: $('Loop Over Items').item.json.phone,\n      row_number: $('Loop Over Items').item.json.row_number\n    }\n  });\n}\n\nreturn items;"
+      },
+      "id": "b38ba938-6005-45cb-ae3a-4d367915a167",
+      "name": "Remove HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2352,
+        2400
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a sales assistant. Your job is to scan a company's homepage and extract 1-2 short, real insights that could be used to personalize a cold email. Only use content found in the input. Do not assume or fabricate anything.",
+              "role": "system"
+            },
+            {
+              "content": "Analyze this company website content and extract 1-2 interesting, verifiable insights that a salesperson could reference in a personalized cold email. Be brief, natural, and relevant - like something you'd mention in a conversation. Respond like this: \"Insight: ...\" \n\nContext: {{ $json.plainText }}"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 150,
+          "temperature": 0.7
+        }
+      },
+      "id": "fb4bec2e-a44e-4fef-82f6-ac6a0e738dfe",
+      "name": "Get Personalization Insight",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2544,
+        2400
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "UWNUXgm95vfChWzU",
+          "name": "LMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "f3e4bd27-1127-4904-b1ca-ec844921e7dc",
+      "name": "Format Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2848,
+        2400
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a cold email assistant. Your ONLY task is to fill in the placeholders in the email template below using the provided variables. Do not change the structure or add anything new. Do not include markdown.\n\nRandomly choose ONE subject line from these options:\n- Quick question about {{Company Name}}\n- {{First Name}}, noticed something about {{Company Name}}\n- Idea for {{Company Name}}'s growth\n- {{Company Name}} - quick thought\n- {{First Name}}, 30 seconds?",
+              "role": "system"
+            },
+            {
+              "content": "=First Name: {{ $json.firstName }}\nCompany Name: {{ $json.cleanCompanyName }}\nInsight: {{ $json.personalization }}\n\nEmail Template:\nSubject: [Choose one from the list]\n\nBody:\nHi {{First Name}},\n\n{{Insight}}\n\nI help companies like {{Company Name}} [insert relevant value proposition based on your service]. \n\nWould you be open to a brief chat this week to explore if we can help?\n\nBest,\n[Your signature]\n\nOutput format:\nSUBJECT: [chosen subject]\nBODY: [email body]"
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 300,
+          "temperature": 0.8
+        }
+      },
+      "id": "9932394f-f305-4a8d-9cf8-d01c7261daf7",
+      "name": "Write Cold Email",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3024,
+        2400
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "UWNUXgm95vfChWzU",
+          "name": "LMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a cold email assistant. Your ONLY task is to write a follow-up email using the provided variables. Keep it brief and conversational. Do not include markdown or a subject line for follow-ups.",
+              "role": "system"
+            },
+            {
+              "content": "First Name: {{ $json.firstName }}\nCompany Name: {{ $json.cleanCompanyName }}\n\nWrite Follow-up Email 1:\n\nHi {{First Name}},\n\nJust wanted to follow up on my previous email. I understand you're busy, but I genuinely believe we could help {{Company Name}} [specific benefit].\n\nWould a quick 10-minute call next week work for you?\n\nBest,\n[Signature]\n\nOutput only the BODY of the email."
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 200,
+          "temperature": 0.8
+        }
+      },
+      "id": "c771a306-2db7-4a9a-bc09-cdd8a6771c13",
+      "name": "Write Cold Email1",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3312,
+        2400
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "UWNUXgm95vfChWzU",
+          "name": "LMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a cold email assistant. Write a final follow-up email that's brief and creates urgency. Do not include markdown or a subject line.",
+              "role": "system"
+            },
+            {
+              "content": "First Name: {{ $json.firstName }}\nCompany Name: {{ $json.cleanCompanyName }}\n\nWrite Follow-up Email 2:\n\nHi {{First Name}},\n\nI'll keep this short - I've helped similar companies to {{Company Name}} achieve [specific result].\n\nIf this isn't a priority right now, no worries. Should I close your file, or would you prefer to connect briefly?\n\nBest,\n[Signature]\n\nOutput only the BODY of the email."
+            }
+          ]
+        },
+        "options": {
+          "maxTokens": 150,
+          "temperature": 0.8
+        }
+      },
+      "id": "8dfcb2f6-96b2-4b2b-aa4a-197796ab2301",
+      "name": "Write Cold Email2",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3648,
+        2400
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "UWNUXgm95vfChWzU",
+          "name": "LMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse email outputs and prepare for Instantly.ai\nconst items = [];\n\nfor (const item of $input.all()) {\n  // Get the OpenAI responses\n  const email1Response = $('Write Cold Email').item.json.choices[0].message.content || '';\n  const email2Response = $('Write Cold Email1').item.json.choices[0].message.content || '';\n  const email3Response = $('Write Cold Email2').item.json.choices[0].message.content || '';\n  \n  // Parse Email 1 (has subject and body)\n  let email1Subject = '';\n  let email1Body = '';\n  if (email1Response.includes('SUBJECT:')) {\n    const parts = email1Response.split('BODY:');\n    email1Subject = parts[0].replace('SUBJECT:', '').trim();\n    email1Body = parts[1]?.trim() || '';\n  }\n  \n  // Email 2 and 3 are body only\n  const email2Body = email2Response.replace('BODY:', '').trim();\n  const email3Body = email3Response.replace('BODY:', '').trim();\n  \n  items.push({\n    json: {\n      email: item.json.email,\n      firstName: item.json.firstName,\n      lastName: item.json.lastName,\n      cleanCompanyName: item.json.cleanCompanyName,\n      personalization: item.json.personalization,\n      phone: item.json.phone,\n      website: item.json.website,\n      row_number: item.json.row_number,\n      'Email 1-Subject': email1Subject,\n      'Email 1-Body': email1Body,\n      'Email 2-Subject': '',\n      'Email 2-Body': email2Body,\n      'Email 3-Subject': '',\n      'Email 3-Body': email3Body\n    }\n  });\n}\n\nreturn items;"
+      },
+      "id": "4b4c7c6c-775a-4f39-aa42-a160774c1089",
+      "name": "Parse Email Outputs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3984,
+        2400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.instantly.ai/api/v1/lead/add",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"api_key\": \"{{ $credentials.apiKey }}\",\n  \"campaign_id\": \"YOUR_CAMPAIGN_ID_HERE\",\n  \"skip_if_in_workspace\": true,\n  \"leads\": [\n    {\n      \"email\": \"{{ $json.email }}\",\n      \"first_name\": \"{{ $json.firstName }}\",\n      \"last_name\": \"{{ $json.lastName }}\",\n      \"company_name\": \"{{ $json.cleanCompanyName }}\",\n      \"personalization\": \"{{ $json.personalization }}\",\n      \"phone\": \"{{ $json.phone }}\",\n      \"website\": \"{{ $json.website }}\",\n      \"custom_variables\": {\n        \"Email 1-Subject\": \"{{ $json['Email 1-Subject'] }}\",\n        \"Email 1-Body\": \"{{ $json['Email 1-Body'] }}\",\n        \"Email 2-Subject\": \"{{ $json['Email 2-Subject'] }}\",\n        \"Email 2-Body\": \"{{ $json['Email 2-Body'] }}\",\n        \"Email 3-Subject\": \"{{ $json['Email 3-Subject'] }}\",\n        \"Email 3-Body\": \"{{ $json['Email 3-Body'] }}\"\n      }\n    }\n  ]\n}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "7fddcd16-d67f-4add-8a7d-d2aaa8d15ac6",
+      "name": "Upload to Instantly.ai",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4208,
+        2400
+      ],
+      "notes": "Upload enriched lead with personalized email sequence to Instantly.ai campaign"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "fb8c5ebf-7ebe-4176-8aa7-461118f7d4c4",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4400,
+        2400
+      ],
+      "webhookId": "1474796f-3599-4704-91bf-2df54fc4a1e0",
+      "notes": "Prevent rate limiting on Google Sheets API"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_SPREADSHEET_ID_HERE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "9eb33906-face-47ae-baf0-d7c9fbce7ff7",
+      "name": "Update Google Sheets - Mark Enriched",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        4624,
+        2400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MwNUVKfgycMHEpxi",
+          "name": "Yoni2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d1eac780-c4eb-4e84-a960-ba0a52ddc2d4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -400,
+        2512
+      ],
+      "id": "2d4b8acd-e82a-43ff-918b-bd1b165f0870",
+      "name": "Webhook",
+      "webhookId": "d1eac780-c4eb-4e84-a960-ba0a52ddc2d4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0ef3c08b-27cf-4b5d-8e27-da56cce44f7b",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -528,
+        2288
+      ],
+      "id": "7657c0ad-fe93-4238-b034-19922a78693a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        2192
+      ],
+      "id": "f1a58e7a-86f7-4173-bd34-10a623000f27",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "amount": 200
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
+        2496
+      ],
+      "id": "d83aa675-f5c5-4d42-9caf-6e56eb60524d",
+      "name": "Wait2",
+      "webhookId": "cd90e596-4a1e-4a34-ba79-c309dcd0a754"
+    },
+    {
+      "parameters": {
+        "actorSource": "store",
+        "actorId": {
+          "__rl": true,
+          "value": "2Mdma1N6Fd0y3QEjR",
+          "mode": "list",
+          "cachedResultName": "Google Maps Extractor (compass/google-maps-extractor)",
+          "cachedResultUrl": "https://console.apify.com/actors/2Mdma1N6Fd0y3QEjR/input"
+        },
+        "customBody": "={\n  \"searchStringsArray\": [\n    \"{{ $json.body.searchTerm }}\"\n  ],\n  \"locationQuery\": \"{{ $json.body.location }}\",\n  \"maxCrawledPlacesPerSearch\": {{ $json.body.maxResults || 20 }}\n}"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        2512
+      ],
+      "id": "0b777398-bf69-4b73-afdd-1f93be8befde",
+      "name": "Run an Actor1",
+      "credentials": {
+        "apifyApi": {
+          "id": "C23f1vjOCaCJZZJy",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Datasets",
+        "datasetId": "={{ $json.defaultDatasetId }}"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        224,
+        2512
+      ],
+      "id": "84b0b34c-7d63-4e1c-98e7-460f247d8830",
+      "name": "Get dataset items1",
+      "credentials": {
+        "apifyApi": {
+          "id": "C23f1vjOCaCJZZJy",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "df457cf8-2f0c-4c63-b690-37996ca39ff9",
+              "leftValue": "={{ $json.website }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        432,
+        2512
+      ],
+      "id": "2a0f3499-7b6b-424d-a984-221086a3a0bf",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "amount": 20
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        2512
+      ],
+      "id": "5a4f8265-ce9d-46f5-a871-2314cfbc7e2b",
+      "name": "Wait3",
+      "webhookId": "65d1836b-3893-4ed6-bcc5-35fc003dd3f8"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Yv3exZXF7B37WHZj8yxejJO9Q8LOVgGw5hWEVY2UndE",
+          "mode": "list",
+          "cachedResultName": "Google Maps Lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Yv3exZXF7B37WHZj8yxejJO9Q8LOVgGw5hWEVY2UndE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1637240241,
+          "mode": "list",
+          "cachedResultName": "n8n-sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Yv3exZXF7B37WHZj8yxejJO9Q8LOVgGw5hWEVY2UndE/edit#gid=1637240241"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "price",
+              "displayName": "price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categoryName",
+              "displayName": "categoryName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "neighborhood",
+              "displayName": "neighborhood",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "street",
+              "displayName": "street",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "city",
+              "displayName": "city",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "postalCode",
+              "displayName": "postalCode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "state",
+              "displayName": "state",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "countryCode",
+              "displayName": "countryCode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phoneUnformatted",
+              "displayName": "phoneUnformatted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "claimThisBusiness",
+              "displayName": "claimThisBusiness",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "location",
+              "displayName": "location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "totalScore",
+              "displayName": "totalScore",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "permanentlyClosed",
+              "displayName": "permanentlyClosed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "temporarilyClosed",
+              "displayName": "temporarilyClosed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "placeId",
+              "displayName": "placeId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "categories",
+              "displayName": "categories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fid",
+              "displayName": "fid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cid",
+              "displayName": "cid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reviewsCount",
+              "displayName": "reviewsCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "imagesCount",
+              "displayName": "imagesCount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "imageCategories",
+              "displayName": "imageCategories",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "scrapedAt",
+              "displayName": "scrapedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "googleFoodUrl",
+              "displayName": "googleFoodUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hotelAds",
+              "displayName": "hotelAds",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "openingHours",
+              "displayName": "openingHours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "peopleAlsoSearch",
+              "displayName": "peopleAlsoSearch",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "placesTags",
+              "displayName": "placesTags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reviewsTags",
+              "displayName": "reviewsTags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gasPrices",
+              "displayName": "gasPrices",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "searchPageUrl",
+              "displayName": "searchPageUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "searchString",
+              "displayName": "searchString",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rank",
+              "displayName": "rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isAdvertisement",
+              "displayName": "isAdvertisement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "imageUrl",
+              "displayName": "imageUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "kgmid",
+              "displayName": "kgmid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "additionalOpeningHours",
+              "displayName": "additionalOpeningHours",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "additionalInfo",
+              "displayName": "additionalInfo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reviewsDistribution",
+              "displayName": "reviewsDistribution",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        2368
+      ],
+      "id": "e2596ead-ad98-49cd-99a0-e7fcff96cf2a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "d7DkUmAwLIwnX2ws",
+          "name": "erm_google_sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Datasets",
+        "datasetId": "={{ $json.defaultDatasetId }}",
+        "limit": 1
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        2496
+      ],
+      "id": "b47b4ae5-c36b-42e1-a7b6-3712df43d3af",
+      "name": "Get dataset items",
+      "credentials": {
+        "apifyApi": {
+          "id": "C23f1vjOCaCJZZJy",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.clearout.io/v2/email_finder/instant' \\\n-H 'Authorization: 4709b1a02b4982175fc3a7bbf43fec31:8cabf5d454a244554bd937c46674a4869736c324001ffd5db40a40f91b46c637' \\\n-H 'Content-Type: application/json' \\\n-d '{ \"domain\": \"{{ $json.website }}\", \"timeout\": 30000 }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1056,
+        2496
+      ],
+      "id": "00ca8b68-49b1-44cf-bcfa-4f619de077ec",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Get Scraper Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Contact Scraper": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Scraper Results": {
+      "main": [
+        []
+      ]
+    },
+    "Google Sheets - Read Unenriched Leads": {
+      "main": [
+        []
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Website URL": {
+      "main": [
+        []
+      ]
+    },
+    "Anymail Finder - Get Decision Maker Email": {
+      "main": [
+        []
+      ]
+    },
+    "If - Email Found?": {
+      "main": [
+        [
+          {
+            "node": "Scrape Company Website",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Google Sheets - No Email Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Google Sheets - No Email Found": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Company Website": {
+      "main": [
+        [
+          {
+            "node": "Remove HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove HTML": {
+      "main": [
+        [
+          {
+            "node": "Get Personalization Insight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Personalization Insight": {
+      "main": [
+        [
+          {
+            "node": "Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data": {
+      "main": [
+        [
+          {
+            "node": "Write Cold Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Cold Email": {
+      "main": [
+        [
+          {
+            "node": "Write Cold Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Cold Email1": {
+      "main": [
+        [
+          {
+            "node": "Write Cold Email2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Cold Email2": {
+      "main": [
+        [
+          {
+            "node": "Parse Email Outputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Email Outputs": {
+      "main": [
+        [
+          {
+            "node": "Upload to Instantly.ai",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Instantly.ai": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Update Google Sheets - Mark Enriched",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Google Sheets - Mark Enriched": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Read Unenriched Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Get dataset items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run an Actor1": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get dataset items1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Get dataset items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get dataset items": {
+      "main": [
+        [
+          {
+            "node": "If - Email Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.tebita.com",
+            "user-agent": "curl/7.88.1",
+            "content-length": "90",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1",
+            "cf-connecting-ip": "196.190.60.186",
+            "cf-ipcountry": "ET",
+            "cf-ray": "974bc483df478c19-ADD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "content-type": "application/json",
+            "x-forwarded-for": "104.23.208.137",
+            "x-forwarded-host": "n8n.tebita.com",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "ddde75687a15",
+            "x-real-ip": "104.23.208.137"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "searchTerm": "digital marketing agency",
+            "location": "London",
+            "maxResults": 50
+          },
+          "webhookUrl": "https://n8n.tebita.com/webhook/d1eac780-c4eb-4e84-a960-ba0a52ddc2d4",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "versionId": "a38da8ef-4652-45cd-b571-ff81e7c25a1f",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-08-21T05:58:48.974Z",
+      "updatedAt": "2025-08-21T05:58:48.974Z",
+      "role": "workflow:owner",
+      "workflowId": "jvfjVDry7mpwt1n4",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

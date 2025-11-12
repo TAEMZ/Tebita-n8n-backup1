@@ -1,0 +1,305 @@
+{
+  "createdAt": "2025-03-27T06:17:30.516Z",
+  "updatedAt": "2025-09-23T03:48:27.189Z",
+  "id": "Iyy7H2WNYzcDDHLk",
+  "name": "Upwork Cover letter Generator",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "43df1461-0e8a-4c1a-afc7-0716c8a06c2f",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        32,
+        -224
+      ],
+      "id": "0cd485d5-c7b2-41b0-afe9-2a5666b9287a",
+      "name": "Webhook",
+      "webhookId": "43df1461-0e8a-4c1a-afc7-0716c8a06c2f"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.jobDetailsHtml }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a helpful assistant and u will take in html and take out the job details from it and give me the formated and clear job details from the html.\n\ni dont need an explanation plz i just want the full job details and every thing from it."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        368,
+        -224
+      ],
+      "id": "29c12d93-25ef-4d70-871c-64bc1222f007",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"job_title\": \"Beta testers - must have website\",\n  \"job_details\": {\n    \"posted_date\": \"March 27, 2025\",\n    \"description\": \"Looking for beta testers to test my SaaS.\",\n    \"requirements\": {\n      \"must_have_website\": \"Preferably SaaS, e-commerce\",\n      \"ability_to_add_code_snippets\": true,\n      \"knowledge_of_AI\": \"Must have knowledge of GPT and other AI\"\n    },\n    \"payment\": {\n      \"price\": \"$5\",\n      \"type\": \"Fixed-price\"\n    },\n    \"duration\": {\n      \"project_length\": \"Less than 1 month\"\n    },\n    \"experience_level\": \"Expert\",\n    \"skills_and_expertise\": [\n      \"Bug Reports\",\n      \"Usability Testing\"\n    ],\n    \"links\": {\n      \"job_posting\": \"https://www.example.com/jobs/~021905143292569282746\"\n    }\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        0
+      ],
+      "id": "66360f9b-c294-4ef3-812b-5b52ada62bc9",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a helpful assistant your job is to take the job discription and use the airtabel tool to make a cover letter based on the job detail({{ $json.output }}) and the air table tool to take the informations and also when u get information from the airtable tool use this user id to take the information: {{ $('Webhook').item.json.body.userId }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        720,
+        -224
+      ],
+      "id": "f5e2bef4-9a05-4178-a242-5316c69e8ec6",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "applqGKuf38BnK8j6",
+          "mode": "list",
+          "cachedResultName": "Upwork",
+          "cachedResultUrl": "https://airtable.com/applqGKuf38BnK8j6"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl35fNEeSXDL6CSE",
+          "mode": "list",
+          "cachedResultName": "Table",
+          "cachedResultUrl": "https://airtable.com/applqGKuf38BnK8j6/tbl35fNEeSXDL6CSE"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        848,
+        0
+      ],
+      "id": "ae996fc0-8718-4029-9278-af229679c8a6",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "BgjqBxMAU9tCx7BJ",
+          "name": "Airtable Personal Access Token account Upwork"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"name\": \"Beamlak A.\",\n  \"address\": \"Addis Ababa, Ethiopia\",\n  \"contact\": {\n    \"email\": \"[empty]\",\n    \"phone\": \"[empty]\"\n  },\n  \"date\": \"March 27, 2025\",\n  \"recipient\": {\n    \"name\": \"Hiring Manager\",\n    \"company\": \"SaaS Company\",\n    \"address\": \"[empty]\"\n  },\n  \"subject\": \"Application for Beta Tester Position\",\n  \"body\": \"Dear Hiring Manager,\\n\\nI am writing to express my interest in the Beta Tester position advertised. With my background in software engineering and my hands-on experience in web development, I believe I would be a valuable addition to your team.\\n\\nI meet all the requirements for this role. I have my own website, which is focused on SaaS solutions. I am proficient in adding code snippets to website headers, and I have substantial knowledge of AI tools, including GPT. My experience includes usability testing and bug reporting, making me well-suited for the responsibilities of this position.\\n\\nI am looking forward to the opportunity to contribute to your project and provide valuable feedback to enhance the user experience. Thank you for considering my application. I look forward to discussing my qualifications further.\",\n  \"closing\": \"Sincerely,\",\n  \"signature\": \"Beamlak A.\\nSoftware Engineer\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        992,
+        0
+      ],
+      "id": "6ee78fe2-8dda-44d3-a6ed-be3b1343b21e",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        -224
+      ],
+      "id": "19e9e344-af77-4667-9f5e-7dc1c39ad303",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o1",
+          "mode": "list",
+          "cachedResultName": "o1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        336,
+        -16
+      ],
+      "id": "1af319e9-5d9a-43bf-9db9-88b668bfcf85",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "O1PHcm8q29zCIxMY",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "o1",
+          "mode": "list",
+          "cachedResultName": "o1"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        0
+      ],
+      "id": "fbd8f6da-6174-44ea-906c-88cfef35234a",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "O1PHcm8q29zCIxMY",
+          "name": "OpenAi account 3"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1911d0ef-e59c-4743-9f81-a3f00fce204c",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-03-27T06:17:30.516Z",
+      "updatedAt": "2025-03-27T06:17:30.516Z",
+      "role": "workflow:owner",
+      "workflowId": "Iyy7H2WNYzcDDHLk",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

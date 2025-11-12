@@ -1,0 +1,476 @@
+{
+  "createdAt": "2025-11-05T11:04:04.614Z",
+  "updatedAt": "2025-11-12T06:36:43.557Z",
+  "id": "Vwneg2gtEOIEQuz1",
+  "name": "workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {
+          "download": false
+        }
+      },
+      "id": "d1c0f18d-372b-49e8-a7e4-396ebd730216",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        80
+      ],
+      "webhookId": "5d18e99d-22de-4101-b516-9851aa6325a0",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "NqHlvqylD4LKFDH0",
+          "name": "tg_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.message }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{ $json.reply_markup.inline_keyboard[0][0].text }}",
+                    "additionalFields": {
+                      "callback_data": "={{ $json.reply_markup.inline_keyboard[0][0].callback_data }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{ $json.reply_markup.inline_keyboard[0][1].text }}",
+                    "additionalFields": {
+                      "callback_data": "={{ $json.reply_markup.inline_keyboard[0][1].callback_data }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{ $json.reply_markup.inline_keyboard[1][1].text }}",
+                    "additionalFields": {
+                      "callback_data": "={{ $json.reply_markup.inline_keyboard[1][1].callback_data }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{ $json.reply_markup.inline_keyboard[1][0].text }}",
+                    "additionalFields": {
+                      "callback_data": "={{ $json.reply_markup.inline_keyboard[1][0].callback_data }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{ $json.reply_markup.inline_keyboard[2][0].text }}",
+                    "additionalFields": {
+                      "callback_data": "={{ $json.reply_markup.inline_keyboard[2][0].callback_data }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "={{ $json.reply_markup.inline_keyboard[2][1].text }}",
+                    "additionalFields": {
+                      "callback_data": "={{ $json.reply_markup.inline_keyboard[2][1].callback_data }}"
+                    }
+                  }
+                ]
+              }
+            },
+            {}
+          ]
+        },
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "85ebd472-e6cc-4d73-bdae-4745f7fc522a",
+      "name": "Send Telegram Message1",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        128
+      ],
+      "webhookId": "2df67571-f3f4-4dea-9c30-337419f2d05f",
+      "credentials": {
+        "telegramApi": {
+          "id": "NqHlvqylD4LKFDH0",
+          "name": "tg_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('process input').item.json.chatId }}",
+        "text": "={{ $json.snippet }}{{ $json.link }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "id": "cdb289bd-9dc5-4e3d-bda4-8671abd795c6",
+      "name": "Send Telegram Message",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        432
+      ],
+      "webhookId": "2df67571-f3f4-4dea-9c30-337419f2d05f",
+      "credentials": {
+        "telegramApi": {
+          "id": "NqHlvqylD4LKFDH0",
+          "name": "tg_bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "send_with_buttons",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d9de72dc-381f-41d9-81bd-3bbe9bccebea"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "03abd14c-664a-4b03-b198-bfdfabe44a69",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "scrape_news",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -528,
+        144
+      ],
+      "id": "2c1b800c-1e0c-4e8d-8f36-3a8b7e69dc7a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process Telegram Input with Nested Categories\nconst telegramData = $input.first().json;\n\nconsole.log('RAW TELEGRAM DATA:', JSON.stringify(telegramData, null, 2));\n\nconst languages = {\n  'main': [\n    { text: '🇺🇸 English', callback_data: 'lang_en' },\n    { text: '🇪🇸 Español', callback_data: 'lang_es' },\n    { text: '🇫🇷 Français', callback_data: 'lang_fr' },\n    { text: '🇩🇪 Deutsch', callback_data: 'lang_de' },\n    { text: '🇮🇹 Italiano', callback_data: 'lang_it' },\n    { text: '🇵🇹 Português', callback_data: 'lang_pt' }\n  ]\n};\n\n// Language-specific search strategies\nconst languageSearchStrategies = {\n  'en': {\n    query: \"latest news\",\n    sites: \"bbc.com OR reuters.com OR cnn.com\",\n    region: \"us\"\n  },\n  'es': {\n    query: \"últimas noticias\",\n    sites: \"elpais.com OR elmundo.es OR lavanguardia.com\",\n    region: \"es\"\n  },\n  'fr': {\n    query: \"actualités récentes\", \n    sites: \"lemonde.fr OR lefigaro.fr OR liberation.fr\",\n    region: \"fr\"\n  },\n  'de': {\n    query: \"aktuelle nachrichten\",\n    sites: \"spiegel.de OR faz.net OR zeit.de\",\n    region: \"de\"\n  },\n  'it': {\n    query: \"notizie recenti\",\n    sites: \"repubblica.it OR corriere.it OR ansa.it\",\n    region: \"it\"\n  },\n  'pt': {\n    query: \"notícias recentes\",\n    sites: \"publico.pt OR observador.pt OR expresso.pt\", \n    region: \"pt\"\n  }\n};\n\n// Define all categories and subcategories\nconst categories = {\n  // Main Categories\n  'main_categories': [\n    { text: '📰 News', callback_data: 'category_news' },\n    { text: '⚽ Sports', callback_data: 'category_sports' },\n    { text: '🎬 Entertainment', callback_data: 'category_entertainment' },\n    { text: '💼 Business', callback_data: 'category_business' },\n    { text: '🏥 Health', callback_data: 'category_health' },\n    { text: '🔬 Technology', callback_data: 'category_technology' }\n  ],\n  \n  // News Subcategories\n  'category_news': [\n    { text: '🌍 World News', callback_data: 'news_world' },\n    { text: '🇺🇸 US News', callback_data: 'news_us' },\n    { text: '🇬🇧 UK News', callback_data: 'news_uk' },\n    { text: '🇪🇺 Europe News', callback_data: 'news_europe' },\n    { text: '🌏 Asia News', callback_data: 'news_asia' },\n    { text: '📊 Politics', callback_data: 'news_politics' },\n    { text: '⬅️ Back to Main', callback_data: 'back_to_main' }\n  ],\n  \n  // Sports Subcategories\n  'category_sports': [\n    { text: '⚽ Football', callback_data: 'sports_football' },\n    { text: '🏀 Basketball', callback_data: 'sports_basketball' },\n    { text: '🎾 Tennis', callback_data: 'sports_tennis' },\n    { text: '🏎️ Motorsports', callback_data: 'sports_motorsports' },\n    { text: '🏈 American Football', callback_data: 'sports_american_football' },\n    { text: '⚾ Baseball', callback_data: 'sports_baseball' },\n    { text: '🎯 Other Sports', callback_data: 'sports_other' },\n    { text: '⬅️ Back to Main', callback_data: 'back_to_main' }\n  ],\n  \n  // Football Subcategories\n  'sports_football': [\n    { text: '⚽ Premier League', callback_data: 'football_premier_league' },\n    { text: '⚽ La Liga', callback_data: 'football_la_liga' },\n    { text: '⚽ Serie A', callback_data: 'football_serie_a' },\n    { text: '⚽ Bundesliga', callback_data: 'football_bundesliga' },\n    { text: '⚽ Champions League', callback_data: 'football_champions_league' },\n    { text: '⚽ World Cup', callback_data: 'football_world_cup' },\n    { text: '⬅️ Back to Sports', callback_data: 'back_to_sports' }\n  ],\n  \n  // Basketball Subcategories\n  'sports_basketball': [\n    { text: '🏀 NBA', callback_data: 'basketball_nba' },\n    { text: '🏀 EuroLeague', callback_data: 'basketball_euroleague' },\n    { text: '🏀 NCAA', callback_data: 'basketball_ncaa' },\n    { text: '🏀 FIBA', callback_data: 'basketball_fiba' },\n    { text: '⬅️ Back to Sports', callback_data: 'back_to_sports' }\n  ],\n  \n  // Entertainment Subcategories\n  'category_entertainment': [\n    { text: '🎬 Movies', callback_data: 'entertainment_movies' },\n    { text: '📺 TV Shows', callback_data: 'entertainment_tv_shows' },\n    { text: '🎵 Music', callback_data: 'entertainment_music' },\n    { text: '🎭 Celebrities', callback_data: 'entertainment_celebrities' },\n    { text: '🎮 Gaming', callback_data: 'entertainment_gaming' },\n    { text: '🎨 Arts & Culture', callback_data: 'entertainment_arts' },\n    { text: '⬅️ Back to Main', callback_data: 'back_to_main' }\n  ],\n  \n  // Movies Subcategories\n  'entertainment_movies': [\n    { text: '🎬 Hollywood', callback_data: 'movies_hollywood' },\n    { text: '🎬 Bollywood', callback_data: 'movies_bollywood' },\n    { text: '🎬 Independent', callback_data: 'movies_independent' },\n    { text: '🎬 Film Festivals', callback_data: 'movies_festivals' },\n    { text: '⬅️ Back to Entertainment', callback_data: 'back_to_entertainment' }\n  ],\n  \n  // Music Subcategories\n  'entertainment_music': [\n    { text: '🎵 Pop', callback_data: 'music_pop' },\n    { text: '🎵 Rock', callback_data: 'music_rock' },\n    { text: '🎵 Hip-Hop', callback_data: 'music_hiphop' },\n    { text: '🎵 Electronic', callback_data: 'music_electronic' },\n    { text: '🎵 Classical', callback_data: 'music_classical' },\n    { text: '⬅️ Back to Entertainment', callback_data: 'back_to_entertainment' }\n  ],\n  \n  // Business Subcategories\n  'category_business': [\n    { text: '💹 Stock Market', callback_data: 'business_stocks' },\n    { text: '🏦 Banking', callback_data: 'business_banking' },\n    { text: '🚀 Startups', callback_data: 'business_startups' },\n    { text: '🌐 E-commerce', callback_data: 'business_ecommerce' },\n    { text: '📈 Economy', callback_data: 'business_economy' },\n    { text: '💼 Careers', callback_data: 'business_careers' },\n    { text: '⬅️ Back to Main', callback_data: 'back_to_main' }\n  ],\n  \n  // Health Subcategories\n  'category_health': [\n    { text: '💊 Medicine', callback_data: 'health_medicine' },\n    { text: '🧘 Wellness', callback_data: 'health_wellness' },\n    { text: '🍎 Nutrition', callback_data: 'health_nutrition' },\n    { text: '🏃 Fitness', callback_data: 'health_fitness' },\n    { text: '🧠 Mental Health', callback_data: 'health_mental' },\n    { text: '👶 Pediatrics', callback_data: 'health_pediatrics' },\n    { text: '⬅️ Back to Main', callback_data: 'back_to_main' }\n  ],\n  \n  // Technology Subcategories\n  'category_technology': [\n    { text: '📱 Mobile', callback_data: 'technology_mobile' },\n    { text: '💻 Computers', callback_data: 'technology_computers' },\n    { text: '🤖 AI & Robotics', callback_data: 'technology_ai' },\n    { text: '🔐 Cybersecurity', callback_data: 'technology_cybersecurity' },\n    { text: '🚀 Space Tech', callback_data: 'technology_space' },\n    { text: '🌐 Internet', callback_data: 'technology_internet' },\n    { text: '⬅️ Back to Main', callback_data: 'back_to_main' }\n  ],\n  \n  // Mobile Tech Subcategories\n  'technology_mobile': [\n    { text: '📱 Smartphones', callback_data: 'mobile_smartphones' },\n    { text: '⌚ Wearables', callback_data: 'mobile_wearables' },\n    { text: '📶 5G Technology', callback_data: 'mobile_5g' },\n    { text: '📲 Apps', callback_data: 'mobile_apps' },\n    { text: '⬅️ Back to Technology', callback_data: 'back_to_technology' }\n  ],\n  \n  // AI Subcategories\n  'technology_ai': [\n    { text: '🤖 Machine Learning', callback_data: 'ai_ml' },\n    { text: '🧠 Neural Networks', callback_data: 'ai_neural' },\n    { text: '🗣️ NLP', callback_data: 'ai_nlp' },\n    { text: '👁️ Computer Vision', callback_data: 'ai_vision' },\n    { text: '⬅️ Back to Technology', callback_data: 'back_to_technology' }\n  ]\n};\n\nlet chatId;\nlet callbackQueryId;\nlet selectedCategories = [];\nlet currentLevel = 'main'; // Start with language selection\nvar userLanguage = null;\nlet message = '🌍 *Welcome to News Bot!*\\n\\nPlease select your language:';\n\n// Helper functions\nfunction getLanguageButtons() {\n  const buttons = languages.main;\n  const inlineButtons = [];\n  for (let i = 0; i < buttons.length; i += 2) {\n    const row = [];\n    row.push(buttons[i]);\n    if (i + 1 < buttons.length) row.push(buttons[i + 1]);\n    inlineButtons.push(row);\n  }\n  return inlineButtons;\n}\n\nfunction getCategoryButtons() {\n  const buttons = categories['main_categories'];\n  const inlineButtons = [];\n  for (let i = 0; i < buttons.length; i += 2) {\n    const row = [];\n    row.push(buttons[i]);\n    if (i + 1 < buttons.length) row.push(buttons[i + 1]);\n    inlineButtons.push(row);\n  }\n  return inlineButtons;\n}\n\nfunction getButtonsForLevel(level) {\n  const buttons = categories[level];\n  if (!buttons) return [];\n  \n  const inlineButtons = [];\n  for (let i = 0; i < buttons.length; i += 2) {\n    const row = [];\n    row.push(buttons[i]);\n    if (i + 1 < buttons.length) row.push(buttons[i + 1]);\n    inlineButtons.push(row);\n  }\n  return inlineButtons;\n}\n\n// Get chat ID from either message or callback\nif (telegramData.callback_query) {\n  chatId = telegramData.callback_query.message.chat.id;\n  callbackQueryId = telegramData.callback_query.id;\n  const callbackData = telegramData.callback_query.data;\n  \n  console.log('Callback data:', callbackData);\n  \n  // Handle language selection FIRST\n  if (callbackData.startsWith('lang_')) {\n    userLanguage = callbackData.replace('lang_', '');\n    currentLevel = 'main_categories';\n   message = `✅ Language set to ${languages.main.find(lang => lang.callback_data === callbackData)?.text}\\n\\n📰 Please select a news category:`;\n    \n    return [\n      // Output 0: Show category selection\n      {\n        json: {\n          chatId: chatId,\n          message: message,\n          reply_markup: { inline_keyboard: getCategoryButtons() },\n          action: 'send_with_buttons'\n        }\n      },\n      // Output 1: Store language preference\n      {\n        json: {\n          chatId: chatId,\n          userLanguage: userLanguage,\n          action: 'store_language'\n        }\n      }\n    ];\n  }\n  \n  // Handle navigation and selection AFTER language is set\n  if (callbackData.startsWith('category_')) {\n    currentLevel = callbackData;\n    message = `🎯 *${callbackData.replace('category_', '').toUpperCase()}*\\n\\nSelect subcategory:`;\n  }\n  else if (callbackData.startsWith('sports_') || \n           callbackData.startsWith('entertainment_') || \n           callbackData.startsWith('business_') || \n           callbackData.startsWith('health_') || \n           callbackData.startsWith('technology_') ||\n           callbackData.startsWith('news_')) {\n    // Subcategory selected - show further filters or scrape\n    if (categories[callbackData]) {\n      // Has further subcategories\n      currentLevel = callbackData;\n      const displayName = callbackData.replace(/_/g, ' ').replace(/\\b\\w/g, l => l.toUpperCase());\n      message = `🔍 *${displayName}*\\n\\nSelect specific category:`;\n    } else {\n      // Final selection - scrape news\n      selectedCategories = [callbackData];\n      const displayName = callbackData.replace(/_/g, ' ').replace(/\\b\\w/g, l => l.toUpperCase());\n      message = `📡 Fetching news for ${displayName}...`;\n    }\n  }\n  else if (callbackData.startsWith('back_to_')) {\n    // Handle back navigation\n    if (callbackData === 'back_to_main') {\n      currentLevel = 'main_categories';\n      message = '📰 Please select a news category:';\n    } else if (callbackData === 'back_to_sports') {\n      currentLevel = 'category_sports';\n      message = '⚽ *SPORTS*\\n\\nSelect sport type:';\n    } else if (callbackData === 'back_to_entertainment') {\n      currentLevel = 'category_entertainment';\n      message = '🎬 *ENTERTAINMENT*\\n\\nSelect category:';\n    } else if (callbackData === 'back_to_technology') {\n      currentLevel = 'category_technology';\n      message = '🔬 *TECHNOLOGY*\\n\\nSelect category:';\n    }\n  }\n  else if (callbackData.startsWith('football_') || \n           callbackData.startsWith('basketball_') || \n           callbackData.startsWith('movies_') || \n           callbackData.startsWith('music_') ||\n           callbackData.startsWith('mobile_') ||\n           callbackData.startsWith('ai_')) {\n    // Final level selection - scrape news\n    selectedCategories = [callbackData];\n    const displayName = callbackData.replace(/_/g, ' ').replace(/\\b\\w/g, l => l.toUpperCase());\n    message = `📡 Fetching news for ${displayName}...`;\n  }\n} \n// Handle regular message (like /start)\nelse if (telegramData.message) {\n  chatId = telegramData.message.chat.id;\n  // Start with language selection for new users\n  currentLevel = 'main';\n  message = '🌍 *Welcome to News Bot!*\\n\\nPlease select your language:';\n}\n\n// Get appropriate buttons for current level\nlet inlineButtons = [];\nif (currentLevel === 'main') {\n  // Show language selection\n  inlineButtons = getLanguageButtons();\n} else if (categories[currentLevel]) {\n  // Show categories for the current level\n  inlineButtons = getButtonsForLevel(currentLevel);\n}\nconst languageStrategy = userLanguage \n  ? languageSearchStrategies[userLanguage] \n  : languageSearchStrategies['en']; \n\n// Return appropriate output based on context\nif (selectedCategories.length > 0) {\n  // Scrape news for selected categories\n  return [\n    // Output 0: Show current selection message\n    {\n      json: {\n        chatId: chatId,\n        message: message,\n        reply_markup: { inline_keyboard: inlineButtons },\n        action: 'send_with_buttons'\n      }\n    },\n\n \n  \n  // Handle language selection FIRST\n \n    // Output 1: Scrape news with language info\n    {\n      json: {\n        chatId: chatId,\n        callbackQueryId: callbackQueryId,\n        selectedCategories: selectedCategories,\n        userLanguage: userLanguage||'en',\n        languageStrategy: languageStrategy,\n        action: 'scrape_news'\n      }\n    }\n  ];\n} else {\n  // Show category/language selection\n  return [{\n    json: {\n      chatId: chatId,\n      message: message,\n      reply_markup: { inline_keyboard: inlineButtons },\n      action: 'send_with_buttons'\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -784,
+        160
+      ],
+      "id": "4b33da8b-1804-47c8-9a94-62c70663c0b2",
+      "name": "process input",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/customsearch/v1",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "AIzaSyBN8L5pPTMwgVFa0y51JXwOTyL4NR5t2es"
+            },
+            {
+              "name": "cx",
+              "value": "24d3ee36e6fe1427d"
+            },
+            {
+              "name": "q",
+              "value": "=todays news on;{{ $json.selectedCategories }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -864,
+        400
+      ],
+      "id": "cb81eaaa-8752-4ebf-af5c-9de185b92fbb",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        400
+      ],
+      "id": "092e9dad-302f-486d-aa90-0eabf9cd4f29",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=change the language of the snnipet described below into amharic and just display the link as it was:{{ $json.htmlSnippet }}{{ $json.formattedUrl }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -576,
+        528
+      ],
+      "id": "7f2c6dcb-fa3b-49d0-974c-9dc6a3aaa139",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -464,
+        608
+      ],
+      "id": "4999c092-9629-4ecc-8746-defc1057c244",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.addisassistant.com/api/v1/chat_generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-KEY",
+              "value": " sk_ffee3fb8-108c-46fc-8a06-8db8b26a035b_3d005604e58bc8bb7ec35bd5313ef5b5f5c117fb020d0e20de39217418c59947"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prompt\": \"translate the snippet into amharic and then give me one out put with this link: {{ $json.htmlSnippet }},{{ $json.formattedUrl }}\",\n  \"target_language\": \"am\",\n  \"generation_config\": {\n    \"temperature\": 0.7,\n    \"maxOutputTokens\": 1200,\n    \"stream\": false\n  }\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -768,
+        608
+      ],
+      "id": "8e6fb96d-30cc-42ab-a5da-e049a3f23c85",
+      "name": "HTTP Request1"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "process input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Telegram Message1": {
+      "main": [
+        []
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "process input": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d6058c2b-9ff6-4949-a7bb-c9a1e2b5eef5",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-11-05T11:04:04.614Z",
+      "updatedAt": "2025-11-05T11:04:04.614Z",
+      "role": "workflow:owner",
+      "workflowId": "Vwneg2gtEOIEQuz1",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

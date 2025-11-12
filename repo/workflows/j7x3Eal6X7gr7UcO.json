@@ -1,0 +1,522 @@
+{
+  "createdAt": "2025-11-06T06:23:55.230Z",
+  "updatedAt": "2025-11-06T07:31:08.189Z",
+  "id": "j7x3Eal6X7gr7UcO",
+  "name": "business leads",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "google maps scraper",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "search query",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "location",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "max number of results",
+              "fieldType": "number",
+              "placeholder": "5"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "80e412cc-19bf-4c06-b201-05f8b89d2d07",
+      "name": "On form submission",
+      "webhookId": "9bc3c55c-6926-4bdf-8c68-4b8e2a6f5225"
+    },
+    {
+      "parameters": {
+        "actorSource": "store",
+        "actorId": {
+          "__rl": true,
+          "value": "https://console.apify.com/actors/nwua9Gu5YrADL7ZDj/input",
+          "mode": "url"
+        },
+        "customBody": "={\n    \"includeWebResults\": false,\n    \"language\": \"en\",\n    \"locationQuery\": \"{{ $json.location }}, ETHIOPIA\",\n    \"maxCrawledPlacesPerSearch\": {{ $json['max number of results'] }},\n    \"maxImages\": 0,\n    \"maximumLeadsEnrichmentRecords\": 0,\n    \"scrapeContacts\": true,\n    \"scrapeDirectories\": false,\n    \"scrapeImageAuthors\": false,\n    \"scrapePlaceDetailPage\": false,\n    \"scrapeReviewsPersonalData\": true,\n    \"scrapeTableReservationProvider\": false,\n    \"searchStringsArray\": [\n        \" {{ $json['search query'] }}\"\n    ],\n    \"skipClosedPlaces\": false\n}"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6b39e472-eaed-4084-8326-92cb4939b38d",
+      "name": "Run an Actor",
+      "credentials": {
+        "apifyApi": {
+          "id": "D3SWj8mcVtmOSAnN",
+          "name": "Apify account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Datasets",
+        "datasetId": "={{ $json.defaultDatasetId }}",
+        "offset": {}
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "9f21a161-510c-4ea1-9b43-907d306f6eba",
+      "name": "Get dataset items",
+      "credentials": {
+        "apifyApi": {
+          "id": "D3SWj8mcVtmOSAnN",
+          "name": "Apify account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5c1b789c-8b72-423e-ae4e-4ac8dd3e446d",
+              "leftValue": "={{ $json.permanentlyClosed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "901d09aa-4960-49f3-92f0-2a8466ae9467",
+              "leftValue": "={{ $json.temporarilyClosed }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "c532398e-7ee0-4495-a0e2-c6066ec7edc6",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "7408b38e-3c47-432d-a5bd-909639359701",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=I want u to do a research on a business and give me a few items i can bring up in an email or phone call.\n\nuse the perplexity tool for research\n\nthe business info is listed below\n\ntitle:{{ $json.title }}\nwebsite:{{ $json.website }}\nphone:{{ $json.phone }}\naddress:{{ $json.address }}\n\nTo save token usage,just give me short sentense with quick info.i dont need the business info repeated unless you know the owners name\n\nExample: frank pepe rated an 8.5 by dave portnoy",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        96
+      ],
+      "id": "c3698709-f9a0-4a21-93a3-dedba22c3db0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        912,
+        304
+      ],
+      "id": "d633047a-a5ff-4724-ae74-0f9c28ba356a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Message a model in perplexity to get info about restaurants in Perplexity",
+        "model": "sonar",
+        "messages": {
+          "message": [
+            {
+              "content": "=business:{{ $json.title }}\nadress:{{ $json.address }}\nwebsite:{{ $json.website }}\nphone:{{ $json.phone }}"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexityTool",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        304
+      ],
+      "id": "ff682bd0-d7c9-4335-b27b-b26f8d67777c",
+      "name": "Message a model in Perplexity",
+      "credentials": {
+        "perplexityApi": {
+          "id": "dz46tmQNtZGcEn8i",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1BZLcnYMx7JuRcD694k8abk1b0uvO_nG2q-R4aJNyeYY",
+          "mode": "list",
+          "cachedResultName": "goog map leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BZLcnYMx7JuRcD694k8abk1b0uvO_nG2q-R4aJNyeYY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BZLcnYMx7JuRcD694k8abk1b0uvO_nG2q-R4aJNyeYY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "bussiness name": "={{ $('Filter').item.json.title }}",
+            "adress": "={{ $('Filter').item.json.address }}",
+            "phone": "={{ $('Filter').item.json.phone }}",
+            "email": "={{ $('Filter').item.json.emails }}",
+            "domain": "={{ $('Filter').item.json.website }}",
+            "fb": "={{ $('Filter').item.json.facebooks }}",
+            "instagram": "={{ $('Filter').item.json.youtubes }}",
+            "quick info": "={{ $json.output }}",
+            "scrape date": "={{ $('Filter').item.json.scrapedAt }}",
+            "number of revie": "={{ $('Filter').item.json.reviewsCount }}",
+            "maps url": "={{ $('Filter').item.json.url }}",
+            "average reviews": "={{ $('Filter').item.json.totalScore }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "bussiness name",
+              "displayName": "bussiness name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "adress",
+              "displayName": "adress",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "domain",
+              "displayName": "domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "average reviews",
+              "displayName": "average reviews",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "number of revie",
+              "displayName": "number of revie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "maps url",
+              "displayName": "maps url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fb",
+              "displayName": "fb",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "instagram",
+              "displayName": "instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "quick info",
+              "displayName": "quick info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "scrape date",
+              "displayName": "scrape date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1392,
+        96
+      ],
+      "id": "03b3a0a3-63da-4988-9eaa-d9ee06074281",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QRDbPRePSjuJZQ2h",
+          "name": "lead scrape"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run an Actor": {
+      "main": [
+        [
+          {
+            "node": "Get dataset items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get dataset items": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model in Perplexity": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "cbe04603-cd2c-491d-8bfd-c8021f3d9787",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-11-06T06:23:55.230Z",
+      "updatedAt": "2025-11-06T06:23:55.230Z",
+      "role": "workflow:owner",
+      "workflowId": "j7x3Eal6X7gr7UcO",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,333 @@
+{
+  "createdAt": "2025-02-28T12:00:11.547Z",
+  "updatedAt": "2025-02-28T15:23:47.027Z",
+  "id": "ZDoeMLPIb5iANwxC",
+  "name": "My workflow 22",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        -60
+      ],
+      "id": "5bb47f1d-fb53-483b-8c77-3251e2176dd2",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appfZYDELkAH5Boxd",
+          "mode": "list",
+          "cachedResultName": "Instagram Prospects",
+          "cachedResultUrl": "https://airtable.com/appfZYDELkAH5Boxd"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltjOWmonAXT9LKt",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://airtable.com/appfZYDELkAH5Boxd/tbltjOWmonAXT9LKt"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "DM Sent? (Yes/No)": "={{ $json['DM Sent?'] }}",
+            "Followers": "={{ $json.Followers }}",
+            "Following": "={{ $json.Following }}",
+            " Engagement Score": "={{ $json['Engagement Score'] }}",
+            "Username": "={{ $json.Username }}",
+            "Full Name": "={{ $json['Full Name'] }}",
+            "Profile URL": "={{ $json['Profile URL'] }}",
+            "Bio": "={{ $json.Bio }}",
+            " Email (if available)": "={{ $json.Email }}",
+            "Response Status (Interested, Not Interested, etc.)": "={{ $json['Response Status'] }}",
+            "Last Contacted Date": "={{ $json['Last Contacted Date'] }}",
+            "Dm": "={{ $json.DM }}",
+            "Voice message": "={{ $json['Voice Message'] }}",
+            "Start date": "={{ $json['Start Date'] }}",
+            "Status": "={{ $json.Status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Profile URL",
+              "displayName": "Profile URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Bio",
+              "displayName": "Bio",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Followers",
+              "displayName": "Followers",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Following",
+              "displayName": "Following",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": " Engagement Score",
+              "displayName": " Engagement Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": " Email (if available)",
+              "displayName": " Email (if available)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "DM Sent? (Yes/No)",
+              "displayName": "DM Sent? (Yes/No)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Response Status (Interested, Not Interested, etc.)",
+              "displayName": "Response Status (Interested, Not Interested, etc.)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Interested",
+                  "value": "Interested"
+                },
+                {
+                  "name": "Not Interested",
+                  "value": "Not Interested"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Last Contacted Date",
+              "displayName": "Last Contacted Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Dm",
+              "displayName": "Dm",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Voice message",
+              "displayName": "Voice message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Start date",
+              "displayName": "Start date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "To do",
+                  "value": "To do"
+                },
+                {
+                  "name": "In progress",
+                  "value": "In progress"
+                },
+                {
+                  "name": "Done",
+                  "value": "Done"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        -60
+      ],
+      "id": "d0af9d24-0fda-4537-97f8-29f9d3976c65",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "CoUxADxD2Jx40nVa",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "When clicking ‘Test workflow’": [
+      {
+        "json": {
+          "Username": "master_chief",
+          "Full Name": "Beamlak Adane",
+          "Profile URL": "https://instagram.com/master_chief",
+          "Bio": "Software Engineer | Automation Enthusiast",
+          "Followers": 1500,
+          "Following": 300,
+          "Engagement Score": 85,
+          "Email": "masterchief@email.com",
+          "DM Sent?": "Yes",
+          "Response Status": "Interested",
+          "Last Contacted Date": "2025-02-28T14:30:00Z",
+          "DM": "Hey, I'd love to connect and discuss potential collaborations!",
+          "Voice Message": "Sent",
+          "Start Date": "2025-02-27T10:00:00Z",
+          "Status": "Active"
+        }
+      }
+    ]
+  },
+  "versionId": "601afda6-f53d-441f-8ffa-e7d56142d8aa",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-28T12:00:11.547Z",
+      "updatedAt": "2025-02-28T12:00:11.547Z",
+      "role": "workflow:owner",
+      "workflowId": "ZDoeMLPIb5iANwxC",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

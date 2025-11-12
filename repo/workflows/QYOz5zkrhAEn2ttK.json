@@ -1,0 +1,958 @@
+{
+  "createdAt": "2025-09-10T13:07:11.613Z",
+  "updatedAt": "2025-10-17T08:07:06.470Z",
+  "id": "QYOz5zkrhAEn2ttK",
+  "name": "My workflow 42",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2224,
+        976
+      ],
+      "id": "15839834-074b-46b3-bf25-69da174d61f7",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -432,
+        976
+      ],
+      "id": "0f3f3791-6546-4198-ab97-ea010c5c45ec",
+      "name": "Wait",
+      "webhookId": "6ffa59ee-2a59-45b5-a92b-c0e5ed8648be",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"heygen_api_key\": \"MjhiOWRjYjIzY2VlNGUzM2JiNWRhMWNjNzQ0YmU4OWItMTczNDE3NTY5OA==\",\n  \"avatar_id\": \"fb864d055f364fcb8573a56bdce05c7e\",\n  \"voice_id\": \"13f6bed419a748879b944c8e8b98fbff\",\n  \"has_background_video\": false,\n  \"background_video_url\": \"https://database.blotato.io/storage/v1/object/public/public_media/4ddd33eb-e811-4ab5-93e1-2cd0b7e8fb3f/videogen2-render-e6b398a2-5859-4a77-88ef-2345bcefdc98.mp4\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1168,
+        976
+      ],
+      "id": "8d71f1c8-ffdf-4ea6-b98b-d9d66f547394",
+      "name": "Setup Heygen"
+    },
+    {
+      "parameters": {
+        "url": "https://api.heygen.com/v1/video_status.get",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "video_id",
+              "value": "={{ $('Merge').item.json.data.video_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "={{ $('Setup Heygen').item.json.heygen_api_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -272,
+        976
+      ],
+      "id": "5370a24c-d194-471a-b05f-9c2671fb128d",
+      "name": "Get Avatar Video"
+    },
+    {
+      "parameters": {
+        "content": "# Research Industry News using Perplexity\n\n- Sign up for Perplexity, setup billing, and create API key: https://www.perplexity.ai/account/api/keys\n- Update your niche/industry in the Perplexity prompt",
+        "height": 868,
+        "width": 940,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2288,
+        560
+      ],
+      "id": "734868a8-566d-442f-ae3b-bf07b582e4cb",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Create AI Avatar Video Using HeyGen\n\n- This requires HeyGen API plan (paid); the free plan is insufficient: https://www.heygen.com/api-pricing\n- If you have a long script, you may need to increase the WAIT time.\n- You can use a custom Elevenlabs voice by integrating Elevenlabs within HeyGen web app.\n- Tutorial on how to create a high-quality avatar and voice clone: https://youtu.be/_jogmHuuKXk\n- If you want a background video playing behind your avatar: (1) ensure you have an avatar with background removed which requires a higher tier plan; (2) open SETUP HEYGEN node and set parameter 'has_background_video' to true; (3) open SETUP HEYGEN node and replace video URL in parameter 'background_video_url'",
+        "height": 868,
+        "width": 1120,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1232,
+        560
+      ],
+      "id": "6b72ba58-e0c2-4d38-8cd5-3d862985e3b4",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Step 2\n\nFill out \"Setup Heygen\"",
+        "height": 116,
+        "width": 182,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        1136
+      ],
+      "id": "58af9e5e-cbad-484a-922b-e75f684df329",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "={{ $json.heygen_api_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"{{ $json.avatar_id }}\",\n        \"avatar_style\": \"normal\",\n        \"scale\": 1.0,\n        \"offset\": {\n          \"x\": 0.15,\n          \"y\": 0.15\n        },\n        \"matting\": true\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": {{ $('AI Writer').item.json.choices[0].message.content.title.toJsonString() }},\n        \"voice_id\": \"{{ $json.voice_id }}\",\n        \"speed\": 1.1,\n        \"pitch\": 50,\n        \"emotion\": \"Excited\"\n      },\n      \"background\": {\n        \"type\": \"video\",\n        \"url\": \"{{ $json.background_video_url }}\",\n        \"play_style\": \"loop\",\n        \"fit\": \"cover\"\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 720,\n    \"height\": 1280\n  },\n  \"aspect_ratio\": \"9:16\",\n  \"caption\": false,\n  \"title\": \"{{ $('AI Writer').item.json.choices[0].message.content.title }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -800,
+        864
+      ],
+      "id": "afb2ae4f-14ba-49bc-9fdd-93ca42fb33aa",
+      "name": "Create Avatar Video WITH Background Video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.heygen.com/v2/video/generate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "={{ $json.heygen_api_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"video_inputs\": [\n    {\n      \"character\": {\n        \"type\": \"avatar\",\n        \"avatar_id\": \"{{ $json.avatar_id }}\",\n        \"avatar_style\": \"normal\",\n        \"scale\": 1.0\n      },\n      \"voice\": {\n        \"type\": \"text\",\n        \"input_text\": {{ $('AI Writer').item.json.choices[0].message.content.script.toJsonString() }},\n        \"voice_id\": \"{{ $json.voice_id }}\",\n        \"speed\": 1.1,\n        \"pitch\": 50,\n        \"emotion\": \"Excited\"\n      }\n    }\n  ],\n  \"dimension\": {\n    \"width\": 720,\n    \"height\": 1280\n  },\n  \"aspect_ratio\": \"9:16\",\n  \"caption\": false,\n  \"title\": \"{{ $('AI Writer').item.json.choices[0].message.content.title }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -800,
+        1088
+      ],
+      "id": "4baab493-48c0-43f6-9a54-d7d7c44f3dd1",
+      "name": "Create Avatar Video WITHOUT Background Video"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "73001c6b-fae2-48cd-b0a6-aa453b837902",
+              "leftValue": "={{ $json.has_background_video }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1008,
+        976
+      ],
+      "id": "c21c1bfb-7bb6-4243-b44d-7f91d0cfb103",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -592,
+        976
+      ],
+      "id": "8c923024-c56d-4446-982c-286ad8390614",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "content": "# FULL TUTORIAL\n\n## Tutorial\n\nhttps://help.blotato.com/api/templates/3-hackernews-to-ai-clone-videos\n\n## Description\n\nThis fully automated AI Avatar Viral News system researches the latest trending news in your niche or industry, then generates talking head AI clone videos, WITHOUT having to film or edit yourself. It combines ChatGPT, Perplexity, HeyGen, and Blotato to research, create, and auto-post talking head AI avatar videos to every social media platform, every single day.\n\n## Overview\n\n**1. Trigger: Schedule**\n- Configured to run once daily at 10am\n\n**2. AI Researcher**\n- Call Perplexity to research the top 10 latest news in your industry\n- Select news story most likely to go viral\n- Compile detailed factual report on selected news story\n\n**3. AI Writer**\n- AI writes monologue script, video caption, and short title\n\n**4. Create Avatar Video**\n- Call Heygen API (requires paid API plan), specifying your avatar ID and voice ID\n- Create avatar video, optionally passing in an image/video background if you have a green screen avatar\n\n**5. Get Video**\n- Wait awhile, then fetch completed avatar video\n- Upload video to Blotato\n\n**6. Publish to Social Media via Blotato**\n- Connect your Blotato account\n- Choose your social accounts\n- Either post immediately or schedule for later",
+        "height": 1120,
+        "width": 576,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2912,
+        48
+      ],
+      "typeVersion": 1,
+      "id": "14a1eacf-09e6-4e94-8ce5-abc5d1fc2fce",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# Step 1\n\nEdit prompt for your niche/industry",
+        "height": 132,
+        "width": 182,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2080,
+        800
+      ],
+      "id": "86cddab2-79dc-43a6-961d-fd9735710d1c",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# TASK\n1. Analyze the following viral news story:\n<news>\n{{ $('AI Research - Report').item.json.message }}\n</news>\n\n2. Write a conversational monologue script for an AI avatar video, following these guidelines:\n   - The script should be approximately 30 seconds when spoken aloud.\n   - Include lots of factual details and statistics from the article.\n   - Use 6th grade reading level.\n   - Balanced viewpoint.\n   - First sentence should create an irresistible curiosity gap to hook B2B AI founders and startup executives.\n   - Speak as a GTM expert who helps B2B AI startups scale.\n   - Replace the last sentence with this CTA: \"Hit follow for more B2B AI startup insights!\"\n   - ONLY output the exact video script. Do not output anything else. NEVER include intermediate thoughts, notes, or formatting.\n\n3. Write an SEO-optimized caption that will accompany the video, following a similar structure as the EXAMPLE below, max 5 hashtags:\n\n<example>\nMany B2B AI founders have recently asked me about go-to-market challenges in the current funding environment, which is all about positioning your AI solution so buyers instantly understand the value and investors see the traction potential. Consider that most technical founders struggle with translating complex AI capabilities into clear business outcomes that resonate with decision-makers.\n\n- How are successful AI startups positioning themselves in 2025?\n- What GTM strategies are working for B2B AI companies right now?\n- How can AI founders build trust and credibility with enterprise buyers?\n\n#ai #startups #gtm #b2bmarketing #artificialintelligence\n</example>\n\n4. Write 1 viral sentence, max 8 words, summarizing the content, use 6th grade language, balanced neutral perspective, no emojis, no punctuation except `?` or `!`.\n\n# OUTPUT\n\nYou will output structured JSON in the following format, where `script` is the output of step 2, `caption` is the output of step 3, and `title` is the output of step 4:\n```json\n{\n  \"script\": \"Monologue script to be spoken by AI avatar\",\n  \"caption\": \"Long SEO-optimized video caption\",\n  \"title\": \"Short video title\"\n}",
+              "role": "system"
+            }
+          ]
+        },
+        "simplify": false,
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1616,
+        976
+      ],
+      "id": "e7bc6253-f82f-42c3-8ee6-602f1945f1c9",
+      "name": "AI Writer",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "sonar-pro",
+        "messages": {
+          "message": [
+            {
+              "content": "=# INSTRUCTIONS\n\nComplete the following tasks, in order:\n\n1. Out of the 10 news stories listed below, select the ONE top news story that is most likely to go viral on social media. It should have broad appeal and contain something unique, controversial, or vitally important information that B2B AI founders, startup executives, and marketing professionals should know.\n\n<news>\n{{ $('AI Research - Top 10').item.json.message }}\n</news>\n\n2. Research more information about the top news story you selected in step 1.\n\n3. Your final output should be a detailed report of the top story you've selected. It should be dense with factual data, statistics, sources, and key information based on your research. Include reasons why this story would perform well on social media among B2B AI startup founders and GTM professionals. Include why a \"typical B2B AI startup founder or CMO\" should care about this news and how it impacts their go-to-market strategy, funding prospects, or business growth."
+            }
+          ]
+        },
+        "simplify": true,
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexity",
+      "typeVersion": 1,
+      "position": [
+        -1824,
+        976
+      ],
+      "id": "a0a164b6-960d-4e46-84fb-0454918f7ab5",
+      "name": "AI Research - Report",
+      "credentials": {
+        "perplexityApi": {
+          "id": "dz46tmQNtZGcEn8i",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "sonar-pro",
+        "messages": {
+          "message": [
+            {
+              "content": "Research the top 10 trending news items in my industry from the past 24 hours.\n\n- Industry: B2B AI startups, go-to-market strategy, artificial intelligence in business, startup funding, and marketing technology"
+            }
+          ]
+        },
+        "simplify": true,
+        "options": {
+          "searchRecency": "day"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.perplexity",
+      "typeVersion": 1,
+      "position": [
+        -2032,
+        976
+      ],
+      "id": "edfe1355-22e6-4f6f-8aea-d7e4f1bb0948",
+      "name": "AI Research - Top 10",
+      "credentials": {
+        "perplexityApi": {
+          "id": "dz46tmQNtZGcEn8i",
+          "name": "Perplexity account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app9k6BbU4Bh9YFwU",
+          "mode": "list",
+          "cachedResultName": "Mark's Avatar Content",
+          "cachedResultUrl": "https://airtable.com/app9k6BbU4Bh9YFwU"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvkpXIt7GPfSZms",
+          "mode": "list",
+          "cachedResultName": "contents",
+          "cachedResultUrl": "https://airtable.com/app9k6BbU4Bh9YFwU/tblvkpXIt7GPfSZms"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "content": "={{ $json.data.video_url }}",
+            "caption": "={{ $('AI Writer').item.json.choices[0].message.content.caption }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "caption",
+              "displayName": "caption",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Draft",
+                  "value": "Draft"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -64,
+        976
+      ],
+      "id": "84a263a6-6ff7-4b0d-83fb-606b71567fc9",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "T3d6QtsqjVwvQFLJ",
+          "name": "Mark-Airtable"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Post Everywhere Using Blotato\n\n## IMPORTANT\nDo not post the same video over and over again, otherwise it will be flagged as spam. Make sure to disclose AI generated content if you're using avatars.\n\n👉  **Blotato API Docs**: https://help.blotato.com/api\n✅  **Troubleshoot Errors**: https://my.blotato.com/api-dashboard\n📷  **Media Requirements**: https://help.blotato.com/api/media\n🛠️  **Contact help**: log into blotato > click support button in bottom right corner",
+        "height": 1664,
+        "width": 720,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        992,
+        64
+      ],
+      "id": "ff999eb5-5322-41a9-a7bb-7fcc512e5564",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# Step 3\n1. Open each node\n2. Select your social account\n3. 👉 **You don't need to do anything else!**",
+        "height": 144,
+        "width": 304,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        336
+      ],
+      "id": "b2702fcd-6a34-4631-bf9b-1a585aacdc89",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "accountId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        1488
+      ],
+      "id": "d14471c4-e4c4-4261-adea-a46125ee8a58",
+      "name": "Pinterest [BLOTATO]",
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "accountId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        1248
+      ],
+      "id": "d7d20a6a-67e8-4244-8187-f94dbc1a9968",
+      "name": "Bluesky [BLOTATO]",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "accountId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        1248
+      ],
+      "id": "15ce6534-90d0-47c0-96bf-6b12522b14af",
+      "name": "Threads [BLOTATO]",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "accountId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        1008
+      ],
+      "id": "aaa69d0c-cc7e-40aa-bd72-51fa54000a04",
+      "name": "Youtube [BLOTATO]",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "accountId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        1008
+      ],
+      "id": "12e0c381-ad8b-4459-8626-3ce553e32147",
+      "name": "Twitter [BLOTATO]",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "accountId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        752
+      ],
+      "id": "fec8b286-28d4-4901-9e05-7cc7438ff754",
+      "name": "Instagram [BLOTATO]",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "accountId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        752
+      ],
+      "id": "a09c3365-6ab8-4580-bfcf-c5ec6230e522",
+      "name": "Facebook [BLOTATO]",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "accountId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        528
+      ],
+      "id": "3dc6c3a9-b372-4ace-b9f9-33143d4b7ba7",
+      "name": "Linkedin [BLOTATO]",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "accountId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        528
+      ],
+      "id": "2093edb8-2666-4607-a62a-85ac2869ccb9",
+      "name": "Tiktok [BLOTATO]",
+      "credentials": {
+        "blotatoApi": {
+          "id": "Zwd0TMnrWBJODpKK",
+          "name": "Blotato account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "accountId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@blotato/n8n-nodes-blotato.blotato",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        1008
+      ],
+      "id": "ba695f67-d56e-4427-a4ee-c101cd53c092",
+      "name": "Upload media",
+      "credentials": {
+        "blotatoApi": {
+          "id": "Zwd0TMnrWBJODpKK",
+          "name": "Blotato account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Research - Top 10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup Heygen": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Avatar Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Avatar Video WITH Background Video": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Create Avatar Video WITH Background Video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Avatar Video WITHOUT Background Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Avatar Video WITHOUT Background Video": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Writer": {
+      "main": [
+        [
+          {
+            "node": "Setup Heygen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Research - Report": {
+      "main": [
+        [
+          {
+            "node": "AI Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Research - Top 10": {
+      "main": [
+        [
+          {
+            "node": "AI Research - Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Avatar Video": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Threads [BLOTATO]": {
+      "main": [
+        [
+          {
+            "node": "Bluesky [BLOTATO]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter [BLOTATO]": {
+      "main": [
+        [
+          {
+            "node": "Youtube [BLOTATO]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook [BLOTATO]": {
+      "main": [
+        [
+          {
+            "node": "Instagram [BLOTATO]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tiktok [BLOTATO]": {
+      "main": [
+        [
+          {
+            "node": "Linkedin [BLOTATO]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload media": {
+      "main": [
+        [
+          {
+            "node": "Pinterest [BLOTATO]",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Threads [BLOTATO]",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter [BLOTATO]",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Facebook [BLOTATO]",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Tiktok [BLOTATO]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "z5dK4hrIczUamG3b"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2025-09-10T17:40:39.350+02:00",
+          "Readable date": "September 10th 2025, 5:40:39 pm",
+          "Readable time": "5:40:39 pm",
+          "Day of week": "Wednesday",
+          "Year": "2025",
+          "Month": "September",
+          "Day of month": "10",
+          "Hour": "17",
+          "Minute": "40",
+          "Second": "39",
+          "Timezone": "Europe/Berlin (UTC+02:00)"
+        }
+      }
+    ]
+  },
+  "versionId": "b9111582-fedf-4ee0-bc64-717ff25d7efe",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-09-10T13:07:11.613Z",
+      "updatedAt": "2025-09-10T13:07:11.613Z",
+      "role": "workflow:owner",
+      "workflowId": "QYOz5zkrhAEn2ttK",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,230 @@
+{
+  "createdAt": "2025-05-23T06:53:07.503Z",
+  "updatedAt": "2025-11-05T12:52:51.853Z",
+  "id": "ej3Orj24g3yHOkqY",
+  "name": "Mistral OCR",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "OCR",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "image",
+              "fieldType": "file",
+              "acceptFileTypes": ".png",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        -16
+      ],
+      "id": "45af0357-d6a8-4e5b-a4ce-b20d35af6628",
+      "name": "On form submission",
+      "webhookId": "704e77e2-590f-4962-bfc7-bf84b62fc1af"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "purpose",
+              "value": "ocr"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "Pdf"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "ee7ab061-e4f4-4b1f-ba75-9af0455eb253",
+      "name": "Upload",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "n9agGN0bAD9jx7V1",
+          "name": "Mistral OCR"
+        },
+        "mistralCloudApi": {
+          "id": "JhAasE4Sz9S7u4eD",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.mistral.ai/v1/files/{{ $json.id }}/url",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "expiry",
+              "value": "24"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -16
+      ],
+      "id": "dda24021-122d-43ff-aa7d-caa7db3033d2",
+      "name": "Get URL",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "n9agGN0bAD9jx7V1",
+          "name": "Mistral OCR"
+        },
+        "mistralCloudApi": {
+          "id": "JhAasE4Sz9S7u4eD",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mistral.ai/v1/ocr",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "mistralCloudApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"mistral-ocr-latest\",\n  \"document\": {\n    \"type\": \"document_url\",\n    \"document_url\": \"{{ $json.url }}\"\n  },\n  \"include_image_base64\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        -16
+      ],
+      "id": "ef9fe97f-15d7-46d0-aafa-22cd6484e467",
+      "name": "OCR with pdf",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "n9agGN0bAD9jx7V1",
+          "name": "Mistral OCR"
+        },
+        "mistralCloudApi": {
+          "id": "JhAasE4Sz9S7u4eD",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "pages[0].markdown",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        -16
+      ],
+      "id": "a92802ee-ece4-4b90-a3f3-1865daab8a7f",
+      "name": "Convert to File"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload": {
+      "main": [
+        [
+          {
+            "node": "Get URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get URL": {
+      "main": [
+        [
+          {
+            "node": "OCR with pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR with pdf": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "14a48ba3-1f68-48ea-91c1-1dc63d8052d2",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-05-23T06:53:07.503Z",
+      "updatedAt": "2025-05-23T06:53:07.503Z",
+      "role": "workflow:owner",
+      "workflowId": "ej3Orj24g3yHOkqY",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

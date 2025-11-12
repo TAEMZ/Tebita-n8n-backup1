@@ -1,0 +1,138 @@
+{
+  "createdAt": "2025-07-08T07:17:52.900Z",
+  "updatedAt": "2025-07-08T13:25:32.919Z",
+  "id": "nrDbsp7wfngwD0TJ",
+  "name": "ROI Email",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4852247b-12ce-46bc-8a06-299d982ea5bb",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        100,
+        140
+      ],
+      "id": "589e9f0f-7648-4324-a000-8d3fa6158fa4",
+      "name": "Webhook",
+      "webhookId": "4852247b-12ce-46bc-8a06-299d982ea5bb"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert email copywriter writing on behalf of a tech platform that licenses educational or technical content to organizations.\n\nYou are given the following ROI calculator output and should generate a personalized email that explains the value of licensing content via our platform.\n\nThe email should be concise, professional, and tailored to the recipient. It should explain what each ROI figure means in simple, non-technical terms and encourage the reader to take the next step (such as booking a call or exploring the platform).\n\nYou also have access to the user’s email address: {{ $json.body.email }}  \nUse the portion before the \"@\" symbol as the recipient's first name if no other name is available.\n\nHere is the data from the ROI calculator:\n\nLicensing Revenue (Annual Estimate): {{ $json.body.results[\"Licensing Revenue (Annual Estimate)\"] }}  \nSupport Savings (Annual): {{ $json.body.results[\"Support Savings (Annual)\"] }}  \nEstimated ROI: {{ $json.body.results[\"Estimated ROI\"] }}  \nTotal Value Range: {{ $json.body.results[\"Total Value Range\"] }}\n\nThe email should follow this structure:\n- **Subject line**: \"Your ROI Calculation with UTHEREAL\"\n- **Greeting** using their name if possible\n- **ROI Summary explanation**: Break down each result simply\n- **Call to Action**: Invite them to take the next step (e.g. “Book a discovery call” or “See how this applies to your content”)\n- **Friendly sign-off** with a helpful tone\n\nThe tone should be friendly, confident, and value-driven — helpful but not salesy.\n\nGenerate the full email including the subject line.\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        360,
+        140
+      ],
+      "id": "59a06d28-d8d3-4d7c-98ab-23042bad8c4c",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "zX2livQODEYFHZvm",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.email }}",
+        "subject": "={{ $json.message.content.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.message.content.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        140
+      ],
+      "id": "bf93a0ca-dc92-4585-92ce-3e3408405328",
+      "name": "Gmail",
+      "webhookId": "fca62677-2f59-454d-99a2-74d7a3e61d58",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "i7uXNlPSEakokJkR",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "229a66d4-99c5-41d2-aea9-4503cc2bcb4e",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-07-08T07:17:52.900Z",
+      "updatedAt": "2025-07-08T07:17:52.900Z",
+      "role": "workflow:owner",
+      "workflowId": "nrDbsp7wfngwD0TJ",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

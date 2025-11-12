@@ -1,0 +1,1505 @@
+{
+  "createdAt": "2025-03-03T08:15:12.617Z",
+  "updatedAt": "2025-04-08T06:52:29.076Z",
+  "id": "1twYuXkSbsuNc6Vv",
+  "name": "Facebook Ad Analysis Last",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblupA5NH2eKpej5w",
+          "mode": "list",
+          "cachedResultName": "Ad per Ad Account",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tblupA5NH2eKpej5w"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ad_id": "={{ $json.ad_id }}",
+            "Angle Type": "={{ $json.angle_type }}",
+            "Angle": "={{ $json.angle }}",
+            "Explanation": "={{ $json.explanation }}"
+          },
+          "matchingColumns": [
+            "ad_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_name",
+              "displayName": "ad_name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "account_id",
+              "displayName": "account_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "creative_id",
+              "displayName": "creative_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "ad_text",
+              "displayName": "ad_text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "ad_title",
+              "displayName": "ad_title",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "image",
+              "displayName": "image",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "video",
+              "displayName": "video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "ad per account",
+              "displayName": "ad per account",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "post_link",
+              "displayName": "post_link",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Angle",
+              "displayName": "Angle",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Angle Type",
+              "displayName": "Angle Type",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Explanation",
+              "displayName": "Explanation",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_id (from comment)",
+              "displayName": "ad_id (from comment)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "comment 2",
+              "displayName": "comment 2",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        380,
+        580
+      ],
+      "id": "ea3c0c35-9f98-4d20-a705-31f189de5538",
+      "name": "Airtable1",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zKI4T9icngPEPFoi",
+          "name": "Airtable Personal Access Token account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblupA5NH2eKpej5w",
+          "mode": "list",
+          "cachedResultName": "Ad per Ad Account",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tblupA5NH2eKpej5w"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -3400,
+        560
+      ],
+      "id": "6f22a6aa-c06e-46b6-9b3a-3f72dbd6fab8",
+      "name": "Airtable5",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zKI4T9icngPEPFoi",
+          "name": "Airtable Personal Access Token account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=### Precise Comment Theme Extraction for Decision-Making  \n\nAnalyze the following customer comment:  \n**\"{{ $json.message }}\"**  \n\nExtract a **clear and specific theme** that directly reflects the intent of the comment, ensuring it provides actionable insights for advertising decisions.  \n\n---\n\n### Guidelines for Theme Extraction  \n\n- The theme must be **detailed yet concise**—**one sentence or two at most**—to capture the essence of the comment.  \n- Avoid **generalized labels** like \"Positive Feedback\" or \"Negative Feedback.\" Instead, **state the exact concern, praise, or request** in a way that helps optimize ads.  \n- Ensure **consistent labeling** so that similar comments receive the same theme.  \n\n---\n\n### Handling Edge Cases  \n\n- If the comment **only mentions another user** (e.g., `\"@username\"` or `\"John Doe\"`), return `\"\"`.  \n- If the comment is a **question**, classify it based on its **core intent** (e.g., `\"Asking About Product Durability\"`, `\"Inquiry About Shipping Time\"`).  \n- If the comment expresses **multiple ideas**, prioritize the **most decision-relevant theme** based on its impact on ads.  \n\n---\n\n### Expected JSON Output  \n```json\n{\n  \"comment_theme\": \"...\"\n}",
+              "role": "system"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1920,
+        1720
+      ],
+      "id": "398c2156-9ad8-433b-84bd-133ef391ca56",
+      "name": "Theme Analyzer",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.image[0].url }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isImage"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7a4bf244-7afa-497e-8e4a-82b06de3c0cd",
+                    "leftValue": "={{ $json.video[0].url }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "isVideo"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2520,
+        580
+      ],
+      "id": "64fa6901-7c2a-4cb4-947f-efd137b01a9c",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.image[0].url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2180,
+        460
+      ],
+      "id": "8f9b8ddd-da4e-49ab-bc26-1be3cdba0614",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "Input:\n- Image: {Image Content}\n\nTask:\n1. Analyze the given image to determine the dominant message it conveys. Focus on visual elements such as product features, context, and any relevant cues in the image that communicate the angle of the ad.\n\n2. Provide a cohesive explanation for the **angle** the image conveys.\n\nOutput Format:\n{\n  \"ad_analysis\": \"The overall communicated message by the image.\"\n}",
+        "inputType": "base64",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1900,
+        460
+      ],
+      "id": "1b990e5b-d0d4-4ea6-b75a-5b15efc981ce",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -1360,
+        560
+      ],
+      "id": "b9dfb2dd-7d09-48d1-b1a1-7a8d27afc5fb",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1380,
+        1200
+      ],
+      "id": "a77fac83-5157-4aeb-88cf-d4a5ec78e6e8",
+      "name": "OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -1040,
+        600
+      ],
+      "id": "56c84520-39a8-4642-ae30-d3ce847a5b51",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://143.198.47.9:8000/extract-audio/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "video_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1620,
+        1200
+      ],
+      "id": "5170d507-5249-4a19-95e5-796e152b3e1b",
+      "name": "HTTP Request",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.video[0].url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2300,
+        1180
+      ],
+      "id": "1203bb82-d51b-40c0-812f-83641a79b522",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl3nJr60faWbnLIc",
+          "mode": "list",
+          "cachedResultName": "comment",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tbl3nJr60faWbnLIc"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -3420,
+        1000
+      ],
+      "id": "718824f6-0351-4b3f-8997-5114d3d13762",
+      "name": "Airtable",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zKI4T9icngPEPFoi",
+          "name": "Airtable Personal Access Token account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl3nJr60faWbnLIc",
+          "mode": "list",
+          "cachedResultName": "comment",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tbl3nJr60faWbnLIc"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comment_id": "={{ $('If1').item.json.comment_id }}",
+            "theme": "={{ $json.message.content.comment_theme }}"
+          },
+          "matchingColumns": [
+            "comment_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "comment_id",
+              "displayName": "comment_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "created_time",
+              "displayName": "created_time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Brand",
+              "displayName": "Brand",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Positive",
+                  "value": "Positive"
+                },
+                {
+                  "name": "Negative",
+                  "value": "Negative"
+                },
+                {
+                  "name": "Neutral",
+                  "value": "Neutral"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "theme",
+              "displayName": "theme",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -1220,
+        1720
+      ],
+      "id": "9bda8025-17b8-4c7f-b434-f869c4ae4091",
+      "name": "Airtable2",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zKI4T9icngPEPFoi",
+          "name": "Airtable Personal Access Token account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -1720,
+        620
+      ],
+      "id": "33fb131c-e115-45dc-99f6-53cb7cab23f3",
+      "name": "Merge",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -2100,
+        1180
+      ],
+      "id": "437b66eb-7b44-4b91-b5ab-ca5b249322dc",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1220,
+        1200
+      ],
+      "id": "83437e27-0e8c-452a-a0ec-711a321c7bc3",
+      "name": "Wait",
+      "webhookId": "873074b2-6cc3-4dcb-a201-451de8f0145c"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "109023bb-c6d7-4bf8-ae4f-9d0c8b4b83ea",
+              "name": "ad_id",
+              "value": "={{ $('Merge2').item.json.ad_id }}",
+              "type": "string"
+            },
+            {
+              "id": "3c0b3584-0042-4460-9f48-0e93620e9c4e",
+              "name": "angle",
+              "value": "={{ $json.output.angle }}",
+              "type": "string"
+            },
+            {
+              "id": "c2604707-d2e2-409e-af0f-59b4d86d2205",
+              "name": "angle_type",
+              "value": "={{ $json.output.angle_type }}",
+              "type": "string"
+            },
+            {
+              "id": "33612f2f-b145-428b-9d94-7fcd138e0baf",
+              "name": "explanation",
+              "value": "={{ $json.output.explanation }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -120,
+        600
+      ],
+      "id": "aa8c2a16-03d4-472a-abdc-f08a3bd59b64",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "091612b1-fe1c-4722-b3f4-cc793352984b",
+              "leftValue": "={{ $json[\"Angle Type\"] }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "85e8d4c5-23da-46a0-b77d-dec0856a72d6",
+              "leftValue": "={{ $json.Explanation }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2820,
+        560
+      ],
+      "id": "3c75f524-feac-4ba2-88ba-4f0b6afd5bf0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6849cdd4-5418-4edc-8339-c437406b3268",
+              "leftValue": "={{ $json.sentiment }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "d578607b-ff7f-43f5-a38a-e451483d8444",
+              "leftValue": "={{ $json.theme }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2440,
+        1700
+      ],
+      "id": "6d849d57-1e46-4805-ae45-95a921b4f287",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "content": "## Comment Analysis",
+        "height": 260,
+        "width": 1600
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2700,
+        1640
+      ],
+      "id": "a1421670-5337-46e4-bfac-b2a945ab7ea8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "\n\n\n\n\n\n\n\n\n\n\n\n## Video Transcription\n",
+        "height": 360,
+        "width": 1640,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2700,
+        1160
+      ],
+      "id": "44dbf91a-6a3e-4264-8526-f479d2dfc3f1",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3900,
+        1000
+      ],
+      "id": "7ff46a94-6c1a-47f4-8a2a-b1e6f293d70a",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltfn0VXVebF3yOL",
+          "mode": "list",
+          "cachedResultName": "prompts",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tbltfn0VXVebF3yOL"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.1,
+      "position": [
+        -540,
+        920
+      ],
+      "id": "6010d619-7638-448b-8cc6-8b1d2b7b2f80",
+      "name": "Airtable4",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "zKI4T9icngPEPFoi",
+          "name": "Airtable Personal Access Token account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Inputs:\n\t•Image Analysis Result: {{ $json.content }}\n\t•Ad Text:{{ $json.ad_text }}\n\t•\tAd Video Transcript (if available):{{ $json.text }}\n\nInstructions:\n\t1.\tFetch Airtable Data: Retrieve the relevant classification prompt and guidelines from Airtable.\n\t2.\tAnalyze the Ad: Use the provided image analysis, ad text, and video transcript (if available) to determine the dominant angle.\n\t3.\tClassify the Ad: Based on the Airtable classification data, assign the correct angle type (e.g., Benefit-Based, Feature-Based).\n\t4.\tProvide Justification: Explain the reasoning behind the classification, integrating insights from all provided inputs.\n\t5.\tEnsure Accuracy: Do not hallucinate or generate unsupported conclusions.\n6. ** You have to return only JSON format **\nOutput Format json only inside {}, don't give an output like ``json{ }, instead follow the output format mentioned below strictly:\n{\n  \"angle\": \"Identified dominant angle of the ad\",\n  \"angle_type\": \"Classification type based on Airtable data. exact name of the angle from airtable\",\n  \"explanation\": \"Detailed justification integrating image analysis, text, video (if available), and Airtable classification data.\"\n}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "### Advertisement Angle Analysis  \nAnalyze the advertisement by integrating insights from its **image, text, and video transcript (if available)** to determine its **dominant angle** and **angle type**. The angle should be **descriptive, specific, and insightful**, ensuring it clearly conveys the ad’s focus.  \nAll ads have at least ad_text, image analysis result(ad_analysis), or video transcribed text. so there won't be any mismatch in number of input and output.\n---\n\n### Process  \n\n1. **Retrieve classification guidelines from Airtable** to determine the correct angle type.  \n2. **Analyze all ad elements** (image, text, video) to identify the most prominent angle.  \n3. **Provide a detailed and decision-driven explanation** based on the retrieved Airtable(I have given you as a tool) classification and ad content.  \n\n---\n\n### Output Format  \njson\n{\n  \"angle\": \"A well-defined, descriptive, and insightful explanation of the ad’s dominant angle. Avoid short or vague descriptions—ensure it provides clear decision-making insights.\",\n  \"angle_type\": \"Exact classification type from Airtable data.\",\n  \"explanation\": \"Comprehensive reasoning incorporating insights from the image, text, video, and Airtable classification guidelines.\"\n}\n\nOutput Format json only inside {}, don't give an output text like  \"``json{\"output\":\"...\" }\", instead follow the output format mentioned strictly"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -660,
+        600
+      ],
+      "id": "3f4b6086-f52b-4556-a51a-05b7e68d493a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -680,
+        940
+      ],
+      "id": "1157b5f7-e559-4ec2-9320-7b1e382cabd0",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Image Analysis",
+        "height": 500,
+        "width": 1640,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2700,
+        460
+      ],
+      "id": "53f0ef1c-769e-4bc8-b071-7f58a13de8f6",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"angle\": \"Identified dominant angle of the ad\",\n  \"angle_type\": \"Classification type based on Airtable data and only mention the name here\",\n  \"explanation\": \"Detailed reasoning incorporating insights from image, text, video classification guidelines.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -440,
+        960
+      ],
+      "id": "a2e49730-c2fa-43dd-9c49-cdee7671b155",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "path": "d1b479f9-fac1-47cf-bdbc-c9a847781e64",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -3900,
+        560
+      ],
+      "id": "baff094f-99cc-4801-b1ee-a8f364b44773",
+      "name": "Webhook",
+      "webhookId": "d1b479f9-fac1-47cf-bdbc-c9a847781e64",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -3900,
+        780
+      ],
+      "id": "8e91bd2e-3aaf-472f-b4e5-61a4f592f5d6",
+      "name": "When Executed by Another Workflow",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "maxItems": 100
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -3180,
+        560
+      ],
+      "id": "5fc0d73e-873a-4b0e-b3f7-1b576c88a0bd",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "maxItems": 100
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -3200,
+        1000
+      ],
+      "id": "22f80e08-3eb5-4136-ad54-52014af954d9",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "batchSize": 100,
+        "options": {}
+      },
+      "id": "5d694f00-78f5-4db5-bdb4-d2c57dd6251e",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        -3000,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 50,
+        "options": {}
+      },
+      "id": "ecb6ac08-9fef-4daf-82c3-a98d4b40c9f4",
+      "name": "Split In Batches1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        600
+      ]
+    }
+  ],
+  "connections": {
+    "Airtable5": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Theme Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Airtable2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "OpenAI2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Airtable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Theme Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Airtable5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable4": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Airtable5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Airtable5",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "37e8d5c7-f1d6-4647-b9c2-1f6ea39a3c73",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-03-03T21:40:26.192Z",
+      "updatedAt": "2025-03-03T21:40:26.192Z",
+      "id": "D5XeVe1qBJcqK9gN",
+      "name": "Nico"
+    }
+  ],
+  "shared": [
+    {
+      "createdAt": "2025-03-03T08:15:12.617Z",
+      "updatedAt": "2025-03-03T08:15:12.617Z",
+      "role": "workflow:owner",
+      "workflowId": "1twYuXkSbsuNc6Vv",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,743 @@
+{
+  "createdAt": "2025-03-26T12:04:31.649Z",
+  "updatedAt": "2025-07-01T12:50:27.246Z",
+  "id": "hYAozy7bVEedMOnp",
+  "name": "Upwork chrome Extension",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "743ab9d9-c96b-42f4-815b-66e1c7ac5dad",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        -140
+      ],
+      "id": "8c81a069-6d1f-4464-ae16-7ba748bd84cd",
+      "name": "Webhook",
+      "webhookId": "743ab9d9-c96b-42f4-815b-66e1c7ac5dad"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.profileHtml }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a helpful assistant\nand your task is to go throug the html provided and make an organized profile of the person if there are image_url certification links project links discription everything\n\nand also include this: {{ $json.body.userId }}\n\nevery link that is relevant to the user and also include if there are any project links project images everything"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        360,
+        0
+      ],
+      "id": "49f5aac2-c93c-42bd-9b3d-40b6f1b65a31",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        360,
+        200
+      ],
+      "id": "c472efe5-8c24-444e-a67c-c2b2fb42739b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"profile_overview\": {\n    \"name\": \"Beamlak A.\",\n    \"role\": \"Software Engineer (Web Designer)\",\n    \"location\": \"Addis Ababa, Ethiopia\",\n    \"status\": \"Online\",\n    \"hourly_rate\": \"$13.00/hr\",\n    \"availability\": \"Available now\",\n    \"profile_image\": \"https://www.upwork.com/profile-portraits/c14Q35qO8u28jBMrur9phMEiD5im78WteYB0bTj68cY6cQNXoMuB3gK2FTNh1u4CvR\"\n  },\n  \"background_and_education\": {\n    \"degree\": {\n      \"name\": \"Construction Technology Management\",\n      \"institution\": \"University of Gondar\",\n      \"years\": \"2017 - 2022\"\n    },\n    \"current_studies\": {\n      \"program\": \"Software Engineering\",\n      \"institution\": \"ALX\",\n      \"expected_graduation\": \"April 2024\"\n    }\n  },\n  \"summary\": {\n    \"introduction\": \"Hello, I'm Beamlak Adane, a seasoned professional with a degree in BSc Construction Technology Management and a current student at ALX for Software Engineering. My unique blend of skills and experience makes me a valuable asset to any project.\",\n    \"key_strengths\": [\n      {\n        \"title\": \"Construction Technology Management\",\n        \"description\": \"Proficient in construction processes, ensuring efficient project execution and delivery.\"\n      },\n      {\n        \"title\": \"Software Engineering\",\n        \"description\": \"Currently enhancing technical expertise in software development and programming languages as a student.\"\n      },\n      {\n        \"title\": \"Adaptability\",\n        \"description\": \"Thrives in dynamic environments, easily adapting to evolving project requirements.\"\n      }\n    ],\n    \"projects_and_accomplishments\": [\n      {\n        \"title\": \"Construction Management Success\",\n        \"description\": \"Led successful construction projects with a strong understanding of project management, budgeting, and quality control.\"\n      },\n      {\n        \"title\": \"Software Engineering Capstone\",\n        \"description\": \"Engaged in a capstone project at ALX, applying software engineering principles.\"\n      }\n    ]\n  },\n  \"language_proficiencies\": {\n    \"English\": \"Native or Bilingual\",\n    \"Amharic\": \"Native or Bilingual\"\n  },\n  \"skills\": [\n    \"HTML\",\n    \"CSS\",\n    \"JavaScript\",\n    \"MySQL\",\n    \"Python\",\n    \"React\"\n  ],\n  \"portfolio\": {\n    \"projects\": [\n      {\n        \"title\": \"Portfolio Site\",\n        \"image\": \"<missing image>\",\n        \"link\": \"javascript: \\\"portfolio site\\\"\",\n        \"project discrition\": \"something\"\n      },\n      {\n        \"title\": \"Maze Game Project\",\n        \"image\": \"<missing image>\",\n        \"link\": \"javascript: \\\"maze game project\\\"\",\n        \"project discrition\": \"something\"\n      }\n    ]\n  },\n  \"certifications\": [\n    {\n      \"title\": \"ALX Software Engineering\",\n      \"provider\": \"ALX\",\n      \"issued\": \"April 2024\"\n    }\n  ],\n  \"work_history\": {\n    \"experience\": \"Not specified\"\n  },\n  \"other_experiences\": {\n    \"experience\": \"Not specified\"\n  },\n  \"additional_information\": {\n    \"connects\": 109,\n    \"interests\": \"Open to collaboration and project development opportunities.\"\n  }\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        540,
+        220
+      ],
+      "id": "d69965da-ea90-4783-bf5f-85d51ad12dfe",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "applqGKuf38BnK8j6",
+          "mode": "list",
+          "cachedResultName": "Upwork",
+          "cachedResultUrl": "https://airtable.com/applqGKuf38BnK8j6"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl35fNEeSXDL6CSE",
+          "mode": "list",
+          "cachedResultName": "Table",
+          "cachedResultUrl": "https://airtable.com/applqGKuf38BnK8j6/tbl35fNEeSXDL6CSE"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.output.profile_overview.name }}",
+            "Role": "={{ $json.output.profile_overview.role }}",
+            "Location": "={{ $json.output.profile_overview.location }}",
+            "Status": "={{ $json.output.profile_overview.status }}",
+            "Hourly Rate": "={{ $json.output.profile_overview.hourly_rate }}",
+            "Availability": "={{ $json.output.profile_overview.availability }}",
+            "Profile Image (URL)": "={{ $json.output.profile_overview.profile_image }}",
+            "Background & Education": "={{ $json.output.background_and_education }}",
+            "Summary": "={{ $json.output.summary }}",
+            "Languages": "={{ $json.output.language_proficiencies }}",
+            "Skills": "={{ $json.output.skills }}",
+            "Portfolio": "={{ $json.output.portfolio }}",
+            "Certifications": "={{ $json.output.certifications }}",
+            "Work History & Other Experiences": "={{ $json.output.work_history }}, {{ $json.output.other_experiences }}",
+            "Additional Information": "={{ $json.output.additional_information }}",
+            "UserId": "={{ $('Webhook').item.json.body.userId }}"
+          },
+          "matchingColumns": [
+            "UserId"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "UserId",
+              "displayName": "UserId",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hourly Rate",
+              "displayName": "Hourly Rate",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Availability",
+              "displayName": "Availability",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Profile Image (URL)",
+              "displayName": "Profile Image (URL)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Background & Education",
+              "displayName": "Background & Education",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Languages",
+              "displayName": "Languages",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Skills",
+              "displayName": "Skills",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Portfolio",
+              "displayName": "Portfolio",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Certifications",
+              "displayName": "Certifications",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Work History & Other Experiences",
+              "displayName": "Work History & Other Experiences",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Additional Information",
+              "displayName": "Additional Information",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        980,
+        0
+      ],
+      "id": "2630f86d-cd35-4faa-9333-3081a1a1fafe",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "BgjqBxMAU9tCx7BJ",
+          "name": "Airtable Personal Access Token account Upwork"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad62f815-8d07-45f1-a64b-4f090314f830",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        0
+      ],
+      "id": "7b8605b3-cd6e-48c1-a0c6-63dad3f27f30",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.profileHtml }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notExists",
+                      "singleValue": true
+                    },
+                    "id": "04a01956-9d42-4dfa-9936-f9ac0af435e2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "User id"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ad559c9f-570e-4931-9435-35b160ac16cb",
+                    "leftValue": "={{ $json.body.profileHtml }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Info"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        160,
+        -140
+      ],
+      "id": "cc495fb8-241e-4ea6-a1d9-65f177741e8b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "applqGKuf38BnK8j6",
+          "mode": "list",
+          "cachedResultName": "Upwork",
+          "cachedResultUrl": "https://airtable.com/applqGKuf38BnK8j6"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl35fNEeSXDL6CSE",
+          "mode": "list",
+          "cachedResultName": "Table",
+          "cachedResultUrl": "https://airtable.com/applqGKuf38BnK8j6/tbl35fNEeSXDL6CSE"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "UserId": "={{ $json.body.userId }}",
+            "Name": "="
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "UserId",
+              "displayName": "UserId",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hourly Rate",
+              "displayName": "Hourly Rate",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Availability",
+              "displayName": "Availability",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Profile Image (URL)",
+              "displayName": "Profile Image (URL)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Background & Education",
+              "displayName": "Background & Education",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Languages",
+              "displayName": "Languages",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Skills",
+              "displayName": "Skills",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Portfolio",
+              "displayName": "Portfolio",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Certifications",
+              "displayName": "Certifications",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Work History & Other Experiences",
+              "displayName": "Work History & Other Experiences",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Additional Information",
+              "displayName": "Additional Information",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        -260
+      ],
+      "id": "718395c3-79a0-4cab-a88e-d8e602307e98",
+      "name": "Airtable1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "BgjqBxMAU9tCx7BJ",
+          "name": "Airtable Personal Access Token account Upwork"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        []
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "4641c259-625b-447b-aab7-9e49cc9da437",
+  "triggerCount": 1,
+  "tags": [
+    {
+      "createdAt": "2025-02-25T22:53:05.470Z",
+      "updatedAt": "2025-02-25T22:53:05.470Z",
+      "id": "rrcGeGrAEXCldrwm",
+      "name": "upwork"
+    }
+  ],
+  "shared": [
+    {
+      "createdAt": "2025-03-26T12:04:31.649Z",
+      "updatedAt": "2025-03-26T12:04:31.649Z",
+      "role": "workflow:owner",
+      "workflowId": "hYAozy7bVEedMOnp",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

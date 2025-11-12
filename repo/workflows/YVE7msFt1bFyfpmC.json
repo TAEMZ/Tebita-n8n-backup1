@@ -1,0 +1,247 @@
+{
+  "createdAt": "2025-05-23T06:40:22.110Z",
+  "updatedAt": "2025-05-23T08:13:59.857Z",
+  "id": "YVE7msFt1bFyfpmC",
+  "name": "Skool Communities post",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        -60
+      ],
+      "id": "6abfb0c9-ea81-49d8-a98d-e2d33a51372d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appxvd94awDfIbfKy",
+          "mode": "list",
+          "cachedResultName": "Skool Communities",
+          "cachedResultUrl": "https://airtable.com/appxvd94awDfIbfKy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblOmYidCVjCdR6ic",
+          "mode": "list",
+          "cachedResultName": "Idea",
+          "cachedResultUrl": "https://airtable.com/appxvd94awDfIbfKy/tblOmYidCVjCdR6ic"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -260,
+        -60
+      ],
+      "id": "3c8c7f25-3ade-4f90-9933-3d367589b4b8",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "l7tXJ2YUKdrm3OvF",
+          "name": "Airtable Skool Communities"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "o1-mini",
+          "mode": "list",
+          "cachedResultName": "O1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a creative visual assistant for a community focused on {{ $json['Community'] || 'AI and Community Impact' }}.\n\nYour job is to read the following post content, extract the core visual theme, and describe a compelling image that matches the content idea. The image should feel relevant for social platforms or community posts.\n\nHere’s the content:\n{{ $json['Poll Monday Content'] }}\n\nFollow these instructions:\n1. Identify the main topic or idea of the post.\n2. Imagine a powerful, eye-catching image that visually represents the topic.\n3. The image should reflect the tone (professional, innovative, community-centered, etc.).\n4. Avoid generic icons. Think in **scenes**, **symbolic illustrations**, or **conceptual metaphors**.\n5. Return just the **image description**, ready to be used in tools like DALL·E, Midjourney, or OpenAI image generation.\n\n**Output format**:\nA one-sentence prompt that describes a visually rich, concept-aligned image.\n\nExample output:\n> A futuristic city skyline overlaid with transparent AI interfaces and glowing data points, showing collaboration between humans and machines in a smart city environment.\n\nNow generate the image description.\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        160,
+        -380
+      ],
+      "id": "38d93280-f1a8-4fb3-a385-7c29cef248be",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        260,
+        -180
+      ],
+      "id": "49cdd6c9-6f57-48fb-bb9e-9971d658e43f",
+      "name": "Wait",
+      "webhookId": "50b95b5f-8f9f-4d1b-abce-04ce42971717"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.piapi.ai/api/v1/task",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"model\": \"Qubico/flux1-dev\", \n  \"task_type\": \"txt2img\", \n  \"input\": { \n  \"prompt\": \"{{ $json.message.content }} \", \n  \"width\": 540, \n  \"height\": 960\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        120,
+        -180
+      ],
+      "id": "dc396024-42e8-444f-8296-baba1e7eae3f",
+      "name": "Text-To-Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2lVjEF3eGAi56Tnf",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.piapi.ai/api/v1/task/{{ $json.data.task_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"model\": \"Qubico/flux1-dev\", \n  \"task_type\": \"txt2img\", \n  \"input\": { \n  \"prompt\": \"{{ $json.message.content }} \", \n  \"width\": 540, \n  \"height\": 960\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        -180
+      ],
+      "id": "e9709fba-e888-4f0a-b44e-7c0c80ae8aa2",
+      "name": "Get-Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2lVjEF3eGAi56Tnf",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Text-To-Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get-Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text-To-Image": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "fddecb0e-0303-4d1d-80da-193d8e24eea9",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-05-23T06:40:22.110Z",
+      "updatedAt": "2025-05-23T06:40:22.110Z",
+      "role": "workflow:owner",
+      "workflowId": "YVE7msFt1bFyfpmC",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,1099 @@
+{
+  "createdAt": "2025-02-07T17:35:55.948Z",
+  "updatedAt": "2025-02-07T18:49:05.685Z",
+  "id": "StcI3oMWwWk1Q4Oi",
+  "name": "sales_script_chat",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2120,
+        260
+      ],
+      "id": "1dbb37e7-1f00-403d-a77c-7e296a092e2e",
+      "name": "When chat message received",
+      "webhookId": "43f0abb3-1382-4d97-8053-91987d06ed48"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=you are a helpful assistant to analyze user response. Input to be analyzed : -  \n\nUser response:- {{ $('When chat message received').item.json.chatInput }}\nQuestions: {{ $json.question }}, {{ $json.follow_up }}\n\n- if the length of the response given is more than 5 words the response for variable \"fullyAnswered\": true, esle the response is less than or equal to 5 words the value of \"fully answered\": false. and You have to return counts of questions that are separated by comma.\n\n\n- Your response should be in object format inside currly brace only.\n- don't respond any comment, instruction, or suggestion.\n- set a value to \"fullyAnswered\".\n- exceptional case if the user response is “skip” set the value of “fullyAnswered”: true.\n\nexample:\n\nUser response:-\n\"response\": \"Yes\"\nQuestion: What are the most common objections you hear from prospects? , How do you typically address these objections?, Are there any objections that are particularly challenging to overcome?\nAI response:-\n{\"fullyAnswered\": false, \"count\": 3 }\n\nUser response:-\n\"response\": \"We plan to use cold email campaigns and social media outreach.\"\nQuestion: What are the most common objections you hear from prospects? , How do you typically address these objections?, Are there any objections that are particularly challenging to overcome?\n\nAI response:\n{\"fullyAnswered\": true, \"count\": 3 }\n\nUser response:\n\"response\": \"skip\"\nQuestion: What are the most common objections you hear from prospects? , How do you typically address these objections?, Are there any objections that are particularly challenging to overcome?\n\nAI Response:\n{\"fullyAnswered\": true, \"count\": 3 }\n"
+            }
+          ]
+        },
+        "simplify": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1360,
+        260
+      ],
+      "id": "0f197641-27f3-4a80-9ac7-d7ddfaa381a8",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "LECbHwV7WQjNhD2I",
+          "name": "OpenAi account "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "agent": "openAiFunctionsAgent",
+        "promptType": "define",
+        "text": "=User response:- {{ $('When chat message received').item.json.chatInput }}\n\nQuestion:- \nmain question:- {{ $json.question }}\nfollow-up:- {{ $json.follow_up }}\ndescription:- {{ $json.description }}\norder_no:- {{ $json.order_no }}\n\n\nSpecial Variable:\nfullyAnswered:- {{ $('convert String to JSON1').item.json.data.fullyAnswered }}",
+        "options": {
+          "systemMessage": "You are an expert at asking questions given to you, questions from the above context.\n- Ask the user a series of questions in their order.\n- Always make sure to use the question provided only.\n- Don't use any other questions.\n- Ensure all questions are asked in the correct order based on the provided list.\n- track the number of repetitions of the provided question by setting a variable called “repetition”: number of repetition.\n- The given follow-up questions are optional questions; they have to be asked only to get a detailed answer. If you are given a new question without the follow-up questions being asked, you must pass to the new question without asking the previous follow-up question.\n- In your response don’t return anything like suggestion, instruction, guide, comment etc… Just return the value of 4 variables in object format.\nWorkflow & Logic:\n1. Start the Conversation\nBegin the chat with:\n\"Hey, I'm your assistant that helps you create a *sales script* by asking questions. Are you ready for the questions?\"\n\n- Wait for user confirmation (e.g., \"Yes\" or \"Ready\").\n2. Ask & Track Questions\n- You will be provided with a question with its respective follow-up questions in the context .\n- Track how many times a single question with its follow-up is given.\n3. Ask Questions One by One\nPresent each question along with its description.\n- Ensure responses are clear before moving to the next question by asking their follow-up.\n- Keep track of active question order so as to move to next question\n- Your feedback should be in object format like this to keep easy \n\n**AI (Question):**  \n{{\n  \"response\": \"What is the primary goal of this sales script? (e.g., Generate leads, close sales, book appointments, upsell products, etc.)\\n\\nDescription: This question helps us understand the main objective of your sales script. Please provide as much detail as possible.\",\n  \"activeQuestion\": 1,\n  \"isFollowup\": false, \n“repetition”: 1\n}}\n\n**User:**  \n{{\"response\": \"Generate leads.\"}}\n4. Handle User Responses\nIf a new question is provided with its follow-up make sure to reset the number of “repetition”: 1.\nIf the question is repeated just update the repetition to the number of repetition to the number of repetition.\nThe value of “activeQuestion” depends on the question order number.\n5. Completion & Closing Message\nIf you are provided with an empty question this indicates the end of the question so take the following action.\nAfter all questions are answered, respond with:\n\"Thank you! Your sales script will be generated soon.\"\n\nExample Interaction:\nAI (Greeting):\n\nAI (Initial Greeting):  \n{{\"response\": \"Hey, I'm your assistant that helps you create a sales script by asking questions. Are you ready for the questions?\", \"activeQuestion\": 1, \"isFollowup\": false, “repetition” 0\n}}\n\nUser:\n{{\"response\": \"Yes\"}}\n\nAI (Question 1):\n{{\"response\": \"What is the primary goal of this sales script? (e.g., Generate leads, close sales, book appointments, upsell products, etc.)\", \"activeQuestion\": 1, \"isFollowup\": false, “repetition” 1\n}}\n\nUser: \n{{\"response\": \"Generate leads.\"}}\n\nAI (Follow-up): \n{{\"response\": \"Can you elaborate on how you plan to achieve this goal?\", \"activeQuestion\": 1, \"isFollowup\": true, “repetition” 2\n}}\n\nUser:\n{{\"response\": \"We plan to use cold email campaigns and social media outreach.\"}}\n\nAI (Question 2): \n{{\"response\": \"Who is your target audience? (e.g., Demographics, industry, job titles, pain points, or specific challenges they face.)\", \"activeQuestion\": 2, \"isFollowup\": false, “repetition” 1\n}}\n\nUser:\n{{\"response\": \"Small business owners in the tech industry.\"}}\n\nAI (Follow-up):\n{{\"response\": \"What are the biggest challenges or pain points your audience faces?\", \"activeQuestion\": 2, \"isFollowup\": true, “repetition” 2\n}}\n\nUser:\n{{\"response\": \"They struggle with customer acquisition and retention.\"}}\n\nAI (Question 3):\n{{\"response\": \"What are the key features or benefits of your product/service?\", \"activeQuestion\": 3, \"isFollowup\": false, “repetition” 1\n}}\n\n\n\nKey Rules & Considerations:\n1. Always maintain the `activeQuestion` index based on the `order_no` column.\n2. Ask questions based on their order and always begin from the main question.  \n3. End the interaction with the final message after all questions are answered.\n4. Don’t answer any other types of questions.\n5. Don’t accept or invite the user for further discussion.\n6. Don’t make any conversation other than asking questions from a given context.\n\n\nExceptional Case: \nDon’t count the incoming question repetition for the conversation starter. Just begin counting after the main question is asked. \n\nAlways output should contain the following variable:\nresponse(String)\nactiveQuestion(int)\nisFollowup(boolean)\nrepetition(repetition)\n\nRemark: You are given a special indicator to pass to the given question without finishing the previous follow-up questions.\n\n- If the given variable “fullyAnswered”: true, move to the current given question without finishing the previous follow-up questions.\n- If the given variable “fullyAnswered”: false, continue on what you do.\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -160,
+        260
+      ],
+      "id": "bb564a05-0aef-405c-ae7f-9f6db394a3e4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {
+          "topP": 0.5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        -180,
+        520
+      ],
+      "id": "fd7fc40c-be84-4b5b-82af-738170023146",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "LECbHwV7WQjNhD2I",
+          "name": "OpenAi account "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -20,
+        560
+      ],
+      "id": "44af496b-46d0-494e-885f-766ad3e8e6a2",
+      "name": "Window Buffer Memory",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b15b6ccf-89c3-4701-804c-110ff61612cc",
+              "name": "data",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "37e635e4-e7f2-4309-b3b3-5220aab925bd",
+      "name": "convert String to JSON1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -1000,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM question_bank WHERE order_no = {{ $json.active_sesion }};",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -1560,
+        260
+      ],
+      "id": "1c1f7ac0-c2d6-4592-9e79-92ad5cad0254",
+      "name": "Postgres2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "hGCVflzP3H49sHYO",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2699a8e4-2a7d-4581-9558-529ee8f2d447",
+              "name": "active_sesion",
+              "value": "={{ $json[\"active_question_id\"] !== undefined ? $json[\"active_question_id\"] : 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "8a488553-c6f4-4c8a-85aa-82269705eef5",
+              "name": "repetition",
+              "value": "={{ $json[\"repetition\"] !== undefined ? $json[\"repetition\"] : 0 }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1760,
+        260
+      ],
+      "id": "19a9a2c2-70db-4328-b8a7-c3e09ac0d360",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "execute this query to check if the questions are in correct order",
+        "operation": "executeQuery",
+        "query": "SELECT * FROM question_bank WHERE order_no = {{ $json.active_question_id + 1 }};",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.5,
+      "position": [
+        180,
+        560
+      ],
+      "id": "fa17be69-1449-458b-a535-02967fc52f16",
+      "name": "followup",
+      "credentials": {
+        "postgres": {
+          "id": "hGCVflzP3H49sHYO",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "932f2693-f662-4a90-9873-e938849a7b81",
+              "name": "output",
+              "value": "={{ $json.data.response }}",
+              "type": "string"
+            },
+            {
+              "id": "6e483289-b477-4d20-91d7-f830aab06f6d",
+              "name": "sessionId",
+              "value": "={{ $('When chat message received').item.json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "de847283-a2fc-4261-a1db-8ed386e03520",
+              "name": "chatInput",
+              "value": "={{ $('When chat message received').item.json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "c0ba4af1-1f9a-4a60-82f2-a6e2b849c4d2",
+              "name": "active_question_id",
+              "value": "={{ $json.data.activeQuestion }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        200
+      ],
+      "id": "82b7977d-249b-4223-87a4-72e3502c7b7c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('check session').item.json.id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "number",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b80549d8-887c-4f5a-84e4-7e8f0f8f2e63",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        860,
+        200
+      ],
+      "id": "3e98c6a8-8511-4e9e-ab5a-fe7b272f350e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $('check session').item.json.docs_id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Edit Fields').item.json.chatInput }}\n{{ $('Edit Fields').item.json.output }}\n\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        100
+      ],
+      "id": "e65b09cb-6f72-4978-bc83-cd4b03cb24e4",
+      "name": "Google Docs",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "qapocc2pYbcltiNn",
+          "name": "Google Docs account "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "folderId": "19Lv1Tsw6nEVAqoX_bif_Swilfd-XfcWY",
+        "title": "=chat session {{ $('Edit Fields').item.json.sessionId }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        460
+      ],
+      "id": "09c8b6ec-79d1-44ef-852f-5c9d9ef9238f",
+      "name": "Google Docs2",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "qapocc2pYbcltiNn",
+          "name": "Google Docs account "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "203035ec-e225-4669-a0bc-d3d3e51b9bf0",
+              "name": "output",
+              "value": "={{ $json.data.response }}",
+              "type": "string"
+            },
+            {
+              "id": "05ee753a-6c48-4118-9490-d183c94896a0",
+              "name": "activeQuestion",
+              "value": "={{ $json.data.activeQuestion }}",
+              "type": "string"
+            },
+            {
+              "id": "927b8941-7738-4fd9-a8e6-dbab6b841e7d",
+              "name": "data.isFollowup",
+              "value": "={{ $json.data.isFollowup }}",
+              "type": "boolean"
+            },
+            {
+              "id": "26edce7c-0e33-40c7-80bc-413b210ca8a9",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        540
+      ],
+      "id": "fb118071-8e81-4b26-8a6b-f3de6e30b5a1",
+      "name": "Output"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.docs_id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Edit Fields').item.json.chatInput }}\n{{ $('Edit Fields').item.json.output }}\n\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        480
+      ],
+      "id": "a3c1dba9-f29c-4fc1-bcc2-7cbff471725f",
+      "name": "Google Docs3",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "qapocc2pYbcltiNn",
+          "name": "Google Docs account "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "session",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "session_id",
+              "fieldValue": "={{ $('Edit Fields').item.json.sessionId }}"
+            },
+            {
+              "fieldId": "docs_id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "active_question_id",
+              "fieldValue": "1"
+            },
+            {
+              "fieldId": "repetition",
+              "fieldValue": "0"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        480
+      ],
+      "id": "70d83ab1-bb04-4f7f-bc3f-d8aa692d388d",
+      "name": "register session",
+      "credentials": {
+        "supabaseApi": {
+          "id": "hNznE51IINBBG0jM",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst updatedItems = items.map((item) => {\n  item.json.active_question_id = parseInt(item.json.active_question_id);\n  return item;\n});\nreturn updatedItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        200
+      ],
+      "id": "9abfcbaa-a9dc-46ef-b689-c839201aafb2",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b15b6ccf-89c3-4701-804c-110ff61612cc",
+              "name": "data",
+              "value": "={{ $json.output }}",
+              "type": "object"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "830fee29-2055-47a3-8cac-904a46320e73",
+      "name": "convert String to JSON2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        200,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "session",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "keyValue": "={{ $json.sessionId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1940,
+        260
+      ],
+      "id": "f159208e-0367-4b4f-bb99-bf362473349f",
+      "name": "check session",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "hNznE51IINBBG0jM",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5e1a2764-b853-4a55-a0bd-0d15d1964ccc",
+              "name": "order_num",
+              "value": "={{ $json.data.fullyAnswered === true || $json.data.count === $('Edit Fields2').item.json.repetition ? $('Postgres2').item.json.order_no + 1 : $('Postgres2').item.json.order_no}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -760,
+        260
+      ],
+      "id": "6b01a238-9f05-4f72-b51b-da3dd3b1083c",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "session",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "condition": "eq",
+              "keyValue": "={{ $('When chat message received').item.json.sessionId }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "repetition",
+              "fieldValue": "={{ $('convert String to JSON2').item.json.data.repetition }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        100
+      ],
+      "id": "f7f40539-c334-4e36-8b25-d0be7680fe04",
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "hNznE51IINBBG0jM",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM question_bank WHERE order_no = {{ $json.order_num }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -380,
+        260
+      ],
+      "id": "9a1c0c5a-b21a-4288-917d-c8d5112f81fa",
+      "name": "Postgres3",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "hGCVflzP3H49sHYO",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('check session').item.json.session_id }}",
+                    "rightValue": "={{ $('Postgres2').item.json.order_no }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b80549d8-887c-4f5a-84e4-7e8f0f8f2e63",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -520,
+        40
+      ],
+      "id": "145527b7-7822-4a6b-ac42-cf83bc1ed1f8",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "222fd6b2-5854-4d96-bbaf-8a9e56d13921",
+              "leftValue": "={{ $('Edit Fields1').item.json.order_num }}",
+              "rightValue": "={{ $('Postgres2').item.json.order_no }}",
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -300,
+        20
+      ],
+      "id": "5d704561-d3f8-4faf-affb-d9e6b329778f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "session",
+          "mode": "list",
+          "cachedResultName": "session"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "active_question_id": "={{ $('Edit Fields1').item.json.order_num }}",
+            "session_id": "={{ $('When chat message received').item.json.sessionId }}",
+            "repetition": 1
+          },
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "docs_id",
+              "displayName": "docs_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "active_question_id",
+              "displayName": "active_question_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "repetition",
+              "displayName": "repetition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "336e7588-9904-4892-807a-2c3d30acb933",
+      "name": "Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "hGCVflzP3H49sHYO",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "check session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "convert String to JSON1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "convert String to JSON2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert String to JSON1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "followup": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Docs2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs2": {
+      "main": [
+        [
+          {
+            "node": "register session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "register session": {
+      "main": [
+        [
+          {
+            "node": "Google Docs3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert String to JSON2": {
+      "main": [
+        [
+          {
+            "node": "Output",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check session": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Postgres3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "ec01965f-1835-418d-bafb-7f23fe17a919",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-04-29T07:28:32.695Z",
+      "updatedAt": "2025-09-05T08:41:59.880Z",
+      "role": "workflow:owner",
+      "workflowId": "StcI3oMWwWk1Q4Oi",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

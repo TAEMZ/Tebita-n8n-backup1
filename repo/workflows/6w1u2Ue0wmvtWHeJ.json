@@ -1,0 +1,976 @@
+{
+  "createdAt": "2025-09-13T01:13:54.755Z",
+  "updatedAt": "2025-09-13T01:13:54.755Z",
+  "id": "6w1u2Ue0wmvtWHeJ",
+  "name": "Visual Regression",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $json.base }}"
+        },
+        "options": {
+          "binaryPropertyName": "data_1"
+        }
+      },
+      "id": "a075d140-9e19-4790-8989-b0923b80741a",
+      "name": "Base Image",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        2608,
+        640
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-pro-latest",
+        "options": {}
+      },
+      "id": "a8881307-508b-4296-9d46-caf23fc1929f",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "position": [
+        3472,
+        880
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n \"type\": \"array\",\n \"items\": {\n \"type\": \"object\",\n\t\"properties\": {\n\t\t\"type\": {\n \t\t\"type\": \"string\",\n \"description\": \"type of regression. One of text, number, image, color or position.\"\n \t\t},\n\t\t\"description\": { \"type\": \"string\" },\n \"previous_state\": { \"type\": \"string\" },\n \"current_state\": { \"type\": \"string\" }\n\t}\n }\n}"
+      },
+      "id": "c7e19220-53d5-4c4d-809d-255f7190aa8d",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        3664,
+        880
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "content": "### Part A. Generate Base Images\nBefore we can run our visual regression tests, we must generate a series of base screenshots to compare against. This part of the workflow uses an external website screenshotting service, [Apify.com](https://www.apify.com?fpr=414q6), to achieve this. This part of the workflow should only be run when we want to update our base screenshots.",
+        "height": 180.74812634463558,
+        "width": 405.95003875719203,
+        "color": 4
+      },
+      "id": "f8242939-89fe-4163-b115-62cb0cd8c64d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 5. Download Base and Generate new Webpage Screenshot\n[Learn more about Apify.com](https://www.apify.com?fpr=414q6)\n\nLooping for each webpage, we'll do 2 tasks (1) download the base screenshot for the url and (2) and use our [Apify.com](https://www.apify.com?fpr=414q6) webpage screenshot actor again to generate a fresh screenshot.",
+        "height": 548.4621171664835,
+        "width": 702.1744987652204,
+        "color": 7
+      },
+      "id": "8d43e3cf-0953-4aaf-8a06-34a23cbe41cc",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2512,
+        480
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 6. Compare Screenshots using Vision Model\n[Read more about the basic LLM chain](https://docs.n8n.io/integrations/builtin/cluster-nodes/root-nodes/n8n-nodes-langchain.chainllm/)\n\nTo carry out our visual regression test, we need to send both screenshots simultaneously to our Vision model. This is easily achieved using n8n's built-in basic LLM chain where we can define two user messages of the binary type. For our vision model, we'll use Google's Gemini but any capable vision model will also do the job. A Structured Output Parser is used here to return the AI's response in JSON format, this is for easier formatting purposes which we'll get to in the next step.",
+        "height": 548.702446115556,
+        "width": 759.5372282495247,
+        "color": 7
+      },
+      "id": "860b344e-ef3d-45d5-84a9-0b5c4b2a2d5c",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3248,
+        480
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 7. Create Report In Linear\n[Learn more about integrating with Linear.app](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.linear)\n\nFor the final step, we'll generate a simple report which will capture any changes detected in our webpages list. Let's do this by first combining our webpages with their test results and filter out any in the page where no changes were detected. Next, we'll aggregate all changes into the Linear.app node which will be formatted into a markdown snippet and used to create a new issue in Linear. If you don't use Linear, feel free to swap this out for JIRA or even Slack.",
+        "height": 388.92815062755926,
+        "width": 885.2402868841493,
+        "color": 7
+      },
+      "id": "2de459e9-4b97-484e-8ab5-58ba09b5460d",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2752,
+        80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "4f402875-a465-4089-be4b-3f0d6a545b54",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        672,
+        560
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "id": "456698ea-a9c2-4feb-b8a2-4ebb1fb0b3b3",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1104,
+        800
+      ],
+      "webhookId": "f06eab66-30a7-48ad-90ee-cb3394eb2edb",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.screenshotUrl }}",
+        "options": {}
+      },
+      "id": "d912f66c-838f-44a5-9b6d-c9eb99832d55",
+      "name": "Download Screenshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1088,
+        352
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Merge').item.json.url.urlEncode() }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1lAFxJPWcA_sOcjr3UUKKfFfoTwd4Stkh",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1lAFxJPWcA_sOcjr3UUKKfFfoTwd4Stkh",
+          "cachedResultName": "base_images"
+        },
+        "options": {
+          "simplifyOutput": true
+        }
+      },
+      "id": "4fb38f98-9062-445d-9ac1-9b8a993d21ea",
+      "name": "Upload to Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "position": [
+        1264,
+        352
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit?usp=drivesdk",
+          "cachedResultName": "Visual Regression List"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "value": {
+            "url": "={{ $('Merge').item.json.url }}",
+            "base": "={{ $json.id }}"
+          },
+          "schema": [
+            {
+              "id": "service",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "service",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "type": "string",
+              "display": true,
+              "removed": false,
+              "required": false,
+              "displayName": "url",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "base",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "base",
+              "defaultMatch": false,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "url"
+          ]
+        },
+        "options": {}
+      },
+      "id": "65e73e65-e77a-4484-aaf7-bd935e6b0065",
+      "name": "Update Base Image",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1440,
+        352
+      ],
+      "typeVersion": 4.5
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "bbf641e3-8eba-4499-af8e-7c2ea6a36668",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        912,
+        352
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                1
+              ],
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "6381c9ce-1acc-4d2a-bc33-339fa0e8437e",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        1792,
+        368
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit?usp=drivesdk",
+          "cachedResultName": "Visual Regression List"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "options": {}
+      },
+      "id": "53c9061b-68f0-4e1c-aa01-f64636b1165f",
+      "name": "Get URLs with Missing Base Images",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        368,
+        464
+      ],
+      "typeVersion": 4.5
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~screenshot-url/run-sync-get-dataset-items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n \"delay\": 0,\n \"format\": \"png\",\n \"proxy\": {\n \"useApifyProxy\": true\n },\n \"scrollToBottom\": false,\n \"urls\": [\n {\n \"url\": $json.url\n }\n ],\n \"viewportWidth\": 1280,\n \"waitUntil\": \"domcontentloaded\",\n \"waitUntilNetworkIdleAfterScroll\": false\n}\n}}",
+        "options": {}
+      },
+      "id": "433cd20f-8755-42ef-a342-040d31608686",
+      "name": "Run Webpage Screenshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        928,
+        800
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~screenshot-url/run-sync-get-dataset-items",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n \"delay\": 0,\n \"format\": \"png\",\n \"proxy\": {\n \"useApifyProxy\": true\n },\n \"scrollToBottom\": false,\n \"urls\": [\n {\n \"url\": $json.url\n }\n ],\n \"viewportWidth\": 1280,\n \"waitUntil\": \"domcontentloaded\",\n \"waitUntilNetworkIdleAfterScroll\": false\n}\n}}",
+        "options": {}
+      },
+      "id": "4c4bf3dd-0192-4fd4-b140-2e01793e0f1e",
+      "name": "Run Webpage Screenshot1",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2624,
+        816
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "20b18a7e-bf98-4f39-baa9-4d965097526a",
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              },
+              "leftValue": "={{ $json.output }}",
+              "rightValue": 0
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "65fa6a5a-2b79-4ee0-abaa-7b94c6d64282",
+      "name": "Has Changes",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        3024,
+        288
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{\n{\n ...$('Get Webpages List').item.json,\n output: $json.output\n}\n}}\n",
+        "options": {}
+      },
+      "id": "bbfc4559-faeb-4e67-89af-e1fc6ce50448",
+      "name": "Combine Row and Result",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2848,
+        288
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "id": "3034ef4a-97b1-4993-a09e-454bf79f8c32",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        3920,
+        880
+      ],
+      "webhookId": "6bbf2e65-bed1-4efc-bb31-09d12c644dc5",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "ad117d6d-0348-43cf-9c2b-4dfbbddaa038",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        3200,
+        288
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "teamId": "1c721608-321d-4132-ac32-6e92d04bb487",
+        "title": "=Visual Regression Report {{ $now.format('yyyy-MM-dd') }}",
+        "additionalFields": {
+          "description": "=Visual Regression Workflow picked up the following changes:\n\n{{\n$json.data.map(row =>\n`### ${row.url}\n${row.output.map(issue =>\n`* **${issue.description}** - expected \"${issue.previous_state}\" but got \"${issue.current_state}\"`\n).join('\\n')}`\n).join('\\n');\n}}"
+        }
+      },
+      "id": "28883aa0-3360-40f1-9306-77396e67f5de",
+      "name": "Create Report",
+      "type": "n8n-nodes-base.linear",
+      "position": [
+        3392,
+        288
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {},
+      "id": "4c8081cb-ed93-4fa0-af37-c2b9bc549138",
+      "name": "When clicking ‘Test workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        160,
+        464
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit?usp=drivesdk",
+          "cachedResultName": "Visual Regression List"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gid=0",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1RbobwHCJiYKnic6T-VA3kPr-Grd4Y_ZSQXqy2st_T84/edit#gid=0",
+          "cachedResultName": "Sheet1"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "=row_number",
+              "lookupValue": "2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "08e52966-677c-4056-9d17-dacf3cab1087",
+      "name": "Get Webpages List",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1984,
+        368
+      ],
+      "typeVersion": 4.5
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "fb67cd60-99de-472d-af42-9e88cdbbf5e8",
+      "name": "For Each Webpage...",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        2304,
+        432
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "content": "## 4. Trigger Visual Regression Test Run\n[Read more about the Schedule Trigger](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.scheduletrigger/)\n\nOnce we've generated our base images to compare with in Part A, we can now run our Visual Regression Tests. These tests are intended to check for unexpected changes to a webpage by using some form of image detection. To trigger Part B, we'll start with a schedule trigger and pull a list of webpages to test from Google Sheets.",
+        "height": 408.0284015307624,
+        "width": 561.2038065501644,
+        "color": 7
+      },
+      "id": "327514b0-beba-4a87-966e-56d3fbff26b5",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1680,
+        144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 1. Get List of Webpages to Generate Base Images\n[Learn more about using Google Sheets](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googlesheets/)\n\nThis workflow is split into 2 parts: Part A will generate the \"base\" screenshots to compare new screenshots against. To capture these base screenshots, we'll use Google Sheets to hold our list of webpages and their screenshot references (we'll come on to that later).\n\nExample Sheet: https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRZRi55dUbLAsWZboJqH5U-EK0ZRSse8pkqANAV4Ss70otpQ97zgT8YBd3dL4d2u2UC1TTx_o1o1R/pubhtml",
+        "height": 487.40071048786325,
+        "width": 626.9985071319608,
+        "color": 7
+      },
+      "id": "258c2e7a-2cd2-4a2b-9dde-c593fa61b51f",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 2. Generate Webpage Screenshot via Apify\n[Learn more about Apify.com](https://www.apify.com?fpr=414q6)\n\nTo generate a screenshot of the webpage, we'll need a third party service since this functionality is outside the scope of n8n. Feel free to pick whichever internal or external service works for you but I've had great experience using [Apify.com](https://www.apify.com?fpr=414q6) - a popular webscraping SaaS who offer a generous free plan and require very little configuration to get started.\n\nThe Apify \"actor\" (ie. a type of scraper) we'll be using is specifically designed to take webpage screenshots.",
+        "height": 443.1120543367141,
+        "width": 653.369086691465,
+        "color": 7
+      },
+      "id": "d928b978-9b8d-4fc2-80ab-c183d2e1cda4",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        864,
+        560
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 3. Upload Screenshot to Google Drive\n[Read more about using the Google Drive node](https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.googledrive/)\n\nOnce we have our screenshots, we'll download them from Apify and upload them to our Google Drive for safe keeping. After uploading, we'll capture the new Google Drive IDs for the images into our Google Sheet, this will allow us to reference them again when we perform the visual regression testing.",
+        "height": 397.73072497123115,
+        "width": 808.188722669735,
+        "color": 7
+      },
+      "id": "a41a6244-8797-46c5-bed8-acc963661044",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        832,
+        144
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.screenshotUrl }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "data_2"
+            }
+          }
+        }
+      },
+      "id": "047f946a-3e5d-4946-8688-cbe3e911e8bf",
+      "name": "Download New Screenshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2800,
+        816
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "e1d3ea03-c81c-4a92-98ca-1becf6f34610",
+      "name": "Combine Screenshots",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        3008,
+        640
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "content": "### Part B. Run Visual Regression Test\nIn this part of the workflow, we'll retrieve our list of webpages to test with our AI vision model. This part can be run as many times as required.",
+        "height": 111.52173490405977,
+        "width": 394.03359370567625,
+        "color": 4
+      },
+      "id": "320dc5aa-5976-4491-9717-2d7cd32d8f9d",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1680,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Try It Out!\n\n### This workflow implements an approach to Visual Regression Testing - a means to test websites for defects - using AI Vision Models.\n\nThis workflow uses a Google Sheet to track a list of webpages to test and is split into 2 parts; Part A generates the base screenshots of the list and Part B runs the visual regression testing.\n\nThe example spreadsheet can be found here: https://docs.google.com/spreadsheets/d/e/2PACX-1vTXRZRi55dUbLAsWZboJqH5U-EK0ZRSse8pkqANAV4Ss70otpQ97zgT8YBd3dL4d2u2UC1TTx_o1o1R/pubhtml\n\n**[Apify.com](https://www.apify.com?fpr=414q6)** is the screenshot generator of choice and a free account with $5 in credit is available via this [link](https://www.apify.com?fpr=414q6).\n\n\n### Need Help?\nJoin the [Discord](https://discord.com/invite/XPKeKXeB7d) or ask in the [Forum](https://community.n8n.io/)!",
+        "height": 473.4987906976746,
+        "width": 553.2963720930223
+      },
+      "id": "5451aa77-04dc-4ab2-9e70-5c8f57bdaa95",
+      "name": "Sticky Note9",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -576,
+        208
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Identify changes between the base image and test image.",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You help with visual regression testing for websites. Identify changes to text content, images, colors, position and layouts of the elements in the screenshots. Ignore text styling or casing changes.\nThe first image will be the base image and the second image will be the test. Note all changes to the test image which differ from the base. If there are no changes, it is okay to return an empty array."
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary",
+              "binaryImageDataKey": "data_1"
+            },
+            {
+              "type": "HumanMessagePromptTemplate",
+              "messageType": "imageBinary",
+              "binaryImageDataKey": "data_2"
+            }
+          ]
+        }
+      },
+      "id": "22e88530-e79e-4cf2-b46b-48988eeed183",
+      "name": "Visual Regression Agent",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        3472,
+        720
+      ],
+      "typeVersion": 1.4
+    }
+  ],
+  "connections": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Download Screenshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "For Each Webpage...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Create Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Base Image": {
+      "main": [
+        [
+          {
+            "node": "Combine Screenshots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Changes": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Run Webpage Screenshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Drive": {
+      "main": [
+        [
+          {
+            "node": "Update Base Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Webpages List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Webpages List": {
+      "main": [
+        [
+          {
+            "node": "For Each Webpage...",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Screenshots": {
+      "main": [
+        [
+          {
+            "node": "Visual Regression Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Screenshot": {
+      "main": [
+        [
+          {
+            "node": "Upload to Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "For Each Webpage...": {
+      "main": [
+        [
+          {
+            "node": "Combine Row and Result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Base Image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Run Webpage Screenshot1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Row and Result": {
+      "main": [
+        [
+          {
+            "node": "Has Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Webpage Screenshot": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download New Screenshot": {
+      "main": [
+        [
+          {
+            "node": "Combine Screenshots",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Run Webpage Screenshot1": {
+      "main": [
+        [
+          {
+            "node": "Download New Screenshot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Visual Regression Agent": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Visual Regression Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Visual Regression Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get URLs with Missing Base Images": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get URLs with Missing Base Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "3848fdbd-b386-48f6-b87a-76daf73a6022",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-09-13T01:13:54.755Z",
+      "updatedAt": "2025-09-13T01:13:54.755Z",
+      "role": "workflow:owner",
+      "workflowId": "6w1u2Ue0wmvtWHeJ",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

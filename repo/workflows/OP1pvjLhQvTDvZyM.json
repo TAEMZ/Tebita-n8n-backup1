@@ -1,0 +1,2647 @@
+{
+  "createdAt": "2025-04-17T07:27:59.870Z",
+  "updatedAt": "2025-04-17T07:51:12.271Z",
+  "id": "OP1pvjLhQvTDvZyM",
+  "name": "Brand Analyzer",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v22.0/me/accounts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -300,
+        -260
+      ],
+      "id": "7bef88ae-b136-4582-82c8-a82d9c5c2213",
+      "name": "Get All Allowed Accounts",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        -260
+      ],
+      "id": "0c7cfe8a-798a-493e-adb7-17e7524b894f",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2d57e344-ced3-4b0e-9001-7f9e81593adb",
+              "name": "access_token",
+              "value": "={{ $json.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "afa25261-ef60-429e-a68c-0863d4817cb1",
+              "name": "brand_name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "9f83fa16-fcc2-4693-b23e-49e2c9e42775",
+              "name": "account_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        -260
+      ],
+      "id": "52395712-9975-461b-ae52-681635beafc3",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1020,
+        -220
+      ],
+      "id": "dfbdd903-ad10-4a69-883d-2a00251fb72f",
+      "name": "When clicking ‘Test workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{ $json.adAccountId }}/ads?fields=account_id,id,name,status,creative{image_url,object_story_id,effective_object_story_id,body,title,object_type}&date_preset=last_90d&limit=1000&filtering=[{\"field\":\"effective_status\",\"operator\":\"IN\",\"value\":[\"ACTIVE\"]}]",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        -200
+      ],
+      "id": "6614d859-0c12-4e5a-aa30-6e1cd90f8260",
+      "name": "Ads in single Ad Account3",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "72dacc0f-e7e7-4d3d-9af9-13c2db2257c7",
+              "leftValue": "={{ $json.brand_name }}",
+              "rightValue": "={{ $('Edit Fields').item.json.brand }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "de08894b-9144-4c9a-b0c5-3ab57eedf517",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        -260
+      ],
+      "id": "9bd26523-e611-43f2-b2d4-fe2bbe7e8eee",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -920,
+        -60
+      ],
+      "id": "5992b647-3f12-49ae-8ee7-936965beaf73",
+      "name": "When chat message received",
+      "webhookId": "33f08575-302f-48cb-90cf-d4f3ed72deee"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"brand\": \"{{ $json.chatInput }}\",\n  \"date_range\":\"last_90d\"\n}\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -720,
+        -60
+      ],
+      "id": "9836762e-1024-4157-820e-7c79e98f8ecd",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        720,
+        40
+      ],
+      "id": "c3d31efd-265c-4bfb-9add-cb77ab92e945",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "99b8a5ec-ea49-46af-ba7f-b397098599ee",
+              "name": "account_id",
+              "value": "={{ $json.account_id }}",
+              "type": "string"
+            },
+            {
+              "id": "fca45539-9056-4dab-8491-1bce5c32ac42",
+              "name": "ad_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "28d28546-b319-431e-9d56-b67a77a95011",
+              "name": "ad_name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "12688bc5-3473-47ff-970f-e149ab5865a9",
+              "name": "creative",
+              "value": "={{ $json.creative }}",
+              "type": "object"
+            },
+            {
+              "id": "d5a7eb2c-e3a6-40db-a55d-0f053ec88bcc",
+              "name": "account_id",
+              "value": "={{ $json.account_id }}",
+              "type": "string"
+            },
+            {
+              "id": "1a000bfa-ad81-49c0-9a00-c15b58f77ad7",
+              "name": "creative.body",
+              "value": "={{ $json.creative.body }}",
+              "type": "string"
+            },
+            {
+              "id": "5f9463f2-3fc9-4323-9a6d-dd2f7e900fb1",
+              "name": "creative.title",
+              "value": "={{ $json.creative.title }}",
+              "type": "string"
+            },
+            {
+              "id": "04b01855-ca8f-460c-95ff-b45f037fc57d",
+              "name": "object_type",
+              "value": "={{ $json.creative.object_type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1340,
+        40
+      ],
+      "id": "7e4d916a-7d43-4ff1-a859-d4e399452280",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform the input array by adding 'account_id' to each item\nconst updatedArray = $input.all().map(item => {\n  // Extract account_id from effective_object_story_id\n  const account_id = item.json.creative?.effective_object_story_id?.split(\"_\")[0];\n\n  // Return new object with 'account_id' added\n  return {\n    ...item.json, // Spread existing properties\n    account_id // Add new field\n  };\n});\n\n// Return the updated array\nreturn updatedArray;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        40
+      ],
+      "id": "20afcd15-e095-49a9-8cce-b2b0ed72ec86",
+      "name": "Get account_id"
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v22.0/me/adaccounts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -680,
+        140
+      ],
+      "id": "a24f2381-787e-40ae-b194-3c5e4ebe5940",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json.data.map(account => {\n    return { json: { adAccountId: account.id } }; // Create an array of ad account IDs\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        80
+      ],
+      "id": "68d030a7-d5a2-4459-a7a1-127cd8ff8612",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.paging.next }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -460,
+        300
+      ],
+      "id": "4b238147-2992-4a52-a359-2f0519df67bb",
+      "name": "HTTP Request7",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -280,
+        360
+      ],
+      "id": "63dc09d6-1bea-4648-8a2c-bb478919a8e6",
+      "name": "Loop Over Items5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        120,
+        100
+      ],
+      "id": "a27d2e9c-01e8-4da3-9c05-d55965cf5a52",
+      "name": "Merge",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "return items[0].json.data.map(account => {\n    return { json: { adAccountId: account.id } }; // Create an array of ad account IDs\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        400
+      ],
+      "id": "98cbfeb7-3454-47eb-adbe-00e39a33c192",
+      "name": "Code9"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        340,
+        100
+      ],
+      "id": "29b81df8-b6a3-44e6-a69f-1690c23dca7a",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        180
+      ],
+      "id": "ef6e26c5-066b-47e0-8a02-832584f3a268",
+      "name": "Wait",
+      "webhookId": "31dae35d-e245-4163-b183-10f63ed896fc"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v22.0/{{ $json.adAccountId }}/ads?fields=account_id,id,name,status,creative{image_url,object_story_id,effective_object_story_id,body,title,object_type}&date_preset=&limit=1000&filtering=[{\"field\":\"effective_status\",\"operator\":\"IN\",\"value\":[\"ACTIVE\"]}]",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        600,
+        160
+      ],
+      "id": "fff1b08e-0a74-4181-b7bd-17cad128da6b",
+      "name": "Ads in single Ad Account",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9JbrMSn6iDmMpBaq",
+          "name": "Facebook Ads Nico"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "fieldsToMatchString": "account_id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        1420,
+        -200
+      ],
+      "id": "b039f104-3b31-48c0-b17c-a2f60ab555be",
+      "name": "Merge5"
+    }
+  ],
+  "connections": {
+    "Get All Allowed Accounts": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get All Allowed Accounts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Get account_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get account_id": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items5": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code9": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ads in single Ad Account",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ads in single Ad Account": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge5",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {
+    "Get All Allowed Accounts": [
+      {
+        "json": {
+          "data": [
+            {
+              "access_token": "EAAQXxfUy0jUBO9ZARkBnAHfgasRXOFKFiFYZBMMWZBD9AyL56ZAGxT56RgG2mNUYDIDyAZCBD9fpMBZBmP3NdDDJJ1pFU0h6P0u4xkPp4V4r7WAw4AgIpbVegvO0AQCZB3IV880m2W96CgSk51J5spidI2dLOjnag7MKVIupJKMSyYQzyUmVq7Jm4weknoZD",
+              "category": "Internet company",
+              "category_list": [
+                {
+                  "id": "2256",
+                  "name": "Internet Company"
+                }
+              ],
+              "name": "Bottomless Co",
+              "id": "109603435575673",
+              "tasks": [
+                "ADVERTISE",
+                "ANALYZE",
+                "CREATE_CONTENT",
+                "MESSAGING",
+                "MODERATE",
+                "MANAGE"
+              ]
+            },
+            {
+              "access_token": "EAAQXxfUy0jUBO1HTioDLRjym1aC3ZBF8JI5iKYuAqYz92f6rL9paBiKpRj1Xa5DVxaQaZCWy3zX4LXb1ZAzfDZCgZB1LafLguKkdZAh7QU9EfTEhNbiFhfXCLOL7b8S1iVGOZB6YRZAP7z0Y5LxT91K6SBcZAFW1iNLMQaig1HZCKp6DEDZCRV6hkz6tp88pNAZD",
+              "category": "Product/service",
+              "category_list": [
+                {
+                  "id": "2201",
+                  "name": "Product/service"
+                }
+              ],
+              "name": "CORKCICLE",
+              "id": "140527019358724",
+              "tasks": [
+                "MODERATE",
+                "ANALYZE"
+              ]
+            },
+            {
+              "access_token": "EAAQXxfUy0jUBO0iszh0xMLePYUTYU8IZA02ZBlC2ePZAhKknfaKkpoBsll68DU7X8TM7nL6I2SCxavzIqikTVZB0CBYAlhSHmu3J5gfzheEq4ZA71nO7vZBBWP7lFjMmxYSHZA2psEjWzYXXsjmiVkYq8FSVfaszUs9t5aVH79unJkN79SqeUrEVaWoybIZD",
+              "category": "Pet Supplies",
+              "category_list": [
+                {
+                  "id": "2230",
+                  "name": "Pet Supplies"
+                }
+              ],
+              "name": "Reggie",
+              "id": "101304151579549",
+              "tasks": [
+                "ADVERTISE",
+                "ANALYZE",
+                "CREATE_CONTENT",
+                "MESSAGING",
+                "MODERATE",
+                "MANAGE_LEADS"
+              ]
+            },
+            {
+              "access_token": "EAAQXxfUy0jUBOybxRfC8811Rr9BKnTZAu4zl1qncjtcMZCaSzMWjS5UfqZCFpy1T6XZBovsjhq2SR2GOX6xVaGs4PSxo4yiZAuNgIXPCg0PEUo5xCJZBjLC2zkxbtE8SDOntMFZCY5D49p30rHOptaUTMljQR7EMHqHhEkXN7lZBZAdGiRg5Rs10RtaZB8yQAZD",
+              "category": "Health & wellness website",
+              "category_list": [
+                {
+                  "id": "2707",
+                  "name": "Health & wellness website"
+                }
+              ],
+              "name": "BlueChew",
+              "id": "167823547386064",
+              "tasks": [
+                "MODERATE",
+                "ANALYZE",
+                "ADVERTISE"
+              ]
+            }
+          ],
+          "paging": {
+            "cursors": {
+              "before": "QVFIUlJ4cnRHWVBTUnlfSlU1SU5CamNRdTVQdVZAzQ2RBRkNuWFZAPUlJvZADFzUDZANQ1RLaWpkWUNSR0xpMVZARaTFOZAzBVeEJEaGhneGUwem9NYlJYS1V1M1ZAn",
+              "after": "QVFIUnNocEZAuZAThYSEdpVmxOczB1ZAkRqLXJIbzVNOW1QWHQzZA3VESjM3UkRHcXR4XzdLNXJUQ2F0dF9GcDhsY0NwRW81OVUwZAkZANSU9aNW9CWWdNTjlFSGdB"
+            }
+          }
+        }
+      }
+    ],
+    "Ads in single Ad Account": [
+      {
+        "json": {
+          "data": [
+            {
+              "account_id": "10013762",
+              "id": "6730161493972",
+              "name": "Mainstage POV_Multi_GIF_lifestyle_mainstage-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1095602869261755",
+                "object_type": "SHARE",
+                "id": "1721525458761346"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6730161493772",
+              "name": "Mainstage POV_Multi_GIF_lifestyle_mainstage-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1095604982594877",
+                "object_type": "SHARE",
+                "id": "645721084730664"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701059137172",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV1",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109651111077",
+                "object_type": "SHARE",
+                "id": "621321484026054"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724085750172",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885532766822",
+                "object_type": "SHARE",
+                "id": "1288842558851078"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6730074613172",
+              "name": "Mainstage_Multi_GIF_lifestyle_mainstage-LP_client",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1095588189263223",
+                "object_type": "SHARE",
+                "id": "1389375612070984"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701542299172",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109651111077",
+                "object_type": "SHARE",
+                "id": "621321484026054"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6730074613372",
+              "name": "Mainstage_Multi_GIF_lifestyle_mainstage-LP_client",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1095579005930808",
+                "object_type": "SHARE",
+                "id": "685558733940995"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701542298572",
+              "name": "Spring-Breakers_Bracelets_GIF_lifestyle_spring-breakers-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109624444413",
+                "object_type": "SHARE",
+                "id": "484030248121089"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724085750372",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885539433488",
+                "object_type": "SHARE",
+                "id": "535753546245030"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6700902821172",
+              "name": "Spring-Breakers_Multi_PH_lifestyle_spring-breakers-LP_client_V3 - Copy 2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1076995481122494",
+                "object_type": "SHARE",
+                "id": "637669225575235"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701071343772",
+              "name": "Spring-Breakers_Bracelets_GIF_lifestyle_spring-breakers-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109624444413",
+                "object_type": "SHARE",
+                "id": "484030248121089"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6692969320972",
+              "name": "Spring-Breakers_Multi_VID_UGC_spring-breakers-LP_Social-Savannah_V1-Music - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1072203741601668",
+                "object_type": "SHARE",
+                "id": "1639849253592107"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701542298372",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109597777749",
+                "object_type": "SHARE",
+                "id": "655529220271308"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701061917772",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109597777749",
+                "object_type": "SHARE",
+                "id": "655529220271308"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701071344572",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109651111077",
+                "object_type": "SHARE",
+                "id": "621321484026054"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724089150772",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885539433488",
+                "object_type": "SHARE",
+                "id": "535753546245030"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6700902821572",
+              "name": "Spring-Breakers_Multi_PH_lifestyle_spring-breakers-LP_client_V2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1076995474455828",
+                "object_type": "SHARE",
+                "id": "1612375392741401"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724081374572",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885539433488",
+                "object_type": "SHARE",
+                "id": "535753546245030"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724089150972",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885532766822",
+                "object_type": "SHARE",
+                "id": "1288842558851078"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701071344372",
+              "name": "Spring-Breakers_Necklace_GIF_lifestyle_spring-breakers-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109607777748",
+                "object_type": "SHARE",
+                "id": "1282928912780962"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724077367572",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v1",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885532766822",
+                "object_type": "SHARE",
+                "id": "1288842558851078"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701071344172",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109597777749",
+                "object_type": "SHARE",
+                "id": "655529220271308"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6692963920372",
+              "name": "Spring-Breakers_Multi_VID_UGC_spring-breakers-LP_Social-Savannah_V1-Music",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1072203741601668",
+                "object_type": "SHARE",
+                "id": "1639849253592107"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724085749972",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_client_psa - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885492766826",
+                "body": "Mix metals & sizes to make a statement with NEW PV Charms, starting at $7.",
+                "title": "MADE TO MIX & MATCH!",
+                "object_type": "VIDEO",
+                "id": "2112185242563761"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724042815972",
+              "name": "Evergreen_Multi_VID_UGC_home-page_client_favorites - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093877029434339",
+                "body": "Bracelet packs, initial styles, charms, and more!",
+                "title": "Check out this must have jewelry from Pura Vida.",
+                "object_type": "VIDEO",
+                "id": "4045262795694384"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724089151172",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_client_psa - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885492766826",
+                "body": "Mix metals & sizes to make a statement with NEW PV Charms, starting at $7.",
+                "title": "MADE TO MIX & MATCH!",
+                "object_type": "VIDEO",
+                "id": "2112185242563761"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724060995172",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_client_psa",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885492766826",
+                "body": "Mix metals & sizes to make a statement with NEW PV Charms, starting at $7.",
+                "title": "MADE TO MIX & MATCH!",
+                "object_type": "VIDEO",
+                "id": "2112185242563761"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724045640572",
+              "name": "Evergreen_Multi_VID_UGC_home-page_client_favorites",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093877029434339",
+                "body": "Bracelet packs, initial styles, charms, and more!",
+                "title": "Check out this must have jewelry from Pura Vida.",
+                "object_type": "VIDEO",
+                "id": "4045262795694384"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724041761772",
+              "name": "Evergreen_Multi_VID_UGC_home-page_client_favorites",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093877029434339",
+                "body": "Bracelet packs, initial styles, charms, and more!",
+                "title": "Check out this must have jewelry from Pura Vida.",
+                "object_type": "VIDEO",
+                "id": "4045262795694384"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6730074613572",
+              "name": "Mainstage_Multi_GIF_lifestyle_mainstage-LP_client",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1095599565928752",
+                "object_type": "SHARE",
+                "id": "2985650304928315"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090596372",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885532766822",
+                "object_type": "SHARE",
+                "id": "1288842558851078"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090595972",
+              "name": "Evergreen_Multi_VID_UGC_home-page_client_favorites - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093877029434339",
+                "body": "Bracelet packs, initial styles, charms, and more!",
+                "title": "Check out this must have jewelry from Pura Vida.",
+                "object_type": "VIDEO",
+                "id": "4045262795694384"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090595772",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885539433488",
+                "object_type": "SHARE",
+                "id": "535753546245030"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090592372",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885532766822",
+                "object_type": "SHARE",
+                "id": "1288842558851078"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090591972",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_client_psa - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885492766826",
+                "body": "Mix metals & sizes to make a statement with NEW PV Charms, starting at $7.",
+                "title": "MADE TO MIX & MATCH!",
+                "object_type": "VIDEO",
+                "id": "2112185242563761"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090591772",
+              "name": "Evergreen_Multi_VID_UGC_home-page_client_favorites - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093877029434339",
+                "body": "Bracelet packs, initial styles, charms, and more!",
+                "title": "Check out this must have jewelry from Pura Vida.",
+                "object_type": "VIDEO",
+                "id": "4045262795694384"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090592172",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885539433488",
+                "object_type": "SHARE",
+                "id": "535753546245030"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090596172",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_client_psa - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885492766826",
+                "body": "Mix metals & sizes to make a statement with NEW PV Charms, starting at $7.",
+                "title": "MADE TO MIX & MATCH!",
+                "object_type": "VIDEO",
+                "id": "2112185242563761"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6639414864772",
+              "name": "Charms_VID_Lifestyle_Harper-Charms-LP_Client_Emojis-Charms - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093879592767416",
+                "body": "Introducing PV’s NEW waterproof charms! Choose from 4 new alphabets, zodiacs, angel numbers & 30+ symbols starting at $7.",
+                "title": "Charmed to meet these NEW styles ❤️‍🔥",
+                "object_type": "VIDEO",
+                "id": "2036768323464822"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6639413038572",
+              "name": "Charms_PH_Product-Image_Harper-Charms-LP_Client_Ad5",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093878812767494",
+                "object_type": "SHARE",
+                "id": "3967591163528477"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624587020372",
+              "name": "Evergreen_Best-Sellers_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850479873774057",
+                "body": "You 🤝 New Jewelry. Shop our best sellers.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585792376972"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586793772",
+              "name": "Evergreen_New-Arrivals_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850480350440676",
+                "body": "FOUND: your new favorite piece.✨ Shop new arrivals.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585792526172"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701333145972",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109597777749",
+                "object_type": "SHARE",
+                "id": "655529220271308"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701333145172",
+              "name": "Spring-Breakers_Bracelets_GIF_lifestyle_spring-breakers-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109624444413",
+                "object_type": "SHARE",
+                "id": "484030248121089"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701340258572",
+              "name": "Spring-Breakers_Necklace_GIF_lifestyle_spring-breakers-LP_client - Copy 2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109607777748",
+                "object_type": "SHARE",
+                "id": "1282928912780962"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701333146172",
+              "name": "Spring-Breakers_Multi_PH_lifestyle_spring-breakers-LP_client_V2 - Copy 2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1076995474455828",
+                "object_type": "SHARE",
+                "id": "1612375392741401"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701333144972",
+              "name": "Spring-Breakers_Multi_PH_lifestyle_spring-breakers-LP_client_V3 - Copy 2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077184657770243",
+                "object_type": "SHARE",
+                "id": "661278926275124"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701340258772",
+              "name": "Spring-Breakers_Bracelets_GIF_lifestyle_spring-breakers-LP_client - Copy 2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109624444413",
+                "object_type": "SHARE",
+                "id": "484030248121089"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6700902262372",
+              "name": "Spring-Breakers_Multi_PH_lifestyle_spring-breakers-LP_client_V1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1076995487789160",
+                "object_type": "SHARE",
+                "id": "642063818764283"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624581552972",
+              "name": "Brat-Summer-Collection_Bracelet_Collection_Product-Image_Brat-Summer-Colelction-LP_Client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "image_url": "https://scontent-cph2-1.xx.fbcdn.net/v/t45.1600-4/452214347_6610611648172_1501256086990761009_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=890911&_nc_ohc=34j-SFXZmpwQ7kNvwGzROpV&_nc_oc=Adm30sr_EJnalyOaf875nekZgfRxjusjXCtaI5ufrG1-0PCZKhddsNNuSWbQ1A5IMPw&_nc_zt=1&_nc_ht=scontent-cph2-1.xx&edm=AOgd6ZUEAAAA&_nc_gid=NHNNNR7fG8rayvGYZ8xlOg&oh=00_AfFDsAFZZTUJxZFgNulyR7-Z8aBFs-ESzjIHVMrn7ZOxKg&oe=6806701F",
+                "effective_object_story_id": "138876992797995_910550167767027",
+                "body": "Shop the Brat Summer Collection by Pura Vida!",
+                "title": "PV IS BRAT 💚",
+                "object_type": "SHARE",
+                "id": "6610614686772"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6660433061172",
+              "name": "Evergreen_Best-Sellers_DPA-Slideshow_Dynamic-LP",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1045533460935363",
+                "body": "You 🤝 New Jewelry. Shop our best sellers.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "502811636169710"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6660433061572",
+              "name": "Evergreen_Best-Sellers_DPA_Dynamic-LP",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1045533457602030",
+                "body": "You 🤝 New Jewelry. Shop our best sellers.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "597471089754654"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6680926507172",
+              "name": "Casely-Collection_DPA-Slideshow_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1061780149310694",
+                "body": "Choose your dream PV Phone Chain style & size, and pair with your favorite Harper Charms for a look uniquely yours. Shop today!",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "9414610385244502"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6678790774372",
+              "name": "Casely_PH_Lifestyle_casely-LP_Client_Ad3 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1060226792799363",
+                "object_type": "SHARE",
+                "id": "1433802658026249"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6660433064372",
+              "name": "Evergreen_New-Arrivals_DPA_Dynamic-LP",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1045533454268697",
+                "body": "FOUND: your new favorite piece.✨ Shop new arrivals.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "4076846722641064"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586882572",
+              "name": "Evergreen_Charms_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1045504570938252",
+                "body": "In for 2025: ✨ CHARMS ✨ Buy 3 charms, get 1 FREE!",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "960303035645704"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6629605014772",
+              "name": "Evergreen_Bracelets_String_PH_Lifestyle_String-bracelets-anklets-LP_PDM_Ad4",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_968945938594116",
+                "object_type": "SHARE",
+                "id": "6629604980772"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586793972",
+              "name": "Evergreen_New-Arrivals_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_959841816171195",
+                "body": "FOUND: your new favorite piece.✨ Shop new arrivals.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6626887822572"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624587066572",
+              "name": "Evergreen_All-Products_DPA-Slideshow_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_938914708263906",
+                "body": "Pura Vida makes the perfect bracelet, ring & jewelry sets to layer, stack, and share with friends at an affordable price.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6621122579372"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586960372",
+              "name": "Gifting-Collection_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850523540436357",
+                "body": "The NEW Gifting Collection features nine refreshed takes on our OG string style to surprise your loved ones for any occasion.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585795832172"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6629604797972",
+              "name": "Evergreen_Bracelet_String_PH_Lifestyle_String-bracelets-anklets-LP_PDM_Ad2-Pool",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_968946358594074",
+                "object_type": "SHARE",
+                "id": "6629604996372"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6627923573372",
+              "name": "Evergreen_Bracelet_String_VID_UGC_String-bracelets-anklets-LP_Social- Savannah_V2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_963252152496828",
+                "object_type": "SHARE",
+                "id": "6627922743172"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624583834772",
+              "name": "Brat-Summer-Collection_Bracelet_Collection_Product-Image_Brat-Summer-Colelction-LP_Client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "image_url": "https://scontent-cph2-1.xx.fbcdn.net/v/t45.1600-4/452214347_6610611648172_1501256086990761009_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=890911&_nc_ohc=34j-SFXZmpwQ7kNvwGzROpV&_nc_oc=Adm30sr_EJnalyOaf875nekZgfRxjusjXCtaI5ufrG1-0PCZKhddsNNuSWbQ1A5IMPw&_nc_zt=1&_nc_ht=scontent-cph2-1.xx&edm=AOgd6ZUEAAAA&_nc_gid=NHNNNR7fG8rayvGYZ8xlOg&oh=00_AfFDsAFZZTUJxZFgNulyR7-Z8aBFs-ESzjIHVMrn7ZOxKg&oe=6806701F",
+                "effective_object_story_id": "138876992797995_910550167767027",
+                "body": "Shop the Brat Summer Collection by Pura Vida!",
+                "title": "PV IS BRAT 💚",
+                "object_type": "SHARE",
+                "id": "6610614686772"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586960172",
+              "name": "Gifting-Collection_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850523540436357",
+                "body": "The NEW Gifting Collection features nine refreshed takes on our OG string style to surprise your loved ones for any occasion.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585795832172"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586747572",
+              "name": "Evergreen_All-Products_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850480123774032",
+                "body": "Pura Vida makes the perfect bracelet, ring & jewelry sets to layer, stack, and share with friends at an affordable price.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585792398972"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624588795572",
+              "name": "Game-Day-Collection_Bracelets_String_DPA-Carousel_Dynamic-LP",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_951112907044086",
+                "body": "Support your school, club, or fave pro team this season with 20+ new string styles from Pura Vida's Game Day Collection!",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6624588687772"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586883572",
+              "name": "Evergreen_Charms_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850479730440738",
+                "body": "In for 2024: ✨ CHARMS ✨ Buy 3 charms, get 1 FREE!",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585792364172"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624587020172",
+              "name": "Evergreen_Best-Sellers_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850479873774057",
+                "body": "You 🤝 New Jewelry. Shop our best sellers.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585792376972"
+              }
+            }
+          ],
+          "paging": {
+            "cursors": {
+              "before": "QVFIUl9abXg0TEpSeVNtV0QwaHZA3cWI4YmlvSk1hdXpRQTBvRFZATVzRwUFY2ejhWTHlmQVk5bW1FaEdMaVhuaHVENGEZD",
+              "after": "QVFIUmZAWUFJLU2N4Y1Vyc2NseDlKMWJKdVBvUldqVGhaZAFQybkJKN1FMVXVMLW5LcmxqZAU9PVk0zWktsNVYweEMxM1AZD"
+            }
+          }
+        }
+      }
+    ],
+    "HTTP Request": [
+      {
+        "json": {
+          "data": [
+            {
+              "account_id": "10013762",
+              "id": "act_10013762"
+            },
+            {
+              "account_id": "31302864",
+              "id": "act_31302864"
+            },
+            {
+              "account_id": "24267290",
+              "id": "act_24267290"
+            },
+            {
+              "account_id": "63345343",
+              "id": "act_63345343"
+            },
+            {
+              "account_id": "11465889",
+              "id": "act_11465889"
+            },
+            {
+              "account_id": "100903846770105",
+              "id": "act_100903846770105"
+            },
+            {
+              "account_id": "10151944447156892",
+              "id": "act_10151944447156892"
+            },
+            {
+              "account_id": "648054745273544",
+              "id": "act_648054745273544"
+            },
+            {
+              "account_id": "10153721067176823",
+              "id": "act_10153721067176823"
+            },
+            {
+              "account_id": "1014722898567620",
+              "id": "act_1014722898567620"
+            },
+            {
+              "account_id": "946638138790587",
+              "id": "act_946638138790587"
+            },
+            {
+              "account_id": "1540283449603818",
+              "id": "act_1540283449603818"
+            },
+            {
+              "account_id": "1720623098190582",
+              "id": "act_1720623098190582"
+            },
+            {
+              "account_id": "2055367638021878",
+              "id": "act_2055367638021878"
+            },
+            {
+              "account_id": "1275994852413798",
+              "id": "act_1275994852413798"
+            },
+            {
+              "account_id": "109138676266163",
+              "id": "act_109138676266163"
+            },
+            {
+              "account_id": "983655391737566",
+              "id": "act_983655391737566"
+            },
+            {
+              "account_id": "1885562414916014",
+              "id": "act_1885562414916014"
+            },
+            {
+              "account_id": "487093771651007",
+              "id": "act_487093771651007"
+            },
+            {
+              "account_id": "142568463114018",
+              "id": "act_142568463114018"
+            },
+            {
+              "account_id": "324607834783946",
+              "id": "act_324607834783946"
+            },
+            {
+              "account_id": "565961420800129",
+              "id": "act_565961420800129"
+            },
+            {
+              "account_id": "1037164476661023",
+              "id": "act_1037164476661023"
+            },
+            {
+              "account_id": "2833275190091848",
+              "id": "act_2833275190091848"
+            },
+            {
+              "account_id": "520983948579872",
+              "id": "act_520983948579872"
+            }
+          ],
+          "paging": {
+            "cursors": {
+              "before": "NjAwMjIwMzgwNDc3MgZDZD",
+              "after": "MjM4NDQ0MDQxMzM2NTA2MDYZD"
+            },
+            "next": "https://graph.facebook.com/v22.0/4512243298914566/adaccounts?limit=25&after=MjM4NDQ0MDQxMzM2NTA2MDYZD"
+          }
+        }
+      }
+    ],
+    "HTTP Request7": [
+      {
+        "json": {
+          "data": [
+            {
+              "account_id": "544101099565265",
+              "id": "act_544101099565265"
+            },
+            {
+              "account_id": "171200514141877",
+              "id": "act_171200514141877"
+            },
+            {
+              "account_id": "203947687339022",
+              "id": "act_203947687339022"
+            },
+            {
+              "account_id": "341506577042879",
+              "id": "act_341506577042879"
+            },
+            {
+              "account_id": "261524662176587",
+              "id": "act_261524662176587"
+            },
+            {
+              "account_id": "198298135521375",
+              "id": "act_198298135521375"
+            },
+            {
+              "account_id": "833355240553076",
+              "id": "act_833355240553076"
+            },
+            {
+              "account_id": "146707570986002",
+              "id": "act_146707570986002"
+            },
+            {
+              "account_id": "2838061303152300",
+              "id": "act_2838061303152300"
+            },
+            {
+              "account_id": "733706111350062",
+              "id": "act_733706111350062"
+            },
+            {
+              "account_id": "364342085861580",
+              "id": "act_364342085861580"
+            },
+            {
+              "account_id": "950394865670257",
+              "id": "act_950394865670257"
+            },
+            {
+              "account_id": "721735812409276",
+              "id": "act_721735812409276"
+            },
+            {
+              "account_id": "406230428159162",
+              "id": "act_406230428159162"
+            },
+            {
+              "account_id": "503593958446103",
+              "id": "act_503593958446103"
+            },
+            {
+              "account_id": "560344305898485",
+              "id": "act_560344305898485"
+            },
+            {
+              "account_id": "944547296918835",
+              "id": "act_944547296918835"
+            },
+            {
+              "account_id": "183335604417402",
+              "id": "act_183335604417402"
+            },
+            {
+              "account_id": "1443791226421918",
+              "id": "act_1443791226421918"
+            },
+            {
+              "account_id": "744157467080691",
+              "id": "act_744157467080691"
+            },
+            {
+              "account_id": "801845211351752",
+              "id": "act_801845211351752"
+            },
+            {
+              "account_id": "212768954989629",
+              "id": "act_212768954989629"
+            },
+            {
+              "account_id": "1377627439553191",
+              "id": "act_1377627439553191"
+            },
+            {
+              "account_id": "352682421165539",
+              "id": "act_352682421165539"
+            },
+            {
+              "account_id": "1101573340951675",
+              "id": "act_1101573340951675"
+            }
+          ],
+          "paging": {
+            "cursors": {
+              "before": "MjM4NDQ0MjQ4MTkzMzAyOTYZD",
+              "after": "MTIwMjEwMzM3ODkzNzEwMzgw"
+            },
+            "next": "https://graph.facebook.com/v22.0/4512243298914566/adaccounts?limit=25&after=MTIwMjEwMzM3ODkzNzEwMzgw",
+            "previous": "https://graph.facebook.com/v22.0/4512243298914566/adaccounts?limit=25&before=MjM4NDQ0MjQ4MTkzMzAyOTYZD"
+          }
+        }
+      }
+    ],
+    "Wait": [
+      {
+        "json": {
+          "data": [
+            {
+              "account_id": "10013762",
+              "id": "6730161493972",
+              "name": "Mainstage POV_Multi_GIF_lifestyle_mainstage-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1095602869261755",
+                "object_type": "SHARE",
+                "id": "1721525458761346"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6730161493772",
+              "name": "Mainstage POV_Multi_GIF_lifestyle_mainstage-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1095604982594877",
+                "object_type": "SHARE",
+                "id": "645721084730664"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701059137172",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV1",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109651111077",
+                "object_type": "SHARE",
+                "id": "621321484026054"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724085750172",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885532766822",
+                "object_type": "SHARE",
+                "id": "1288842558851078"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6730074613172",
+              "name": "Mainstage_Multi_GIF_lifestyle_mainstage-LP_client",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1095588189263223",
+                "object_type": "SHARE",
+                "id": "1389375612070984"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701542299172",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109651111077",
+                "object_type": "SHARE",
+                "id": "621321484026054"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6730074613372",
+              "name": "Mainstage_Multi_GIF_lifestyle_mainstage-LP_client",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1095579005930808",
+                "object_type": "SHARE",
+                "id": "685558733940995"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701542298572",
+              "name": "Spring-Breakers_Bracelets_GIF_lifestyle_spring-breakers-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109624444413",
+                "object_type": "SHARE",
+                "id": "484030248121089"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724085750372",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885539433488",
+                "object_type": "SHARE",
+                "id": "535753546245030"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6700902821172",
+              "name": "Spring-Breakers_Multi_PH_lifestyle_spring-breakers-LP_client_V3 - Copy 2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1076995481122494",
+                "object_type": "SHARE",
+                "id": "637669225575235"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701071343772",
+              "name": "Spring-Breakers_Bracelets_GIF_lifestyle_spring-breakers-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109624444413",
+                "object_type": "SHARE",
+                "id": "484030248121089"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6692969320972",
+              "name": "Spring-Breakers_Multi_VID_UGC_spring-breakers-LP_Social-Savannah_V1-Music - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1072203741601668",
+                "object_type": "SHARE",
+                "id": "1639849253592107"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701542298372",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109597777749",
+                "object_type": "SHARE",
+                "id": "655529220271308"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701061917772",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109597777749",
+                "object_type": "SHARE",
+                "id": "655529220271308"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701071344572",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109651111077",
+                "object_type": "SHARE",
+                "id": "621321484026054"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724089150772",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885539433488",
+                "object_type": "SHARE",
+                "id": "535753546245030"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6700902821572",
+              "name": "Spring-Breakers_Multi_PH_lifestyle_spring-breakers-LP_client_V2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1076995474455828",
+                "object_type": "SHARE",
+                "id": "1612375392741401"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724081374572",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885539433488",
+                "object_type": "SHARE",
+                "id": "535753546245030"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724089150972",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885532766822",
+                "object_type": "SHARE",
+                "id": "1288842558851078"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701071344372",
+              "name": "Spring-Breakers_Necklace_GIF_lifestyle_spring-breakers-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109607777748",
+                "object_type": "SHARE",
+                "id": "1282928912780962"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724077367572",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v1",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885532766822",
+                "object_type": "SHARE",
+                "id": "1288842558851078"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701071344172",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109597777749",
+                "object_type": "SHARE",
+                "id": "655529220271308"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6692963920372",
+              "name": "Spring-Breakers_Multi_VID_UGC_spring-breakers-LP_Social-Savannah_V1-Music",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1072203741601668",
+                "object_type": "SHARE",
+                "id": "1639849253592107"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724085749972",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_client_psa - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885492766826",
+                "body": "Mix metals & sizes to make a statement with NEW PV Charms, starting at $7.",
+                "title": "MADE TO MIX & MATCH!",
+                "object_type": "VIDEO",
+                "id": "2112185242563761"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724042815972",
+              "name": "Evergreen_Multi_VID_UGC_home-page_client_favorites - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093877029434339",
+                "body": "Bracelet packs, initial styles, charms, and more!",
+                "title": "Check out this must have jewelry from Pura Vida.",
+                "object_type": "VIDEO",
+                "id": "4045262795694384"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724089151172",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_client_psa - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885492766826",
+                "body": "Mix metals & sizes to make a statement with NEW PV Charms, starting at $7.",
+                "title": "MADE TO MIX & MATCH!",
+                "object_type": "VIDEO",
+                "id": "2112185242563761"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724060995172",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_client_psa",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885492766826",
+                "body": "Mix metals & sizes to make a statement with NEW PV Charms, starting at $7.",
+                "title": "MADE TO MIX & MATCH!",
+                "object_type": "VIDEO",
+                "id": "2112185242563761"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724045640572",
+              "name": "Evergreen_Multi_VID_UGC_home-page_client_favorites",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093877029434339",
+                "body": "Bracelet packs, initial styles, charms, and more!",
+                "title": "Check out this must have jewelry from Pura Vida.",
+                "object_type": "VIDEO",
+                "id": "4045262795694384"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724041761772",
+              "name": "Evergreen_Multi_VID_UGC_home-page_client_favorites",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093877029434339",
+                "body": "Bracelet packs, initial styles, charms, and more!",
+                "title": "Check out this must have jewelry from Pura Vida.",
+                "object_type": "VIDEO",
+                "id": "4045262795694384"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6730074613572",
+              "name": "Mainstage_Multi_GIF_lifestyle_mainstage-LP_client",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1095599565928752",
+                "object_type": "SHARE",
+                "id": "2985650304928315"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090596372",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885532766822",
+                "object_type": "SHARE",
+                "id": "1288842558851078"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090595972",
+              "name": "Evergreen_Multi_VID_UGC_home-page_client_favorites - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093877029434339",
+                "body": "Bracelet packs, initial styles, charms, and more!",
+                "title": "Check out this must have jewelry from Pura Vida.",
+                "object_type": "VIDEO",
+                "id": "4045262795694384"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090595772",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885539433488",
+                "object_type": "SHARE",
+                "id": "535753546245030"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090592372",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885532766822",
+                "object_type": "SHARE",
+                "id": "1288842558851078"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090591972",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_client_psa - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885492766826",
+                "body": "Mix metals & sizes to make a statement with NEW PV Charms, starting at $7.",
+                "title": "MADE TO MIX & MATCH!",
+                "object_type": "VIDEO",
+                "id": "2112185242563761"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090591772",
+              "name": "Evergreen_Multi_VID_UGC_home-page_client_favorites - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093877029434339",
+                "body": "Bracelet packs, initial styles, charms, and more!",
+                "title": "Check out this must have jewelry from Pura Vida.",
+                "object_type": "VIDEO",
+                "id": "4045262795694384"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090592172",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_social-savannah_v2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885539433488",
+                "object_type": "SHARE",
+                "id": "535753546245030"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6724090596172",
+              "name": "Charms_Multi_VID_UGC_harper-charm-lp_client_psa - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093885492766826",
+                "body": "Mix metals & sizes to make a statement with NEW PV Charms, starting at $7.",
+                "title": "MADE TO MIX & MATCH!",
+                "object_type": "VIDEO",
+                "id": "2112185242563761"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6639414864772",
+              "name": "Charms_VID_Lifestyle_Harper-Charms-LP_Client_Emojis-Charms - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093879592767416",
+                "body": "Introducing PV’s NEW waterproof charms! Choose from 4 new alphabets, zodiacs, angel numbers & 30+ symbols starting at $7.",
+                "title": "Charmed to meet these NEW styles ❤️‍🔥",
+                "object_type": "VIDEO",
+                "id": "2036768323464822"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6639413038572",
+              "name": "Charms_PH_Product-Image_Harper-Charms-LP_Client_Ad5",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1093878812767494",
+                "object_type": "SHARE",
+                "id": "3967591163528477"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624587020372",
+              "name": "Evergreen_Best-Sellers_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850479873774057",
+                "body": "You 🤝 New Jewelry. Shop our best sellers.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585792376972"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586793772",
+              "name": "Evergreen_New-Arrivals_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850480350440676",
+                "body": "FOUND: your new favorite piece.✨ Shop new arrivals.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585792526172"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701333145972",
+              "name": "Spring-Breakers_Multi_GIF_lifestyle_spring-breakers-LP_client_PostcardV2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109597777749",
+                "object_type": "SHARE",
+                "id": "655529220271308"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701333145172",
+              "name": "Spring-Breakers_Bracelets_GIF_lifestyle_spring-breakers-LP_client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109624444413",
+                "object_type": "SHARE",
+                "id": "484030248121089"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701340258572",
+              "name": "Spring-Breakers_Necklace_GIF_lifestyle_spring-breakers-LP_client - Copy 2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109607777748",
+                "object_type": "SHARE",
+                "id": "1282928912780962"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701333146172",
+              "name": "Spring-Breakers_Multi_PH_lifestyle_spring-breakers-LP_client_V2 - Copy 2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1076995474455828",
+                "object_type": "SHARE",
+                "id": "1612375392741401"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701333144972",
+              "name": "Spring-Breakers_Multi_PH_lifestyle_spring-breakers-LP_client_V3 - Copy 2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077184657770243",
+                "object_type": "SHARE",
+                "id": "661278926275124"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6701340258772",
+              "name": "Spring-Breakers_Bracelets_GIF_lifestyle_spring-breakers-LP_client - Copy 2",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1077109624444413",
+                "object_type": "SHARE",
+                "id": "484030248121089"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6700902262372",
+              "name": "Spring-Breakers_Multi_PH_lifestyle_spring-breakers-LP_client_V1 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1076995487789160",
+                "object_type": "SHARE",
+                "id": "642063818764283"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624581552972",
+              "name": "Brat-Summer-Collection_Bracelet_Collection_Product-Image_Brat-Summer-Colelction-LP_Client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "image_url": "https://scontent-cph2-1.xx.fbcdn.net/v/t45.1600-4/452214347_6610611648172_1501256086990761009_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=890911&_nc_ohc=34j-SFXZmpwQ7kNvwGzROpV&_nc_oc=Adm30sr_EJnalyOaf875nekZgfRxjusjXCtaI5ufrG1-0PCZKhddsNNuSWbQ1A5IMPw&_nc_zt=1&_nc_ht=scontent-cph2-1.xx&edm=AOgd6ZUEAAAA&_nc_gid=NHNNNR7fG8rayvGYZ8xlOg&oh=00_AfFDsAFZZTUJxZFgNulyR7-Z8aBFs-ESzjIHVMrn7ZOxKg&oe=6806701F",
+                "effective_object_story_id": "138876992797995_910550167767027",
+                "body": "Shop the Brat Summer Collection by Pura Vida!",
+                "title": "PV IS BRAT 💚",
+                "object_type": "SHARE",
+                "id": "6610614686772"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6660433061172",
+              "name": "Evergreen_Best-Sellers_DPA-Slideshow_Dynamic-LP",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1045533460935363",
+                "body": "You 🤝 New Jewelry. Shop our best sellers.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "502811636169710"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6660433061572",
+              "name": "Evergreen_Best-Sellers_DPA_Dynamic-LP",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1045533457602030",
+                "body": "You 🤝 New Jewelry. Shop our best sellers.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "597471089754654"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6680926507172",
+              "name": "Casely-Collection_DPA-Slideshow_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1061780149310694",
+                "body": "Choose your dream PV Phone Chain style & size, and pair with your favorite Harper Charms for a look uniquely yours. Shop today!",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "9414610385244502"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6678790774372",
+              "name": "Casely_PH_Lifestyle_casely-LP_Client_Ad3 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1060226792799363",
+                "object_type": "SHARE",
+                "id": "1433802658026249"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6660433064372",
+              "name": "Evergreen_New-Arrivals_DPA_Dynamic-LP",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1045533454268697",
+                "body": "FOUND: your new favorite piece.✨ Shop new arrivals.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "4076846722641064"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586882572",
+              "name": "Evergreen_Charms_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_1045504570938252",
+                "body": "In for 2025: ✨ CHARMS ✨ Buy 3 charms, get 1 FREE!",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "960303035645704"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6629605014772",
+              "name": "Evergreen_Bracelets_String_PH_Lifestyle_String-bracelets-anklets-LP_PDM_Ad4",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_968945938594116",
+                "object_type": "SHARE",
+                "id": "6629604980772"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586793972",
+              "name": "Evergreen_New-Arrivals_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_959841816171195",
+                "body": "FOUND: your new favorite piece.✨ Shop new arrivals.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6626887822572"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624587066572",
+              "name": "Evergreen_All-Products_DPA-Slideshow_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_938914708263906",
+                "body": "Pura Vida makes the perfect bracelet, ring & jewelry sets to layer, stack, and share with friends at an affordable price.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6621122579372"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586960372",
+              "name": "Gifting-Collection_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850523540436357",
+                "body": "The NEW Gifting Collection features nine refreshed takes on our OG string style to surprise your loved ones for any occasion.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585795832172"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6629604797972",
+              "name": "Evergreen_Bracelet_String_PH_Lifestyle_String-bracelets-anklets-LP_PDM_Ad2-Pool",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_968946358594074",
+                "object_type": "SHARE",
+                "id": "6629604996372"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6627923573372",
+              "name": "Evergreen_Bracelet_String_VID_UGC_String-bracelets-anklets-LP_Social- Savannah_V2 - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_963252152496828",
+                "object_type": "SHARE",
+                "id": "6627922743172"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624583834772",
+              "name": "Brat-Summer-Collection_Bracelet_Collection_Product-Image_Brat-Summer-Colelction-LP_Client - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "image_url": "https://scontent-cph2-1.xx.fbcdn.net/v/t45.1600-4/452214347_6610611648172_1501256086990761009_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=890911&_nc_ohc=34j-SFXZmpwQ7kNvwGzROpV&_nc_oc=Adm30sr_EJnalyOaf875nekZgfRxjusjXCtaI5ufrG1-0PCZKhddsNNuSWbQ1A5IMPw&_nc_zt=1&_nc_ht=scontent-cph2-1.xx&edm=AOgd6ZUEAAAA&_nc_gid=NHNNNR7fG8rayvGYZ8xlOg&oh=00_AfFDsAFZZTUJxZFgNulyR7-Z8aBFs-ESzjIHVMrn7ZOxKg&oe=6806701F",
+                "effective_object_story_id": "138876992797995_910550167767027",
+                "body": "Shop the Brat Summer Collection by Pura Vida!",
+                "title": "PV IS BRAT 💚",
+                "object_type": "SHARE",
+                "id": "6610614686772"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586960172",
+              "name": "Gifting-Collection_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850523540436357",
+                "body": "The NEW Gifting Collection features nine refreshed takes on our OG string style to surprise your loved ones for any occasion.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585795832172"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586747572",
+              "name": "Evergreen_All-Products_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850480123774032",
+                "body": "Pura Vida makes the perfect bracelet, ring & jewelry sets to layer, stack, and share with friends at an affordable price.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585792398972"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624588795572",
+              "name": "Game-Day-Collection_Bracelets_String_DPA-Carousel_Dynamic-LP",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_951112907044086",
+                "body": "Support your school, club, or fave pro team this season with 20+ new string styles from Pura Vida's Game Day Collection!",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6624588687772"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624586883572",
+              "name": "Evergreen_Charms_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850479730440738",
+                "body": "In for 2024: ✨ CHARMS ✨ Buy 3 charms, get 1 FREE!",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585792364172"
+              }
+            },
+            {
+              "account_id": "10013762",
+              "id": "6624587020172",
+              "name": "Evergreen_Best-Sellers_DPA_Dynamic-LP - Copy",
+              "status": "ACTIVE",
+              "creative": {
+                "effective_object_story_id": "138876992797995_850479873774057",
+                "body": "You 🤝 New Jewelry. Shop our best sellers.",
+                "title": "{{product.name}}",
+                "object_type": "SHARE",
+                "id": "6585792376972"
+              }
+            }
+          ],
+          "paging": {
+            "cursors": {
+              "before": "QVFIUl9abXg0TEpSeVNtV0QwaHZA3cWI4YmlvSk1hdXpRQTBvRFZATVzRwUFY2ejhWTHlmQVk5bW1FaEdMaVhuaHVENGEZD",
+              "after": "QVFIUmZAWUFJLU2N4Y1Vyc2NseDlKMWJKdVBvUldqVGhaZAFQybkJKN1FMVXVMLW5LcmxqZAU9PVk0zWktsNVYweEMxM1AZD"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "versionId": "7107a7c6-436a-47ea-ba7c-6588d02b30e6",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-04-17T07:27:59.870Z",
+      "updatedAt": "2025-04-17T07:27:59.870Z",
+      "role": "workflow:owner",
+      "workflowId": "OP1pvjLhQvTDvZyM",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,853 @@
+{
+  "createdAt": "2025-02-07T20:12:18.231Z",
+  "updatedAt": "2025-02-28T08:17:22.906Z",
+  "id": "Nm9PIF3JJd8yl8zT",
+  "name": "My workflow 5",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hey there I will help you to create your sales script with high quality  ",
+        "options": {
+          "responseMode": "lastNode"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2440,
+        280
+      ],
+      "id": "af6b01c4-90ee-4896-9a2e-7d7a5f129dbd",
+      "name": "When chat message received",
+      "webhookId": "7128ac6a-f575-4523-a740-23b26db12f15"
+    },
+    {
+      "parameters": {
+        "agent": "openAiFunctionsAgent",
+        "promptType": "define",
+        "text": "=user input: {{ $('When chat message received').item.json.chatInput }}\n\nsystem input: \n1. question:-  {{ $json.question }}\n2. follow_up:- {{ $json.follow_up }}\n3. title:- {{ $json.title }}\n4. description:- {{ $json.description }}",
+        "options": {
+          "systemMessage": "You are expert at interviewing people and analysing their response if it is fully answered or not.\n\n** You will be given the current question to be asked as active questions with all its description and follow-up question(in order to ask if the response is not clear enough).\n** You have to ask follow-up questions from the given context only.\n** You are not allowed to do anything rather than asking the given questions and analyzing.\n** Don't use any other questions.\n\nKey Rules & Considerations:\n1. Always maintain the `activeQuestion` index based on the `order` column.  \n2. Use the JSON format for all questions and follow-ups.  \n3. If the user skips a follow-up, move to the next question.  \n4. Ensure all questions and follow-ups are fetched and ordered correctly from the database.  \n5. End the interaction with the final message after all questions are answered.\n6. Don’t answer any other types of questions.\n7. Don’t accept or invite the user for further discussion.\n8. Don’t make any conversation other than asking questions from databases.\n9. Carefully analyse the user response if the answer that you get from the user is not enough clear just set the value of “fullyAnswered”: false\n\n\nWorkflow & Logic:\n1. Start the Conversation\nBegin the chat with:\n\"Hey, I'm your assistant that helps you create a *sales script* by asking questions. Are you ready for the questions?\"\n\n- Wait for user confirmation (e.g., \"Yes\" or \"Ready\").\n2. Accept & Track Questions\n- You will be provided with an active question with its follow-up questions and description  in the context.\n- Track the current question index and ensure questions are asked sequentially.\n3. Ask Questions One by One\nPresent each question along with its description.\n- Ensure responses are clear before moving to the next question by asking their follow-up from the Input below\n- Keep track of active question order so as to move to next question\n- Your feedback should be in json format like this to keep easy \n\n**AI (Question):**  \n{{\n  \"response\": \"What is the primary goal of this sales script? (e.g., Generate leads, close sales, book appointments, upsell products, etc.)\\n\\nDescription: This question helps us understand the main objective of your sales script. Please provide as much detail as possible.\",\n  \"activeQuestion\": 1,\n  \"isFollowup\": false, \n“fullyAnswered” false,\n}}\n**User:**  \n{{\"response\": \"Generate leads.\"}}\n4. Handle User Responses\n- If the user's response is vague (less than 5 words), ask the corresponding follow-up question to gather more details.\n- The user can choose to skip a follow-up question.\n- If the response is detailed, proceed to the next main question.\n\n5. Completion & Closing Message\nAfter all questions are answered, respond with:\n\"Thank you! Your sales script will be generated soon.\"\nExample Interaction:\nAI (Initial Greeting):  \n{{\"response\": \"Hey, I'm your assistant that helps you create a sales script by asking questions. Are you ready for the questions?\", \"activeQuestion\": 0, \"isFollowup\": false, “fullyAnswered”: false\n}}\nUser:\n{{\"response\": \"Yes\"}}\nAI (Question 1):\n{{\"response\": \"What is the primary goal of this sales script? (e.g., Generate leads, close sales, book appointments, upsell products, etc.)\", \"activeQuestion\": 0, \"isFollowup\": false, “fullyAnswered”: false\n}}\nUser: \n{{\"response\": \"Generate leads.\"}}\nAI (Follow-up): \n{{\"response\": \"Can you elaborate on how you plan to achieve this goal?\", \"activeQuestion\": 0, \"isFollowup\": true, “fullyAnswered”: false\n}}\nUser:\n{{\"response\": \"We plan to use cold email campaigns and social media outreach.\"}}\nAI (Question 2): \n{{\"response\": \"Who is your target audience? (e.g., Demographics, industry, job titles, pain points, or specific challenges they face.)\", \"activeQuestion\": 1, \"isFollowup\": false, “fullyAnswered”: true\n}}\nUser:\n{{\"response\": \"Small business owners in the tech industry.\"}}\nAI (Follow-up):\n{{\"response\": \"What are the biggest challenges or pain points your audience faces?\", \"activeQuestion\": 1, \"isFollowup\": true, “fullyAnswered”: false\n}}\nUser:\n{{\"response\": \"They struggle with customer acquisition and retention.\"}}\nAI (Question 3):\n{{\"response\": \"What are the key features or benefits of your product/service?\", \"activeQuestion\": 2, \"isFollowup\": false, “fullyAnswered”: True\n}}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -1400,
+        280
+      ],
+      "id": "9fc45aa2-5cd8-439a-a4e9-3f57c454e291",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        -1460,
+        520
+      ],
+      "id": "f737f738-b8dc-4247-9272-0307a4e70dce",
+      "name": "OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When chat message received').item.json.sessionId }}",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1320,
+        580
+      ],
+      "id": "3842c304-536b-4e35-81e6-50709f8c5292",
+      "name": "Window Buffer Memory",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "932f2693-f662-4a90-9873-e938849a7b81",
+              "name": "output",
+              "value": "={{ $json.data.response }}",
+              "type": "string"
+            },
+            {
+              "id": "6e483289-b477-4d20-91d7-f830aab06f6d",
+              "name": "sessionId",
+              "value": "={{ $('When chat message received').item.json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "de847283-a2fc-4261-a1db-8ed386e03520",
+              "name": "chatInput",
+              "value": "={{ $('When chat message received').item.json.chatInput }}",
+              "type": "string"
+            },
+            {
+              "id": "c0ba4af1-1f9a-4a60-82f2-a6e2b849c4d2",
+              "name": "active_question_id",
+              "value": "={{ $('check session').item.json.active_question_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -600,
+        160
+      ],
+      "id": "f4b6d1e4-4564-49cb-89e2-8fbb196519a6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('check session').item.json.id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "number",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b80549d8-887c-4f5a-84e4-7e8f0f8f2e63",
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -380,
+        160
+      ],
+      "id": "a486a4cd-86ff-428c-b054-785a88852d8b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $('check session').item.json.docs_id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Edit Fields').item.json.chatInput }}\n{{ $('Edit Fields').item.json.output }}\n\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        40
+      ],
+      "id": "488e7262-3899-4bba-8fde-00edc07aaf0d",
+      "name": "Google Docs"
+    },
+    {
+      "parameters": {
+        "folderId": "1u2pzIHb1AhakChadj6X1Tvq7NFLC_B8b",
+        "title": "=chat session {{ $('Edit Fields').item.json.sessionId }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        280
+      ],
+      "id": "96c8c86c-339a-4782-b293-427c23e9643a",
+      "name": "Google Docs2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "203035ec-e225-4669-a0bc-d3d3e51b9bf0",
+              "name": "output",
+              "value": "={{ $json.data.response }}",
+              "type": "string"
+            },
+            {
+              "id": "05ee753a-6c48-4118-9490-d183c94896a0",
+              "name": "activeQuestion",
+              "value": "={{ $json.data.activeQuestion }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        440
+      ],
+      "id": "8a7ee44c-49c2-4648-9677-be7c4612fdde",
+      "name": "Output"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.docs_id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Edit Fields').item.json.chatInput }}\n{{ $('Edit Fields').item.json.output }}\n\n"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        280,
+        280
+      ],
+      "id": "466ccf11-5512-4110-8579-e24cbf88f7d9",
+      "name": "Google Docs3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b15b6ccf-89c3-4701-804c-110ff61612cc",
+              "name": "data",
+              "value": "={{ $json.output }}",
+              "type": "object"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "e48a5db3-dfb0-4002-a0f1-e5acfd4cf561",
+      "name": "convert String to JSON",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [
+        -820,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Get  question and its follow up question by executing the given query\n\ntable definition:\n\ncreate table public.question_bank (\n  id integer generated by default as identity not null,\n  created_at timestamp with time zone not null default now(),\n  title text null,\n  question text null,\n  description text null,\n  vidoe_url text null,\n  follow_up text null,\n  order_no smallint generated by default as identity not null,\n  constraint question_bank_pkey primary key (id, order_no),\n  constraint question_bank_order_no_key unique (order_no)\n) TABLESPACE pg_default;",
+        "operation": "executeQuery",
+        "query": "SELECT * FROM question_bank WHERE order_no = {{ $json.active_question_id }};",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.5,
+      "position": [
+        -940,
+        500
+      ],
+      "id": "2c334c36-723f-473b-96f2-68afda00ca5d",
+      "name": "questions"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('convert String to JSON').item.json.data.fullyAnswered }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c2a0a1e7-cfd4-4b3d-9536-a16cec1f8280",
+                    "leftValue": "={{ $('Edit Fields').item.json.chatInput }}",
+                    "rightValue": "skip",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        80,
+        40
+      ],
+      "id": "2c62a2bd-df5b-40f8-8ccf-fd710116c245",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "session",
+          "mode": "list",
+          "cachedResultName": "session"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "active_question_id": "={{ $('check session').item.json.active_question_id + 1 }}",
+            "session_id": "={{ $('check session').item.json.session_id }}"
+          },
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "docs_id",
+              "displayName": "docs_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "active_question_id",
+              "displayName": "active_question_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        240,
+        -40
+      ],
+      "id": "74a02bff-a0cc-44be-a1b3-d9e028ad8235",
+      "name": "Postgres"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "session",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "session_id",
+              "keyValue": "={{ $json.sessionId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2180,
+        280
+      ],
+      "id": "3ea907cd-d780-45e5-934d-738db49a7505",
+      "name": "check session",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "tableId": "session",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "session_id",
+              "fieldValue": "={{ $('Edit Fields').item.json.sessionId }}"
+            },
+            {
+              "fieldId": "docs_id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "active_question_id",
+              "fieldValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        80,
+        280
+      ],
+      "id": "7c6d426a-e0fc-4f8d-8ea4-241cc069190b",
+      "name": "register session"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "session",
+          "mode": "list",
+          "cachedResultName": "session"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "active_question_id": "={{ $('check session').item.json.active_question_id + 1 }}",
+            "session_id": "={{ $('check session').item.json.session_id }}"
+          },
+          "matchingColumns": [
+            "session_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "session_id",
+              "displayName": "session_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "docs_id",
+              "displayName": "docs_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "active_question_id",
+              "displayName": "active_question_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        240,
+        120
+      ],
+      "id": "65d1282d-17d5-4769-bffe-cc4e738dca8b",
+      "name": "Postgres1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM question_bank WHERE order_no = {{ $json.active_sesion }};",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -1720,
+        280
+      ],
+      "id": "c0f1e535-a823-455c-94c4-4c87eac1d85d",
+      "name": "Postgres2",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2699a8e4-2a7d-4581-9558-529ee8f2d447",
+              "name": "active_sesion",
+              "value": "={{ $json[\"active_question_id\"] !== undefined ? $json[\"active_question_id\"] : 1 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1960,
+        280
+      ],
+      "id": "0865a0ce-389c-41a6-8118-cb3c1a40677a",
+      "name": "Edit Fields2"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "check session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "convert String to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Google Docs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Google Docs2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs2": {
+      "main": [
+        [
+          {
+            "node": "register session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "convert String to JSON": {
+      "main": [
+        [
+          {
+            "node": "Output",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "questions": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Postgres",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Postgres1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check session": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "register session": {
+      "main": [
+        [
+          {
+            "node": "Google Docs3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Postgres2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9ccd7985-48ef-444e-8eae-f50b5502ec49",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-04-29T07:28:32.695Z",
+      "updatedAt": "2025-04-29T07:28:32.695Z",
+      "role": "workflow:owner",
+      "workflowId": "Nm9PIF3JJd8yl8zT",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

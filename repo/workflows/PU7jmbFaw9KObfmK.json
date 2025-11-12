@@ -1,0 +1,193 @@
+{
+  "createdAt": "2025-02-22T09:28:32.066Z",
+  "updatedAt": "2025-03-03T07:58:13.483Z",
+  "id": "PU7jmbFaw9KObfmK",
+  "name": "My workflow 12",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f3685c34-9780-42d9-ade4-edf58e0597a9",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*",
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        180
+      ],
+      "id": "5e919cbb-bfe7-45c4-9bcf-672b2e104532",
+      "name": "Webhook",
+      "webhookId": "f3685c34-9780-42d9-ade4-edf58e0597a9"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        600,
+        180
+      ],
+      "id": "428cddb3-ceff-4681-b29a-c2b25d56a74d",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "YW9ZsdAeAy4i8EgN",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        860,
+        180
+      ],
+      "id": "0b2ab29b-7ddc-496d-8fbe-0208c13a71b2",
+      "name": "Video Analysis Response"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.body.video_url }}",
+          "mode": "url"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        220,
+        180
+      ],
+      "id": "f5e36fdd-5616-41ba-9c12-407242e6df88",
+      "name": "video file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "3MwlfMnWft3SzbIK",
+          "name": "Google Drive account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://143.198.47.9:8000/extract-audio/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "video_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        180
+      ],
+      "id": "ab628139-e36e-49a4-b760-f9a632e7424d",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "video file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Video Analysis Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "video file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "5687f0a7-9bc5-4de2-bf46-709c9e447552",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-22T09:28:32.066Z",
+      "updatedAt": "2025-02-22T09:28:32.066Z",
+      "role": "workflow:owner",
+      "workflowId": "PU7jmbFaw9KObfmK",
+      "projectId": "VgkBsgW7KMLc7cPH",
+      "project": {
+        "createdAt": "2025-02-22T09:23:18.057Z",
+        "updatedAt": "2025-02-22T09:24:27.776Z",
+        "id": "VgkBsgW7KMLc7cPH",
+        "name": "Elisha Abriham <elishabu28@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

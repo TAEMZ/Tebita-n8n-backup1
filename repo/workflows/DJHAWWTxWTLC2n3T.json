@@ -1,0 +1,136 @@
+{
+  "createdAt": "2025-02-24T09:43:19.501Z",
+  "updatedAt": "2025-03-03T07:55:33.246Z",
+  "id": "DJHAWWTxWTLC2n3T",
+  "name": "My workflow 12a",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "acda43e6-4167-4068-b767-bc934bdb743b",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*",
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -40
+      ],
+      "id": "c8f3c15b-2722-46ef-b40f-07dca1a58eca",
+      "name": "Webhook",
+      "webhookId": "acda43e6-4167-4068-b767-bc934bdb743b"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.choices[0].message.content }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        760,
+        -40
+      ],
+      "id": "7c2b340e-ccaa-41d0-9dd0-51c55723f4c5",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "Analyze the following ad image and determine its core message. Do not hallucinate or describe the image itself. Focus only on extracting the key messaging angle. \n\n\n",
+        "inputType": "base64",
+        "binaryPropertyName": "=data",
+        "simplify": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        340,
+        -40
+      ],
+      "id": "34497ea4-e084-49f3-943a-de6edc83b450",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "lmX7lFQXDczFMqh4",
+          "name": "OpenAi account 8"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "29a6b6c8-abc1-419a-959a-3b6ceb075ccf",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-02-24T09:43:19.501Z",
+      "updatedAt": "2025-02-24T09:43:19.501Z",
+      "role": "workflow:owner",
+      "workflowId": "DJHAWWTxWTLC2n3T",
+      "projectId": "VgkBsgW7KMLc7cPH",
+      "project": {
+        "createdAt": "2025-02-22T09:23:18.057Z",
+        "updatedAt": "2025-02-22T09:24:27.776Z",
+        "id": "VgkBsgW7KMLc7cPH",
+        "name": "Elisha Abriham <elishabu28@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

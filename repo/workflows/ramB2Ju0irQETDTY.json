@@ -1,0 +1,970 @@
+{
+  "createdAt": "2025-09-02T07:28:09.412Z",
+  "updatedAt": "2025-10-17T17:54:37.215Z",
+  "id": "ramB2Ju0irQETDTY",
+  "name": "Linkedin post search",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "0271e62f-5e31-48fa-8642-2afceccd09d0",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/apimaestro~linkedin-posts-search-scraper-no-cookies/run-sync-get-dataset-items?token=apify_api_o1xmdPsPoepgXvvoBK6iq4XUih1slE38J1pW",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \n\"date_filter\": \"past-week\",\n  \"keyword\": \"AI automation\",\n  \"limit\": 15,\n  \"page_number\": 10,\n  \"sort_type\": \"relevance\",\n  \"total_posts\": 50\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32,
+        0
+      ],
+      "id": "e6e66b42-3371-43b4-a748-7c57769a0817",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "content": "## Fields\n\n\"sort_type\": \"relevance\",\n\n\"date_filter\": \"past-week\",\n\"date_filter\": \"past-month\",\n\"date_filter\": \"past-24h\",",
+        "height": 384,
+        "width": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -592,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "1af34d03-79b4-4313-b157-f1101b73e1be",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c389ab0e-e89c-41c7-a58c-12d6c5c9eb7a",
+              "name": "author",
+              "value": "={{ $json.author.headline }}",
+              "type": "string"
+            },
+            {
+              "id": "9d3bf4d2-e7c3-4187-bbac-f222018ff861",
+              "name": "post_url",
+              "value": "={{ $json.post_url }}",
+              "type": "string"
+            },
+            {
+              "id": "d30d04e2-d8e1-44cb-a43f-45bffb17d9a4",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "39e9764d-242d-4398-bfb5-d71f22329a55",
+              "name": "author.profile_url",
+              "value": "={{ $json.author.profile_url }}",
+              "type": "string"
+            },
+            {
+              "id": "d3460851-a46c-4af5-a616-3132a9483a75",
+              "name": "posted_at",
+              "value": "={{ $json.posted_at }}",
+              "type": "object"
+            },
+            {
+              "id": "fac40ee4-f46d-4649-97a7-02beabfb82d5",
+              "name": "hashtags",
+              "value": "={{ $json.hashtags }}",
+              "type": "array"
+            },
+            {
+              "id": "71a8b86a-cbc1-44a9-8c59-200b2d7c7a3d",
+              "name": "content",
+              "value": "={{ JSON.stringify($json.media) || JSON.stringify($json.content) }}",
+              "type": "object"
+            },
+            {
+              "id": "79d7f1f9-6348-48b6-9d5d-4f258dc76a16",
+              "name": "full_urn",
+              "value": "={{ $json.full_urn }}",
+              "type": "string"
+            },
+            {
+              "id": "2595cda8-818f-42f9-bea3-d294afce169d",
+              "name": "stats",
+              "value": "={{ $json.stats }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        864,
+        0
+      ],
+      "id": "4bf1f522-78b3-4d4b-ac63-456a4389d5e3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "da9067ca-f7a7-45ad-b66b-ff3a5261cfcd",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1168,
+        240
+      ],
+      "id": "fe49f0bb-2abb-48cf-bc4d-b0ccb8d6c399",
+      "name": "If",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "full_urn",
+              "field2": "Post id"
+            }
+          ]
+        },
+        "joinMode": "keepNonMatches",
+        "outputDataFrom": "input1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1360,
+        16
+      ],
+      "id": "de1decbf-3128-4cdf-85ca-42d26cc9ce56",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appcyfrUYMKl7NjPw",
+          "mode": "list",
+          "cachedResultName": "Post Tracker",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWRPweaw7hJBqVK",
+          "mode": "list",
+          "cachedResultName": "Posts",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw/tblWRPweaw7hJBqVK"
+        },
+        "filterByFormula": "=({Post id} = '{{ $json.full_urn }}')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        992,
+        240
+      ],
+      "id": "e19dddd3-f725-4175-8d79-f1aae5e03820",
+      "name": "Search records2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appcyfrUYMKl7NjPw",
+          "mode": "list",
+          "cachedResultName": "Post Tracker",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWRPweaw7hJBqVK",
+          "mode": "list",
+          "cachedResultName": "Posts",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw/tblWRPweaw7hJBqVK"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Author": "={{ JSON.stringify($json.author) }}",
+            "Post id": "={{ $json.full_urn }}",
+            "Posted At": "={{ $json.posted_at.date }}",
+            "Post URL": "={{ JSON.stringify($json.post_url) }}",
+            "Text": "={{ JSON.stringify($json.text) }}",
+            "Hashtags": "={{ JSON.stringify($json.hashtags) }}",
+            "Content": "={{ JSON.stringify($json.content) }}",
+            "Stats": "={{ JSON.stringify($json.stats) }}"
+          },
+          "matchingColumns": [
+            "Post id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Author",
+              "displayName": "Author",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Post URL",
+              "displayName": "Post URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Stats",
+              "displayName": "Stats",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Text",
+              "displayName": "Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Generated Comment",
+              "displayName": "Generated Comment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Is Connect Sent",
+              "displayName": "Is Connect Sent",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "is Comment Generated",
+              "displayName": "is Comment Generated",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "is Comment Posted",
+              "displayName": "is Comment Posted",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Posted At",
+              "displayName": "Posted At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Post id",
+              "displayName": "Post id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true,
+          "updateAllMatches": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1584,
+        16
+      ],
+      "id": "603542c9-b980-47e7-b2bd-03d85f9893a4",
+      "name": "Create or update a record1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        16
+      ],
+      "id": "7bbd5430-94d6-47f1-9d02-a073af745fb3",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "V4JijNE0qx45ESY1",
+          "mode": "list",
+          "cachedResultName": "Linkedin Comment generation"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2016,
+        16
+      ],
+      "id": "ec6bd053-5183-4de7-a469-0212d99d01ab",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "base": {
+          "__rl": true,
+          "value": "appcyfrUYMKl7NjPw",
+          "mode": "list",
+          "cachedResultName": "Post Tracker",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblWRPweaw7hJBqVK",
+          "mode": "list",
+          "cachedResultName": "Posts",
+          "cachedResultUrl": "https://airtable.com/appcyfrUYMKl7NjPw/tblWRPweaw7hJBqVK"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Author": "={{ JSON.stringify($json.author) }}",
+            "Post id": "={{ $json.full_urn }}",
+            "Posted At": "={{ $json.posted_at.date }}",
+            "Post URL": "={{ $json.post_url }}",
+            "Text": "={{ JSON.stringify($json.text) }}",
+            "Hashtags": "={{ JSON.stringify($json.hashtags) }}",
+            "Content": "={{ JSON.stringify($json.content) }}",
+            "Stats": "={{ JSON.stringify($json.stats) }}"
+          },
+          "matchingColumns": [
+            "Post id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Author",
+              "displayName": "Author",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Post URL",
+              "displayName": "Post URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Stats",
+              "displayName": "Stats",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Text",
+              "displayName": "Text",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Generated Comment",
+              "displayName": "Generated Comment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Is Connect Sent",
+              "displayName": "Is Connect Sent",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "is Comment Generated",
+              "displayName": "is Comment Generated",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "is Comment Posted",
+              "displayName": "is Comment Posted",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Posted At",
+              "displayName": "Posted At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Post id",
+              "displayName": "Post id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true,
+          "updateAllMatches": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        160,
+        -256
+      ],
+      "id": "16e62c00-a543-4a5a-be5e-4f8be085c5fb",
+      "name": "Create or update a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "HugvDjMnYVe9WgLs",
+          "name": "Content-idea"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "3fb38e11-7bce-400a-86f0-c13ba019c0c0",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7f62c781-b293-4dbb-83d4-bd051ecedba4",
+              "leftValue": "={{ $json.stats.comments }}",
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "d892b9b8-2bd2-41a6-8cad-946b3084f1c9",
+              "leftValue": "={{ $json.stats.total_reactions }}",
+              "rightValue": 15,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        0
+      ],
+      "id": "644063ea-0000-4c9c-bd59-8497e1c9406c",
+      "name": "Filter stats"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5459bad6-2a44-4e64-a672-efa1fc5ee223",
+              "leftValue": "={{ $json.content.type }}",
+              "rightValue": "article",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "f7123b06-40a1-4b9d-a5a3-7439e26788c6",
+              "leftValue": "={{ $json.content.type }}",
+              "rightValue": "document",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "899a7ec8-0611-48b5-8b69-bbcad4dc8f82",
+              "leftValue": "={{ $json.content.type }}",
+              "rightValue": "article",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "1b68d3b8-2361-4b4c-9122-fa0583cb2677",
+              "leftValue": "={{ $json.content.type }}",
+              "rightValue": "video",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "10187b88-ee5a-4392-81c9-9e7483abca6e",
+              "leftValue": "={{ $json.content.type }}",
+              "rightValue": "image",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "ff434002-5d31-4347-8d71-5e3b5d35cbe6",
+              "leftValue": "={{ $json.content.type }}",
+              "rightValue": "text",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        0
+      ],
+      "id": "65556745-7d79-4741-ba0d-95a304c463b1",
+      "name": "Filter content type"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Filter stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Create or update a record1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records2": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or update a record1": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Search records2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter stats": {
+      "main": [
+        [
+          {
+            "node": "Filter content type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter content type": {
+      "main": [
+        [
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "z5dK4hrIczUamG3b"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        16
+      ]
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "9bba63c9-a47f-43e6-8dec-96a0c175a599",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-09-02T07:28:09.412Z",
+      "updatedAt": "2025-09-02T07:28:09.412Z",
+      "role": "workflow:owner",
+      "workflowId": "ramB2Ju0irQETDTY",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

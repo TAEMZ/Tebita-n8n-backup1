@@ -1,0 +1,561 @@
+{
+  "createdAt": "2025-06-10T20:23:26.111Z",
+  "updatedAt": "2025-06-18T06:57:06.944Z",
+  "id": "YsiIksVrbO9lQ4x0",
+  "name": "opendorse scraper",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        60,
+        -160
+      ],
+      "id": "d87c5fdc-947d-41e8-a60c-473ca64f7288",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.opendorse.com/marketplaces/v1/search/athlete-search",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"orderBy\": \"DealsCompleted\",\n    \"pageNumber\": {{ $json.arr }},\n    \"pageSize\": 250,\n    \"showAthletesWithoutDeals\": false,\n    \"showUnclaimedAccounts\": false   \n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1180,
+        -160
+      ],
+      "id": "390ade82-a1a7-4f79-a597-933ce0c1833c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        -160
+      ],
+      "id": "7847846a-8963-472a-bb1a-343dbdbf4d2f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ipK2tX4Vm2OJ_UFmLTWqOY6iO1qKHeTV4yuMcxjI3GA",
+          "mode": "list",
+          "cachedResultName": "athletes list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ipK2tX4Vm2OJ_UFmLTWqOY6iO1qKHeTV4yuMcxjI3GA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "firstName": "={{ $json.firstName }}",
+            "lastName": "={{ $json.lastName }}",
+            "sports": "={{ $json.sports }}",
+            "currentTeams": "={{ $json.currentTeams }}",
+            "facebookUrl": "={{ $json.facebookUrl?$json.facebookUrl:\"\" }}",
+            "twitterUrl": "={{ $json.twitterUrl?$json.twitterUrl:\"\" }}",
+            "instagramUrl": "={{ $json.instagramUrl?$json.instagramUrl:\"\" }}",
+            "linkedInUrl": "={{ $json.linkedInUrl?$json.linkedInUrl:\"\" }}",
+            "tikTokUrl": "={{ $json.tikTokUrl?$json.tikTokUrl:\"\" }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "firstName",
+              "displayName": "firstName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "lastName",
+              "displayName": "lastName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sports",
+              "displayName": "sports",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "currentTeams",
+              "displayName": "currentTeams",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "facebookUrl",
+              "displayName": "facebookUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "twitterUrl",
+              "displayName": "twitterUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "instagramUrl",
+              "displayName": "instagramUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedInUrl",
+              "displayName": "linkedInUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "tikTokUrl",
+              "displayName": "tikTokUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2780,
+        60
+      ],
+      "id": "1e519cc3-399c-4bbd-862d-bb1560a5da7e",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MYJ51fHpcG8U7E9j",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://opendorse.com/profile/{{ $json.networkProfileCode }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1920,
+        -160
+      ],
+      "id": "bbf7c9e1-5a64-4905-a2a6-6a6f50e9a7a5",
+      "name": "HTTP Request1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code Node - Social Media URL Scraper\n// This code extracts social media URLs from HTML content or JSON data\n\n// Function to extract URLs from __NEXT_DATA__ script tag\nfunction extractUrlsFromNextData(htmlContent) {\n  const socialUrls = {\n    facebookUrl: null,\n    twitterUrl: null,\n    instagramUrl: null,\n    linkedInUrl: null,\n    tikTokUrl: null\n  };\n\n  if (!htmlContent) return socialUrls;\n\n  // Look for the __NEXT_DATA__ script tag\n  const nextDataMatch = htmlContent.match(/<script id=\"__NEXT_DATA__\"[^>]*>(.*?)<\\/script>/s);\n  \n  if (nextDataMatch) {\n    try {\n      const nextData = JSON.parse(nextDataMatch[1]);\n      \n      // Navigate to profileData: props.pageProps.initialState.profile.profileData\n      const profileData = nextData?.props?.pageProps?.initialState?.profile?.profileData;\n      \n      if (profileData) {\n        console.log('Found profileData in __NEXT_DATA__');\n        \n        // Extract social media URLs from profileData\n        if (profileData.facebookUrl && !shouldExcludeUrl(profileData.facebookUrl)) {\n          socialUrls.facebookUrl = profileData.facebookUrl.startsWith('http') \n            ? profileData.facebookUrl \n            : 'https://' + profileData.facebookUrl;\n        }\n        \n        if (profileData.twitterUrl && !shouldExcludeUrl(profileData.twitterUrl)) {\n          socialUrls.twitterUrl = profileData.twitterUrl.startsWith('http') \n            ? profileData.twitterUrl \n            : 'https://' + profileData.twitterUrl;\n        }\n        \n        if (profileData.instagramUrl && !shouldExcludeUrl(profileData.instagramUrl)) {\n          socialUrls.instagramUrl = profileData.instagramUrl.startsWith('http') \n            ? profileData.instagramUrl \n            : 'https://' + profileData.instagramUrl;\n        }\n        \n        if (profileData.linkedInUrl && !shouldExcludeUrl(profileData.linkedInUrl)) {\n          socialUrls.linkedInUrl = profileData.linkedInUrl.startsWith('http') \n            ? profileData.linkedInUrl \n            : 'https://' + profileData.linkedInUrl;\n        }\n        \n        if (profileData.tikTokUrl && !shouldExcludeUrl(profileData.tikTokUrl)) {\n          socialUrls.tikTokUrl = profileData.tikTokUrl.startsWith('http') \n            ? profileData.tikTokUrl \n            : 'https://' + profileData.tikTokUrl;\n        }\n        \n        console.log('Extracted from __NEXT_DATA__:', socialUrls);\n        return socialUrls;\n      }\n    } catch (e) {\n      console.log('Error parsing __NEXT_DATA__:', e.message);\n    }\n  }\n  \n  return socialUrls;\n}\n\n// Function to check if a URL should be excluded (company/generic links)\nfunction shouldExcludeUrl(url) {\n  if (!url) return false;\n  \n  const excludePatterns = [\n    // Opendorse company links\n    'facebook.com/opendorse',\n    'instagram.com/opendorse',\n    'linkedin.com/company/opendorse',\n    'twitter.com/opendorse',\n    'tiktok.com/opendorse',\n    // Other common exclusions\n    'connect.facebook.net',\n    'snap.licdn.com',\n    'linkedin.oribi.io'\n  ];\n  \n  return excludePatterns.some(pattern => url.toLowerCase().includes(pattern));\n}\n\n// Function to extract URLs from HTML content\nfunction extractUrlsFromHtml(htmlContent) {\n  const socialUrls = {\n    facebookUrl: null,\n    twitterUrl: null,\n    instagramUrl: null,\n    linkedInUrl: null,\n    tikTokUrl: null\n  };\n\n  if (!htmlContent) return socialUrls;\n\n  // First priority: Extract from __NEXT_DATA__ script tag\n  const nextDataUrls = extractUrlsFromNextData(htmlContent);\n  \n  // If we found URLs in __NEXT_DATA__, use those and return\n  const hasNextDataUrls = Object.values(nextDataUrls).some(url => url !== null);\n  if (hasNextDataUrls) {\n    console.log('Using URLs from __NEXT_DATA__');\n    return nextDataUrls;\n  }\n\n  console.log('No URLs found in __NEXT_DATA__, trying other methods...');\n\n  // Second priority: try to get URLs from JSON-LD structured data\n  const jsonLdMatch = htmlContent.match(/<script[^>]*type=[\"']application\\/ld\\+json[\"'][^>]*>(.*?)<\\/script>/gi);\n  if (jsonLdMatch) {\n    jsonLdMatch.forEach(script => {\n      const jsonContent = script.replace(/<script[^>]*>/, '').replace(/<\\/script>/, '');\n      try {\n        const data = JSON.parse(jsonContent);\n        if (data.sameAs && Array.isArray(data.sameAs)) {\n          data.sameAs.forEach(url => {\n            if (!url || shouldExcludeUrl(url)) return;\n            \n            if (url.includes('twitter.com') && !socialUrls.twitterUrl) {\n              socialUrls.twitterUrl = url;\n            } else if (url.includes('instagram.com') && !socialUrls.instagramUrl) {\n              socialUrls.instagramUrl = url;\n            } else if (url.includes('linkedin.com') && !socialUrls.linkedInUrl) {\n              socialUrls.linkedInUrl = url;\n            } else if (url.includes('facebook.com') && !socialUrls.facebookUrl) {\n              socialUrls.facebookUrl = url;\n            } else if (url.includes('tiktok.com') && !socialUrls.tikTokUrl) {\n              socialUrls.tikTokUrl = url;\n            }\n          });\n        }\n      } catch (e) {\n        // Skip invalid JSON\n      }\n    });\n  }\n\n  // Third priority: Look for social media links in data-qa attributes\n  const profileLinkPatterns = {\n    twitter: /data-qa=[\"']link_social-media_twitter[^\"']*[\"'][^>]*href=[\"']([^\"']+)/gi,\n    instagram: /data-qa=[\"']link_social-media_instagram[^\"']*[\"'][^>]*href=[\"']([^\"']+)/gi,\n    linkedin: /data-qa=[\"']link_social-media_linkedin[^\"']*[\"'][^>]*href=[\"']([^\"']+)/gi,\n    facebook: /data-qa=[\"']link_social-media_facebook[^\"']*[\"'][^>]*href=[\"']([^\"']+)/gi,\n    tikTok: /data-qa=[\"']link_social-media_tiktok[^\"']*[\"'][^>]*href=[\"']([^\"']+)/gi\n  };\n\n  // Extract from profile-specific links\n  let match;\n  \n  // Twitter\n  if (!socialUrls.twitterUrl) {\n    profileLinkPatterns.twitter.lastIndex = 0;\n    while ((match = profileLinkPatterns.twitter.exec(htmlContent)) !== null) {\n      if (!shouldExcludeUrl(match[1])) {\n        socialUrls.twitterUrl = match[1];\n        break;\n      }\n    }\n  }\n\n  // Instagram  \n  if (!socialUrls.instagramUrl) {\n    profileLinkPatterns.instagram.lastIndex = 0;\n    while ((match = profileLinkPatterns.instagram.exec(htmlContent)) !== null) {\n      if (!shouldExcludeUrl(match[1])) {\n        socialUrls.instagramUrl = match[1];\n        break;\n      }\n    }\n  }\n\n  // LinkedIn\n  if (!socialUrls.linkedInUrl) {\n    profileLinkPatterns.linkedin.lastIndex = 0;\n    while ((match = profileLinkPatterns.linkedin.exec(htmlContent)) !== null) {\n      if (!shouldExcludeUrl(match[1])) {\n        socialUrls.linkedInUrl = match[1];\n        break;\n      }\n    }\n  }\n\n  // Facebook\n  if (!socialUrls.facebookUrl) {\n    profileLinkPatterns.facebook.lastIndex = 0;\n    while ((match = profileLinkPatterns.facebook.exec(htmlContent)) !== null) {\n      if (!shouldExcludeUrl(match[1])) {\n        socialUrls.facebookUrl = match[1];\n        break;\n      }\n    }\n  }\n\n  // TikTok\n  if (!socialUrls.tikTokUrl) {\n    profileLinkPatterns.tikTok.lastIndex = 0;\n    while ((match = profileLinkPatterns.tikTok.exec(htmlContent)) !== null) {\n      if (!shouldExcludeUrl(match[1])) {\n        socialUrls.tikTokUrl = match[1];\n        break;\n      }\n    }\n  }\n\n  return socialUrls;\n}\n\n// Function to extract URLs from JSON data\nfunction extractUrlsFromJson(jsonData) {\n  const socialUrls = {\n    facebookUrl: null,\n    twitterUrl: null,\n    instagramUrl: null,\n    linkedInUrl: null,\n    tikTokUrl: null\n  };\n\n  try {\n    let data;\n    \n    // Handle if jsonData is a string\n    if (typeof jsonData === 'string') {\n      data = JSON.parse(jsonData);\n    } else {\n      data = jsonData;\n    }\n\n    // Look for profile data in various possible locations\n    let profileData = null;\n    \n    if (data.profile && data.profile.profileData) {\n      profileData = data.profile.profileData;\n    } else if (data.profileData) {\n      profileData = data.profileData;\n    } else if (data.props && data.props.pageProps && data.props.pageProps.initialState && data.props.pageProps.initialState.profile && data.props.pageProps.initialState.profile.profileData) {\n      profileData = data.props.pageProps.initialState.profile.profileData;\n    } else {\n      profileData = data;\n    }\n\n    if (profileData) {\n      // Extract social media URLs from profile data\n      socialUrls.facebookUrl = profileData.facebookUrl || null;\n      socialUrls.twitterUrl = profileData.twitterUrl || null;\n      socialUrls.instagramUrl = profileData.instagramUrl || null;\n      socialUrls.linkedInUrl = profileData.linkedInUrl || null;\n      socialUrls.tikTokUrl = profileData.tikTokUrl || null;\n\n      // Clean up URLs (remove www. prefix if present, ensure proper format)\n      Object.keys(socialUrls).forEach(key => {\n        if (socialUrls[key]) {\n          let url = socialUrls[key];\n          // Add https:// if not present\n          if (!url.startsWith('http://') && !url.startsWith('https://')) {\n            url = 'https://' + url;\n          }\n          socialUrls[key] = url;\n        }\n      });\n    }\n  } catch (error) {\n    console.log('Error parsing JSON data:', error.message);\n  }\n\n  return socialUrls;\n}\n\n// Main execution\nconst items = $input.all();\nconst results = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i];\n  \n  let socialUrls = {\n    facebookUrl: null,\n    twitterUrl: null,\n    instagramUrl: null,\n    linkedInUrl: null,\n    tikTokUrl: null\n  };\n\n  // Check if we have HTML content in the data field\n  if (item.json.data && typeof item.json.data === 'string') {\n    console.log('Processing HTML content...');\n    socialUrls = extractUrlsFromHtml(item.json.data);\n  }\n  // Check if we have JSON data\n  else if (item.json.data && typeof item.json.data === 'object') {\n    console.log('Processing JSON data...');\n    socialUrls = extractUrlsFromJson(item.json.data);\n  }\n  // Check if the item itself contains the profile data\n  else if (item.json.profile || item.json.profileData) {\n    console.log('Processing direct profile data...');\n    socialUrls = extractUrlsFromJson(item.json);\n  }\n  // Try to find HTML content in any field\n  else {\n    console.log('Searching for HTML in all fields...');\n    for (const [key, value] of Object.entries(item.json)) {\n      if (typeof value === 'string' && value.includes('<html')) {\n        socialUrls = extractUrlsFromHtml(value);\n        break;\n      }\n    }\n  }\n\n  // Log what we found\n  console.log('Extracted URLs:', socialUrls);\n\n  // Add just the social media URLs to results\n  results.push({\n    json: socialUrls,\n    pairedItem: { item: i }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        -160
+      ],
+      "id": "c8052233-9675-4627-b8c2-d5fabd5e3c06",
+      "name": "Code",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2460,
+        40
+      ],
+      "id": "f3187c0d-de16-4ad8-aa41-4184bac441c9",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "=https://opendorse.com/profile/Alyssa-Lavadis",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -60,
+        420
+      ],
+      "id": "d4011562-d757-4c1d-8b18-9b9fedb248e6",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Code Node - Social Media URL Scraper\n// This code extracts social media URLs from HTML content or JSON data\n\n// Function to extract URLs from __NEXT_DATA__ script tag\nfunction extractUrlsFromNextData(htmlContent) {\n  const socialUrls = {\n    facebookUrl: null,\n    twitterUrl: null,\n    instagramUrl: null,\n    linkedInUrl: null,\n    tikTokUrl: null\n  };\n\n  if (!htmlContent) return socialUrls;\n\n  // Look for the __NEXT_DATA__ script tag\n  const nextDataMatch = htmlContent.match(/<script id=\"__NEXT_DATA__\"[^>]*>(.*?)<\\/script>/s);\n  \n  if (nextDataMatch) {\n    try {\n      const nextData = JSON.parse(nextDataMatch[1]);\n      \n      // Navigate to profileData: props.pageProps.initialState.profile.profileData\n      const profileData = nextData?.props?.pageProps?.initialState?.profile?.profileData;\n      \n      if (profileData) {\n        console.log('Found profileData in __NEXT_DATA__');\n        \n        // Extract social media URLs from profileData\n        if (profileData.facebookUrl && !shouldExcludeUrl(profileData.facebookUrl)) {\n          socialUrls.facebookUrl = profileData.facebookUrl.startsWith('http') \n            ? profileData.facebookUrl \n            : 'https://' + profileData.facebookUrl;\n        }\n        \n        if (profileData.twitterUrl && !shouldExcludeUrl(profileData.twitterUrl)) {\n          socialUrls.twitterUrl = profileData.twitterUrl.startsWith('http') \n            ? profileData.twitterUrl \n            : 'https://' + profileData.twitterUrl;\n        }\n        \n        if (profileData.instagramUrl && !shouldExcludeUrl(profileData.instagramUrl)) {\n          socialUrls.instagramUrl = profileData.instagramUrl.startsWith('http') \n            ? profileData.instagramUrl \n            : 'https://' + profileData.instagramUrl;\n        }\n        \n        if (profileData.linkedInUrl && !shouldExcludeUrl(profileData.linkedInUrl)) {\n          socialUrls.linkedInUrl = profileData.linkedInUrl.startsWith('http') \n            ? profileData.linkedInUrl \n            : 'https://' + profileData.linkedInUrl;\n        }\n        \n        if (profileData.tikTokUrl && !shouldExcludeUrl(profileData.tikTokUrl)) {\n          socialUrls.tikTokUrl = profileData.tikTokUrl.startsWith('http') \n            ? profileData.tikTokUrl \n            : 'https://' + profileData.tikTokUrl;\n        }\n        \n        console.log('Extracted from __NEXT_DATA__:', socialUrls);\n        return socialUrls;\n      }\n    } catch (e) {\n      console.log('Error parsing __NEXT_DATA__:', e.message);\n    }\n  }\n  \n  return socialUrls;\n}\n\n// Function to check if a URL should be excluded (company/generic links)\nfunction shouldExcludeUrl(url) {\n  if (!url) return false;\n  \n  const excludePatterns = [\n    // Opendorse company links\n    'facebook.com/opendorse',\n    'instagram.com/opendorse',\n    'linkedin.com/company/opendorse',\n    'twitter.com/opendorse',\n    'tiktok.com/opendorse',\n    // Other common exclusions\n    'connect.facebook.net',\n    'snap.licdn.com',\n    'linkedin.oribi.io'\n  ];\n  \n  return excludePatterns.some(pattern => url.toLowerCase().includes(pattern));\n}\n\n// Function to extract URLs from HTML content\nfunction extractUrlsFromHtml(htmlContent) {\n  const socialUrls = {\n    facebookUrl: null,\n    twitterUrl: null,\n    instagramUrl: null,\n    linkedInUrl: null,\n    tikTokUrl: null\n  };\n\n  if (!htmlContent) return socialUrls;\n\n  // First priority: Extract from __NEXT_DATA__ script tag\n  const nextDataUrls = extractUrlsFromNextData(htmlContent);\n  \n  // If we found URLs in __NEXT_DATA__, use those and return\n  const hasNextDataUrls = Object.values(nextDataUrls).some(url => url !== null);\n  if (hasNextDataUrls) {\n    console.log('Using URLs from __NEXT_DATA__');\n    return nextDataUrls;\n  }\n\n  console.log('No URLs found in __NEXT_DATA__, trying other methods...');\n\n  // Second priority: try to get URLs from JSON-LD structured data\n  const jsonLdMatch = htmlContent.match(/<script[^>]*type=[\"']application\\/ld\\+json[\"'][^>]*>(.*?)<\\/script>/gi);\n  if (jsonLdMatch) {\n    jsonLdMatch.forEach(script => {\n      const jsonContent = script.replace(/<script[^>]*>/, '').replace(/<\\/script>/, '');\n      try {\n        const data = JSON.parse(jsonContent);\n        if (data.sameAs && Array.isArray(data.sameAs)) {\n          data.sameAs.forEach(url => {\n            if (!url || shouldExcludeUrl(url)) return;\n            \n            if (url.includes('twitter.com') && !socialUrls.twitterUrl) {\n              socialUrls.twitterUrl = url;\n            } else if (url.includes('instagram.com') && !socialUrls.instagramUrl) {\n              socialUrls.instagramUrl = url;\n            } else if (url.includes('linkedin.com') && !socialUrls.linkedInUrl) {\n              socialUrls.linkedInUrl = url;\n            } else if (url.includes('facebook.com') && !socialUrls.facebookUrl) {\n              socialUrls.facebookUrl = url;\n            } else if (url.includes('tiktok.com') && !socialUrls.tikTokUrl) {\n              socialUrls.tikTokUrl = url;\n            }\n          });\n        }\n      } catch (e) {\n        // Skip invalid JSON\n      }\n    });\n  }\n\n  // Third priority: Look for social media links in data-qa attributes\n  const profileLinkPatterns = {\n    twitter: /data-qa=[\"']link_social-media_twitter[^\"']*[\"'][^>]*href=[\"']([^\"']+)/gi,\n    instagram: /data-qa=[\"']link_social-media_instagram[^\"']*[\"'][^>]*href=[\"']([^\"']+)/gi,\n    linkedin: /data-qa=[\"']link_social-media_linkedin[^\"']*[\"'][^>]*href=[\"']([^\"']+)/gi,\n    facebook: /data-qa=[\"']link_social-media_facebook[^\"']*[\"'][^>]*href=[\"']([^\"']+)/gi,\n    tikTok: /data-qa=[\"']link_social-media_tiktok[^\"']*[\"'][^>]*href=[\"']([^\"']+)/gi\n  };\n\n  // Extract from profile-specific links\n  let match;\n  \n  // Twitter\n  if (!socialUrls.twitterUrl) {\n    profileLinkPatterns.twitter.lastIndex = 0;\n    while ((match = profileLinkPatterns.twitter.exec(htmlContent)) !== null) {\n      if (!shouldExcludeUrl(match[1])) {\n        socialUrls.twitterUrl = match[1];\n        break;\n      }\n    }\n  }\n\n  // Instagram  \n  if (!socialUrls.instagramUrl) {\n    profileLinkPatterns.instagram.lastIndex = 0;\n    while ((match = profileLinkPatterns.instagram.exec(htmlContent)) !== null) {\n      if (!shouldExcludeUrl(match[1])) {\n        socialUrls.instagramUrl = match[1];\n        break;\n      }\n    }\n  }\n\n  // LinkedIn\n  if (!socialUrls.linkedInUrl) {\n    profileLinkPatterns.linkedin.lastIndex = 0;\n    while ((match = profileLinkPatterns.linkedin.exec(htmlContent)) !== null) {\n      if (!shouldExcludeUrl(match[1])) {\n        socialUrls.linkedInUrl = match[1];\n        break;\n      }\n    }\n  }\n\n  // Facebook\n  if (!socialUrls.facebookUrl) {\n    profileLinkPatterns.facebook.lastIndex = 0;\n    while ((match = profileLinkPatterns.facebook.exec(htmlContent)) !== null) {\n      if (!shouldExcludeUrl(match[1])) {\n        socialUrls.facebookUrl = match[1];\n        break;\n      }\n    }\n  }\n\n  // TikTok\n  if (!socialUrls.tikTokUrl) {\n    profileLinkPatterns.tikTok.lastIndex = 0;\n    while ((match = profileLinkPatterns.tikTok.exec(htmlContent)) !== null) {\n      if (!shouldExcludeUrl(match[1])) {\n        socialUrls.tikTokUrl = match[1];\n        break;\n      }\n    }\n  }\n\n  return socialUrls;\n}\n\n// Function to extract URLs from JSON data\nfunction extractUrlsFromJson(jsonData) {\n  const socialUrls = {\n    facebookUrl: null,\n    twitterUrl: null,\n    instagramUrl: null,\n    linkedInUrl: null,\n    tikTokUrl: null\n  };\n\n  try {\n    let data;\n    \n    // Handle if jsonData is a string\n    if (typeof jsonData === 'string') {\n      data = JSON.parse(jsonData);\n    } else {\n      data = jsonData;\n    }\n\n    // Look for profile data in various possible locations\n    let profileData = null;\n    \n    if (data.profile && data.profile.profileData) {\n      profileData = data.profile.profileData;\n    } else if (data.profileData) {\n      profileData = data.profileData;\n    } else if (data.props && data.props.pageProps && data.props.pageProps.initialState && data.props.pageProps.initialState.profile && data.props.pageProps.initialState.profile.profileData) {\n      profileData = data.props.pageProps.initialState.profile.profileData;\n    } else {\n      profileData = data;\n    }\n\n    if (profileData) {\n      // Extract social media URLs from profile data\n      socialUrls.facebookUrl = profileData.facebookUrl || null;\n      socialUrls.twitterUrl = profileData.twitterUrl || null;\n      socialUrls.instagramUrl = profileData.instagramUrl || null;\n      socialUrls.linkedInUrl = profileData.linkedInUrl || null;\n      socialUrls.tikTokUrl = profileData.tikTokUrl || null;\n\n      // Clean up URLs (remove www. prefix if present, ensure proper format)\n      Object.keys(socialUrls).forEach(key => {\n        if (socialUrls[key]) {\n          let url = socialUrls[key];\n          // Add https:// if not present\n          if (!url.startsWith('http://') && !url.startsWith('https://')) {\n            url = 'https://' + url;\n          }\n          socialUrls[key] = url;\n        }\n      });\n    }\n  } catch (error) {\n    console.log('Error parsing JSON data:', error.message);\n  }\n\n  return socialUrls;\n}\n\n// Main execution\nconst items = $input.all();\nconst results = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i];\n  \n  let socialUrls = {\n    facebookUrl: null,\n    twitterUrl: null,\n    instagramUrl: null,\n    linkedInUrl: null,\n    tikTokUrl: null\n  };\n\n  // Check if we have HTML content in the data field\n  if (item.json.data && typeof item.json.data === 'string') {\n    console.log('Processing HTML content...');\n    socialUrls = extractUrlsFromHtml(item.json.data);\n  }\n  // Check if we have JSON data\n  else if (item.json.data && typeof item.json.data === 'object') {\n    console.log('Processing JSON data...');\n    socialUrls = extractUrlsFromJson(item.json.data);\n  }\n  // Check if the item itself contains the profile data\n  else if (item.json.profile || item.json.profileData) {\n    console.log('Processing direct profile data...');\n    socialUrls = extractUrlsFromJson(item.json);\n  }\n  // Try to find HTML content in any field\n  else {\n    console.log('Searching for HTML in all fields...');\n    for (const [key, value] of Object.entries(item.json)) {\n      if (typeof value === 'string' && value.includes('<html')) {\n        socialUrls = extractUrlsFromHtml(value);\n        break;\n      }\n    }\n  }\n\n  // Log what we found\n  console.log('Extracted URLs:', socialUrls);\n\n  // Add just the social media URLs to results\n  results.push({\n    json: socialUrls,\n    pairedItem: { item: i }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        200,
+        480
+      ],
+      "id": "5b1efd2c-e17b-479e-a945-8acdcd561b53",
+      "name": "Code1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"arr\": [\n  375, 376, 377, 378, 379, 380,\n  381, 382, 383, 384, 385, 386, 387, 388, 389, 390,\n  391, 392, 393, 394, 395, 396, 397, 398, 399, 400,\n  401, 402, 403, 404, 405, 406, 407, 408, 409, 410,\n  411, 412, 413, 414, 415, 416, 417, 418, 419, 420,\n  421, 422, 423, 424, 425, 426, 427, 428, 429, 430,\n  431, 432, 433, 434, 435, 436, 437, 438, 439, 440,\n  441, 442, 443, 444, 445, 446, 447, 448, 449, 450,\n  451, 452, 453, 454, 455, 456, 457, 458, 459, 460,\n  461, 462, 463, 464, 465, 466, 467, 468, 469, 470,\n  471, 472, 473, 474, 475, 476, 477, 478, 479, 480,\n  481, 482, 483, 484, 485, 486, 487, 488, 489, 490,\n  491, 492, 493, 494, 495, 496, 497, 498, 499, 500,\n  501, 502, 503, 504, 505, 506, 507, 508, 509, 510,\n  511, 512, 513, 514, 515, 516, 517, 518, 519, 520,\n  521, 522, 523, 524, 525, 526, 527, 528, 529, 530,\n  531, 532, 533, 534, 535, 536, 537, 538, 539, 540,\n  541, 542, 543, 544, 545, 546, 547, 548, 549, 550,\n  551, 552, 553, 554, 555, 556, 557, 558, 559, 560,\n  561, 562, 563, 564, 565, 566, 567, 568, 569, 570,\n  571, 572, 573, 574, 575, 576, 577, 578, 579, 580,\n  581, 582, 583, 584, 585, 586, 587, 588, 589, 590,\n  591, 592, 593, 594, 595, 596, 597, 598, 599, 600,\n  601, 602, 603, 604, 605, 606, 607, 608, 609, 610,\n  611, 612, 613, 614, 615, 616, 617, 618, 619, 620,\n  621, 622, 623, 624, 625, 626, 627, 628, 629, 630,\n  631, 632, 633, 634, 635, 636, 637, 638, 639, 640,\n  641, 642, 643, 644, 645, 646, 647, 648, 649, 650,\n  651, 652, 653, 654, 655, 656, 657, 658, 659, 660,\n  661, 662, 663, 664, 665, 666, 667, 668, 669, 670,\n  671, 672, 673, 674, 675, 676, 677, 678, 679, 680,\n  681, 682, 683, 684, 685, 686, 687, 688, 689, 690,\n  691, 692, 693, 694, 695, 696, 697, 698, 699, 700\n]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        -160
+      ],
+      "id": "5c856f79-1456-45df-89ad-097cbe35048d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "arr",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        500,
+        -160
+      ],
+      "id": "ffc81762-46b7-4edd-841f-42c160f35933",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "97e556d2-842a-4bd5-96f7-027e9efccd51",
+      "name": "Split In Batches1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -160
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2280,
+        380
+      ],
+      "id": "737148b0-0ff4-4d52-84db-3206298d6f2a",
+      "name": "Wait",
+      "webhookId": "1eb0c81f-ac3c-4224-90b8-4dd75458b349"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f2c1a62c-09fc-49ab-8090-f634dc879439",
+              "leftValue": "={{ $json.data.data }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "array",
+                "operation": "lengthGt",
+                "rightType": "number"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1460,
+        -160
+      ],
+      "id": "99a49589-9f8b-4eb9-ab40-a920a8d6f47f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "path": "d183060f-3843-4424-bc6d-965dc3c8c7c8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        40,
+        20
+      ],
+      "id": "13d51224-7d67-4780-ac65-314466b8e38c",
+      "name": "Webhook",
+      "webhookId": "d183060f-3843-4424-bc6d-965dc3c8c7c8",
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "6ab8c51f-1d12-491f-8a5a-ef0d8cb65d9f",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-06-10T20:23:26.111Z",
+      "updatedAt": "2025-06-10T20:23:26.111Z",
+      "role": "workflow:owner",
+      "workflowId": "YsiIksVrbO9lQ4x0",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

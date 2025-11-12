@@ -1,0 +1,1126 @@
+{
+  "createdAt": "2025-06-26T09:10:47.549Z",
+  "updatedAt": "2025-06-27T06:05:33.371Z",
+  "id": "A20mWOumIyvQBeXr",
+  "name": "fgcuathletics",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "tuJWiVqX14TqBHn0",
+          "mode": "list",
+          "cachedResultName": "influxermerch"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "direction": "next",
+            "_data": "routes/($locale).athletes._index",
+            "cursor": "={{ $json.athletes.pageInfo.endCursor }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "cursor",
+              "displayName": "cursor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "_data",
+              "displayName": "_data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        -40
+      ],
+      "id": "66505aed-8086-4986-bf33-5e3aba181aca",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "path": "e7cc4436-3cdb-4e51-b0f1-39557c0469b8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1540,
+        -20
+      ],
+      "id": "06aac3f2-0c9f-4f52-9ccf-a4901bbaf367",
+      "name": "Webhook",
+      "webhookId": "e7cc4436-3cdb-4e51-b0f1-39557c0469b8",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1540,
+        -280
+      ],
+      "id": "2f0c5313-09a5-455d-8a3a-a80da6580349",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"lists\": [\n    \"baseball\",\"mens-basketball\",\"mens-golf\",\"mens-cross-country\",\"mens-soccer\",\"mens-tennis\",\"womens-basketball\",\"womens-beach-volleyball\",\"womens-golf\",\"womens-soccer\",\"womens-cross-country\",\"softball\",\"womens-swimming-and-diving\",\"womens-tennis\",\"womens-volleyball\"\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1240,
+        -280
+      ],
+      "id": "56261610-3cef-47af-be52-3372b3d2fc23",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "url": "=https://fgcuathletics.com/sports/{{ $json.lists }}/roster",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -540,
+        -280
+      ],
+      "id": "79c80261-df44-490e-8508-ad3eb4583458",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "lists",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1020,
+        -280
+      ],
+      "id": "b1416f7d-cf6f-472e-aab8-1449874c2516",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and extract roster values from HTML for all sports\nfor (const item of $input.all()) {\n  // Get the HTML content from the input item\n  const htmlContent = item.json.html || item.json.content || item.json.data;\n  \n  if (!htmlContent) {\n    // If no HTML content found, skip this item\n    item.json.rosterValues = [];\n    continue;\n  }\n  \n  // List of sports to match\n  const sports = [\n    \"baseball\",\n    \"mens-basketball\",\n    \"mens-golf\",\n    \"mens-cross-country\",\n    \"mens-soccer\",\n    \"mens-tennis\",\n    \"womens-basketball\",\n    \"womens-beach-volleyball\",\n    \"womens-golf\",\n    \"womens-soccer\",\n    \"womens-cross-country\",\n    \"softball\",\n    \"womens-swimming-and-diving\",\n    \"womens-tennis\",\n    \"womens-volleyball\"\n  ];\n  \n  // Regular expression to match option tags with value attributes\n  const optionRegex = /<option[^>]*value=\"([^\"]*)\"[^>]*>/g;\n  \n  // Array to store extracted values\n  const rosterValues = [];\n  \n  // Extract all matches\n  let match;\n  while ((match = optionRegex.exec(htmlContent)) !== null) {\n    const value = match[1];\n    \n    // Check if the value contains any of our sports roster URLs\n    const isRosterUrl = sports.some(sport => \n      value.includes(`/sports/${sport}/roster/`)\n    );\n    \n    if (isRosterUrl) {\n      rosterValues.push(value);\n    }\n  }\n  \n  // Add the extracted values to the item and remove the original HTML data\n  item.json = {\n    rosterValues: [...new Set(rosterValues)]\n  };\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -360,
+        -280
+      ],
+      "id": "ab05c125-94d7-4e21-8457-f270a5d6f9b5",
+      "name": "Code1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "=https://clarkatlantasports.com/{{ $json.value }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        -280
+      ],
+      "id": "08acdc09-6798-4cb7-86a9-0dbaf2d56af8",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = items[0].json.data;\nconst rows = html.match(/<tr>(.*?)<\\/tr>/gs);\n\nconst players = [];\n\nif (rows) {\n  for (const row of rows) {\n    const getCell = (cls) => {\n      const match = row.match(new RegExp(`<td class=\".*?${cls}.*?\">(.*?)<\\\\/td>`, 's'));\n      return match ? match[1].replace(/<[^>]*>/g, '').trim() : null;\n    };\n\n    const nameMatch = row.match(/<td class=\".*?sidearm-table-player-name.*?\">.*?<a .*?>(.*?)<\\/a>/s);\n    const name = nameMatch ? nameMatch[1].trim() : null;\n\n    const imgMatch = row.match(/<img[^>]*data-src=['\"]([^'\"]+)['\"]/);\n    const image = imgMatch ? `https://asugoldenrams.com${imgMatch[1]}` : null;\n\n    const player = {\n      name,\n      position: getCell('rp_position_short'),\n      number: getCell('roster_jerseynum'),\n      height: getCell('height'),\n      weight: getCell('rp_weight'),\n      class: getCell('roster_class'),\n      hometown: getCell('player_hometown'),\n      school: getCell('player_previous_school'),\n      image,\n    };\n\n    // Remove null fields\n    const cleaned = Object.fromEntries(\n      Object.entries(player).filter(([_, value]) => value !== null)\n    );\n\n    players.push(cleaned);\n  }\n}\n\nreturn players.map(player => ({ json: player }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -280
+      ],
+      "id": "0eb63407-f8b4-4d6f-bbf9-534b9c32498f",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1IDU8mAZ0Typrc6n-pX-7Rf_9-nRef885il_lGPYk6_4",
+          "mode": "list",
+          "cachedResultName": "fgcuathletics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IDU8mAZ0Typrc6n-pX-7Rf_9-nRef885il_lGPYk6_4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IDU8mAZ0Typrc6n-pX-7Rf_9-nRef885il_lGPYk6_4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NAME": "={{ $json.name }}",
+            "SPORT": "={{ $json.sport }}",
+            "SCHOOL": "={{ $json.school }}",
+            "HOMETOWN": "={{ $json.hometown }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "NAME",
+              "displayName": "NAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SPORT",
+              "displayName": "SPORT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SCHOOL",
+              "displayName": "SCHOOL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HOMETOWN",
+              "displayName": "HOMETOWN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        740,
+        -1740
+      ],
+      "id": "f7828a2c-0256-4aa6-a4eb-e228db6f0fce",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        200,
+        -280
+      ],
+      "id": "5edd8bfa-ee3c-4f1d-bd71-bf52e2c78fa0",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1nCpBYYWTPrDLgA780WVGziRISDeefC7HTYCRlQ1ZJS4",
+          "mode": "list",
+          "cachedResultName": "fgcuathletics Links",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nCpBYYWTPrDLgA780WVGziRISDeefC7HTYCRlQ1ZJS4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nCpBYYWTPrDLgA780WVGziRISDeefC7HTYCRlQ1ZJS4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "path": "={{ $json.rosterValues }}"
+          },
+          "matchingColumns": [
+            "path"
+          ],
+          "schema": [
+            {
+              "id": "path",
+              "displayName": "path",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -20,
+        -280
+      ],
+      "id": "b93d8898-ef3f-476e-91da-24d626dad7d9",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "ae71309a-d4cd-4412-856f-a482b318531d",
+      "name": "Split In Batches1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -280
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        -20
+      ],
+      "id": "5a9ebd98-feb4-4317-b567-c878c68e96bd",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -600,
+        -1380
+      ],
+      "id": "0da3fe3b-fac2-41a5-ac8e-962644c5ff58",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1nCpBYYWTPrDLgA780WVGziRISDeefC7HTYCRlQ1ZJS4",
+          "mode": "list",
+          "cachedResultName": "fgcuathletics Links",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nCpBYYWTPrDLgA780WVGziRISDeefC7HTYCRlQ1ZJS4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nCpBYYWTPrDLgA780WVGziRISDeefC7HTYCRlQ1ZJS4/edit#gid=0"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -380,
+        -1380
+      ],
+      "id": "4efd54f3-7d5b-4457-922b-d94caf33d20b",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        -1380
+      ],
+      "id": "69da564e-b72e-41f9-9e7d-7acde30cded4",
+      "name": "Limit2"
+    },
+    {
+      "parameters": {
+        "url": "=https://fgcuathletics.com/{{ $json.path }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        -1380
+      ],
+      "id": "77cdf52a-f519-4b66-a127-c1ba5760c00f",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "1nCpBYYWTPrDLgA780WVGziRISDeefC7HTYCRlQ1ZJS4",
+          "mode": "list",
+          "cachedResultName": "fgcuathletics Links",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nCpBYYWTPrDLgA780WVGziRISDeefC7HTYCRlQ1ZJS4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nCpBYYWTPrDLgA780WVGziRISDeefC7HTYCRlQ1ZJS4/edit#gid=0"
+        },
+        "startIndex": "={{ $('Limit2').item.json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        600,
+        -1320
+      ],
+      "id": "b6870d24-f7d2-4506-a825-151b05a27daf",
+      "name": "Google Sheets3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Qzo9pBLR0u93QhG3",
+          "name": "Google Sheets account Bam"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "rosterValues",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        -420
+      ],
+      "id": "4a387515-29c6-4b10-96a8-94282c595cc6",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "players",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -1640
+      ],
+      "id": "415deb8b-a368-4dd7-be19-2f2abc8c602e",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "A20mWOumIyvQBeXr",
+          "mode": "list",
+          "cachedResultName": "fgcuathletics"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        960,
+        -1320
+      ],
+      "id": "a7131e3a-e98b-4a11-9578-d03aa427a7ae",
+      "name": "Execute Workflow1"
+    },
+    {
+      "parameters": {
+        "path": "c2267685-fe82-4739-a426-23f82ab1c6ed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -660,
+        -1080
+      ],
+      "id": "c2bb1fb6-5891-446d-af4d-4a203d21d5f8",
+      "name": "Webhook2",
+      "webhookId": "c2267685-fe82-4739-a426-23f82ab1c6ed"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $json[\"data\"] || \"\";\n\nconst output = {};\n\n// Extract the sport and year from the header\nconst headerMatch = html.match(/<h2[^>]*>(\\d{4}) ([^<]+?) Roster<\\/h2>/);\nconst year = headerMatch ? headerMatch[1] : \"UnknownYear\";\nconst sport = headerMatch ? headerMatch[2].trim() : \"UnknownSport\";\n\n// Create a key like \"Baseball_2025\"\nconst groupKey = `${sport}_${year}`;\n\n// Extract all player blocks\nconst playerBlocks = html.match(/<li class=\"sidearm-roster-player\"[\\s\\S]*?<\\/li>/g) || [];\n\nconst players = [];\n\nfor (const block of playerBlocks) {\n    const nameMatch = block.match(/aria-label=\"([^\"]+?) - View Full Bio\"/);\n    const yearMatch = block.match(/<span class=\"sidearm-roster-player-academic-year[^>]*?\">([^<]+)<\\/span>/);\n    const prevSchoolMatch = block.match(/<span class=\"sidearm-roster-player-previous-school\">([^<]+)<\\/span>/);\n    const highschoolMatch = block.match(/<span class=\"sidearm-roster-player-highschool\">([^<]+)<\\/span>/);\n\n    const name = nameMatch ? nameMatch[1].trim() : null;\n    const academicYear = yearMatch ? yearMatch[1].trim() : null;\n    const university = prevSchoolMatch ? prevSchoolMatch[1].trim() : (highschoolMatch ? highschoolMatch[1].trim() : null);\n\n    if (name) {\n        players.push({\n            name,\n            academicYear,\n            university,\n            rosterYear: parseInt(year),\n            sport\n        });\n    }\n}\n\n// Attach to the grouped key\noutput[groupKey] = players;\n\n// Output as a single item\nreturn [{ json: output }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        -760
+      ],
+      "id": "5bb05b27-944c-4de2-891e-a5a619d5c49c",
+      "name": "Code3",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "138B1tXLKWl6Qt4VK_ZFHCBOnZHY6zYuuD69C8WuARFs",
+          "mode": "list",
+          "cachedResultName": "asugoldenrams",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/138B1tXLKWl6Qt4VK_ZFHCBOnZHY6zYuuD69C8WuARFs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/138B1tXLKWl6Qt4VK_ZFHCBOnZHY6zYuuD69C8WuARFs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NAME": "={{ $json.name }}",
+            "SPORT": "={{ $json.sport }}",
+            "SCHOOL": "={{ $json.school }}",
+            "HOMETOWN": "={{ $json.hometown }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "NAME",
+              "displayName": "NAME",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SPORT",
+              "displayName": "SPORT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "SCHOOL",
+              "displayName": "SCHOOL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HOMETOWN",
+              "displayName": "HOMETOWN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2720,
+        -1140
+      ],
+      "id": "fa352f85-9808-4acc-9ae9-b2d2c9d5007e",
+      "name": "Google Sheets4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MYJ51fHpcG8U7E9j",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://ungathletics.com/sports/{{ $json.lists }}/roster",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        -760
+      ],
+      "id": "36f3112e-abd4-441c-b026-88ca45efe285",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4",
+          "mode": "list",
+          "cachedResultName": "Linkes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4aDD8O_4t09PgxYxxFK7WUIacokZTQojVQ4cJTRAu4/edit#gid=0"
+        },
+        "startIndex": "={{ $('Limit3').item.json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2580,
+        -720
+      ],
+      "id": "76a40811-241f-45ee-805a-e987b21d7f4c",
+      "name": "Google Sheets6",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "MYJ51fHpcG8U7E9j",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ufPTZ6E78j6I48HC",
+          "mode": "list",
+          "cachedResultName": "asugoldenrams"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "cursor",
+              "displayName": "cursor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            },
+            {
+              "id": "_data",
+              "displayName": "_data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2940,
+        -720
+      ],
+      "id": "6455baab-f0eb-4f63-a8c9-390bbcebd9ae",
+      "name": "Execute Workflow2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"lists\": [\n    \"baseball\",\"mens-basketball\",\"football\",\"track-and-field\",\"womens-basketball\",\"womens-cross-country\", \"womens-soccer\",\"softball\",\"tennis\",\"womens-track-and-field\",\"womens-volleyball\"\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1580,
+        -760
+      ],
+      "id": "dc59f3dc-3ae6-4247-9829-544897e604c8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "lists",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        -760
+      ],
+      "id": "69e52733-ea45-413d-affe-3c969be1f845",
+      "name": "Split Out4"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "6977a59c-fa48-455a-8e5c-99de4099c0d1",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        -760
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $json[\"data\"] || \"\";\nconst output = [];\n\n// Helper: safely get a matched regex group and trim\nfunction safeMatch(html, regex, group = 1) {\n    const match = html.match(regex);\n    return match && match[group] ? decodeHtml(match[group].trim()) : null;\n}\n\n// Helper: decode HTML entities like &#39; → '\nfunction decodeHtml(str) {\n    return str.replace(/&#(\\d+);/g, (_, dec) => String.fromCharCode(dec))\n              .replace(/&quot;/g, '\"')\n              .replace(/&amp;/g, '&')\n              .replace(/&lt;/g, '<')\n              .replace(/&gt;/g, '>')\n              .replace(/&#x27;/g, \"'\")\n              .replace(/&apos;/g, \"'\");\n}\n\nlet year = \"UnknownYear\";\nlet sport = null;\n\n// Try <h2> tag\nconst headerMatch = html.match(/<h2[^>]*>(\\d{4}) ([^<]+?) Roster<\\/h2>/);\nif (headerMatch && headerMatch[1] && headerMatch[2]) {\n    year = headerMatch[1];\n    sport = decodeHtml(headerMatch[2].trim());\n}\n\n// Try meta tag\nif (!sport) {\n    const metaMatch = html.match(/<meta[^>]+content=\"(\\d{4})-?\\d{0,2}? ([^\"]+?) Roster\"/);\n    if (metaMatch && metaMatch[1] && metaMatch[2]) {\n        year = metaMatch[1];\n        sport = decodeHtml(metaMatch[2].trim());\n    }\n}\n\n// Try JS variable\nif (!sport) {\n    sport = safeMatch(html, /associated_sport\\s*=\\s*{[^}]*\"title\"\\s*:\\s*\"([^\"]+?)\"/);\n}\n\n// Try from HTML class\nif (!sport) {\n    const code = safeMatch(html, /<html[^>]+class=\"[^\"]*sport\\s+([a-z0-9\\-]+)[^\"]*\"/i);\n    const codeToSportMap = {\n        // Men's\n        \"baseball\": \"Baseball\",\n        \"bsb\": \"Baseball\",\n        \"mens-basketball\": \"Men's Basketball\",\n        \"mbkb\": \"Men's Basketball\",\n        \"mens-cross-country\": \"Men's Cross Country\",\n        \"mxc\": \"Men's Cross Country\",\n        \"mens-soccer\": \"Men's Soccer\",\n        \"msoc\": \"Men's Soccer\",\n        \"mens-golf\": \"Men's Golf\",\n        \"mgolf\": \"Men's Golf\",\n        \"mens-lacrosse\": \"Men's Lacrosse\",\n        \"mlax\": \"Men's Lacrosse\",\n        \"mens-swimming\": \"Men's Swimming\",\n        \"mens-track-and-field\": \"Men's Track and Field\",\n        \"mtrack\": \"Men's Track and Field\",\n        \"mens-tennis\": \"Men's Tennis\",\n        \"mten\": \"Men's Tennis\",\n\n        // Women's\n        \"womens-basketball\": \"Women's Basketball\",\n        \"wbkb\": \"Women's Basketball\",\n        \"womens-cross-country\": \"Women's Cross Country\",\n        \"wxc\": \"Women's Cross Country\",\n        \"womens-soccer\": \"Women's Soccer\",\n        \"wsoc\": \"Women's Soccer\",\n        \"womens-golf\": \"Women's Golf\",\n        \"wgolf\": \"Women's Golf\",\n        \"womens-tennis\": \"Women's Tennis\",\n        \"wten\": \"Women's Tennis\",\n        \"womens-track-and-field\": \"Women's Track and Field\",\n        \"wtrack\": \"Women's Track and Field\",\n        \"womens-volleyball\": \"Women's Volleyball\",\n        \"wvball\": \"Women's Volleyball\",\n        \"womens-lacrosse\": \"Women's Lacrosse\",\n        \"wlax\": \"Women's Lacrosse\",\n        \"womens-swimming\": \"Women's Swimming\",\n\n        // Other sports\n        \"softball\": \"Softball\",\n        \"sball\": \"Softball\",\n        \"tennis\": \"Tennis\",\n        \"track-and-field\": \"Track and Field\",\n        \"xc\": \"Cross Country\",\n        \"football\": \"Football\",\n        \"cheerleading\": \"Cheerleading\",\n        \"equestrian\": \"Equestrian\",\n        \"beach-volleyball\": \"Beach Volleyball\"\n    };\n\n    if (code) {\n        const normalized = code.toLowerCase();\n        sport = codeToSportMap[normalized] || normalized;\n    }\n}\n\n// Fallback\nif (!sport) sport = \"UnknownSport\";\n\n// Extract all player blocks\nconst playerBlocks = html.match(/<li class=\"sidearm-roster-player\"[\\s\\S]*?<\\/li>/g) || [];\n\nfor (const block of playerBlocks) {\n    const name = safeMatch(block, /aria-label=\"([^\"]+?) - View Full Bio\"/);\n    const academicYear = safeMatch(block, /<span class=\"sidearm-roster-player-academic-year[^>]*?\">([^<]+)<\\/span>/);\n    const prevSchool = safeMatch(block, /<span class=\"sidearm-roster-player-previous-school\">([^<]+)<\\/span>/);\n    const highSchool = safeMatch(block, /<span class=\"sidearm-roster-player-highschool\">([^<]+)<\\/span>/);\n    const hometown = safeMatch(block, /<span class=\"sidearm-roster-player-hometown\">([^<]+)<\\/span>/);\n\n    const school = prevSchool || highSchool;\n\n    if (name) {\n        const player = {\n            name,\n            sport,\n            rosterYear: parseInt(year),\n            academicYear,\n            school,\n            hometown,\n        };\n\n        const cleaned = Object.fromEntries(\n            Object.entries(player).filter(([_, value]) => value !== null && value !== \"\")\n        );\n\n        if (Object.keys(cleaned).length > 1) {\n            output.push(cleaned);\n        }\n    }\n}\n\nreturn [{ json: { players: output } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        280,
+        -1380
+      ],
+      "id": "42104507-e68c-4f8c-a39a-d84502c4aed6",
+      "name": "Code4"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets2": {
+      "main": [
+        [
+          {
+            "node": "Limit2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets6": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out4": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e9fa1da7-f9d8-44ac-a57a-06c4eb412970",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-06-26T09:10:47.549Z",
+      "updatedAt": "2025-06-26T09:10:47.549Z",
+      "role": "workflow:owner",
+      "workflowId": "A20mWOumIyvQBeXr",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

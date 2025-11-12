@@ -1,0 +1,370 @@
+{
+  "createdAt": "2025-09-09T13:54:46.845Z",
+  "updatedAt": "2025-09-09T14:53:34.644Z",
+  "id": "hehGGJhYSIsFHqNq",
+  "name": "cis-slack-ingestion",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0a7f6cd-683d-429d-a945-facee5c75d24",
+              "name": "text",
+              "value": "={{ $('Slack Trigger').item.json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "da527e1a-9c89-4426-a0af-a53a6021af29",
+              "name": "=source_type",
+              "value": "slack",
+              "type": "string"
+            },
+            {
+              "id": "746ec51a-429e-400d-974b-57205e372fe5",
+              "name": "=source_type",
+              "value": "slack",
+              "type": "string"
+            },
+            {
+              "id": "d94e8810-d76d-48a3-90e8-c2c4a53ff990",
+              "name": "=slack_channel_name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "82e39c7f-4090-40ff-ac30-24cecf94b0b7",
+              "name": "=slack_channel_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        -112
+      ],
+      "id": "df25ed23-016c-4441-a77d-c3d13c72c1d2",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "channel",
+        "operation": "get",
+        "channelId": {
+          "__rl": true,
+          "value": "={{ $json.channel }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        480,
+        -112
+      ],
+      "id": "21ba4b96-21d3-4c90-b614-759532e77ac7",
+      "name": "Get Channel",
+      "webhookId": "892fb988-f2ca-4079-bd26-b2b7f195d88f",
+      "credentials": {
+        "slackApi": {
+          "id": "f0uPnp9IrPnEE8We",
+          "name": "cis-slack-yo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "cis",
+          "mode": "list",
+          "cachedResultName": "cis"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        -112
+      ],
+      "id": "ac3389a2-c233-4185-b2ce-d327cead71b6",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "hh3dnHsjI82CZcfO",
+          "name": "Unnamed credential Yo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        976,
+        128
+      ],
+      "id": "9856026d-83a3-484e-bbdf-fe8ffb2546cf",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $('Edit Fields').item.json.text }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "=source_type",
+                "value": "={{ $('Edit Fields').item.json.source_type }}"
+              },
+              {
+                "name": "client_name",
+                "value": "={{ $('Get a row').item.json.name }}"
+              },
+              {
+                "name": "=date",
+                "value": "={{ $now.toUTC().toISO() }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        112
+      ],
+      "id": "d19a5bfb-f35f-4979-b75e-cf17db2a15a3",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        336
+      ],
+      "id": "ad9f7f91-3eca-44ee-93a1-d6a9dcc0813c",
+      "name": "Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "trigger": [
+          "message"
+        ],
+        "channelId": {
+          "__rl": true,
+          "value": "C09E8UKLDL2",
+          "mode": "list",
+          "cachedResultName": "cis-bot"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -112
+      ],
+      "id": "e64cae2d-0665-4042-a04f-b5aca4d33bf5",
+      "name": "Slack Trigger",
+      "webhookId": "c457b1d5-4992-4e38-9ddd-c1ffae35b28f",
+      "credentials": {
+        "slackApi": {
+          "id": "f0uPnp9IrPnEE8We",
+          "name": "cis-slack-yo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "clients",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "slack_channel_id",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        688,
+        -112
+      ],
+      "id": "7949cb6a-0a05-46d3-b2da-d2ae4fb6fbba",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "hh3dnHsjI82CZcfO",
+          "name": "Unnamed credential Yo"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Channel": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {
+    "Slack Trigger": [
+      {
+        "json": {
+          "user": "U099QTENW1G",
+          "type": "message",
+          "ts": "1757427507.497869",
+          "client_msg_id": "af774ef3-5948-4c61-9792-96048b709fd3",
+          "text": "hello",
+          "team": "T08P75WL1AN",
+          "blocks": [
+            {
+              "type": "rich_text",
+              "block_id": "ZL1yL",
+              "elements": [
+                {
+                  "type": "rich_text_section",
+                  "elements": [
+                    {
+                      "type": "text",
+                      "text": "hello"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "channel": "C09E8UKLDL2",
+          "event_ts": "1757427507.497869",
+          "channel_type": "group"
+        }
+      }
+    ]
+  },
+  "versionId": "b7f5a683-7564-4233-8f57-b0249cd821ef",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-09-09T13:54:46.845Z",
+      "updatedAt": "2025-09-09T13:54:46.845Z",
+      "role": "workflow:owner",
+      "workflowId": "hehGGJhYSIsFHqNq",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

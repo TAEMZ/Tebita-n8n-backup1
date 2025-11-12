@@ -1,0 +1,1597 @@
+{
+  "createdAt": "2025-08-11T08:07:36.511Z",
+  "updatedAt": "2025-09-02T10:31:58.279Z",
+  "id": "y952ygFhXgj6MacZ",
+  "name": "Grade",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Upload Clean Template",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "data",
+              "fieldType": "file",
+              "acceptFileTypes": "pdf"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -144,
+        192
+      ],
+      "id": "b4158de4-6d49-4cd6-9758-95f3ff1cf303",
+      "name": "On form submission2",
+      "webhookId": "f1f85d91-11d4-4181-ac8f-d75a05c9507b"
+    },
+    {
+      "parameters": {},
+      "id": "1ca7a60d-4eab-4013-9a17-18d05b9aefe7",
+      "name": "Extract Zip File2",
+      "type": "n8n-nodes-base.compression",
+      "position": [
+        560,
+        192
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://45.32.189.71:8073/convert/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "pdf_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        352,
+        192
+      ],
+      "id": "8e953f60-68e3-4465-bcab-16b30ea056f4",
+      "name": "HTTP Request2",
+      "retryOnFail": true,
+      "maxTries": 4,
+      "waitBetweenTries": 1000
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 75,
+        "height": 75,
+        "resizeOption": "percent",
+        "options": {}
+      },
+      "id": "89aaf0c0-a957-439c-983b-d5690b58dba1",
+      "name": "Resize Images For AI3",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        1152,
+        192
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [];\n\nfor (item of items) {\n    for (key of Object.keys(item.binary)) {\n        results.push({\n            json: {\n                fileName: item.binary[key].fileName\n            },\n            binary: {\n                data: item.binary[key],\n            }\n        });\n    }\n}\n\nreturn results;"
+      },
+      "id": "c79e882f-0d6b-4d39-a272-f40562ca679e",
+      "name": "Images To List3",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        752,
+        192
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "fileName"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4cee3eea-cc43-4248-9a4d-a937f0eaf593",
+      "name": "Sort Pages3",
+      "type": "n8n-nodes-base.sort",
+      "position": [
+        928,
+        192
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "# Prompt: Submitted Test Image Analyzer\n\nYou are analyzing an image of a completed test submitted by a student.\n\n## Instructions:\n1. **Identify and describe** each question and selected answer exactly as they appear in the image.  \n   - Do **not** determine correctness — only describe what is visible.\n\n2. For each question, provide:\n   - **question_number**\n   - **question_text** (if readable)\n   - **correct_answer** (letter, number, word, or marked choice)\n   - **coordinates** for the question text (bounding box in pixels: x1, y1, x2, y2)\n   - **coordinates** for the answer text/mark (bounding box in pixels: x1, y1, x2, y2)\n   - **confidence_score** (0–100%) for certainty about the extracted answer\n   -**processing_notes** for each question and write a brief description of what it contains\n\n3. If any part is unclear:\n   - Set `\"question_text\"` or `\"answer_text\"` to `\"uncertain\"`\n   - Lower the **confidence_score** accordingly",
+        "inputType": "base64",
+        "options": {
+          "detail": "high",
+          "maxTokens": 4000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1408,
+        192
+      ],
+      "id": "2b320307-b0e0-4378-b013-ceadd5a0d70e",
+      "name": "Analyze image2",
+      "retryOnFail": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_assessments_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.1,
+      "position": [
+        4032,
+        512
+      ],
+      "id": "e10a64f3-34aa-4859-906d-471744ec31d9",
+      "name": "Supabase Vector Store1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "cZHVjFKhe54hk8Fu",
+          "name": "Supabase account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3872,
+        800
+      ],
+      "id": "d98df0e1-6a39-4bd1-b60f-c80825ee6176",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ \nJSON.stringify($('Format response1').item.json.questions)\n}}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "school_name",
+                "value": "={{ $('Format response1').item.json.metadata.school_name }}"
+              },
+              {
+                "name": "subject",
+                "value": "={{ $('Format response1').item.json.metadata.subject }}"
+              },
+              {
+                "name": "year_level",
+                "value": "={{ $('Format response1').item.json.metadata.year_level }}"
+              },
+              {
+                "name": "unit",
+                "value": "={{ $('Format response1').item.json.metadata.unit}}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        4112,
+        704
+      ],
+      "id": "212333f3-7a3b-4bc7-97d3-5c1a37395d3d",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
+      "typeVersion": 1,
+      "position": [
+        4144,
+        992
+      ],
+      "id": "b995c5d8-0b21-45ed-b7b3-5fbb0febcb0b",
+      "name": "Token Splitter1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the incoming JSON string from the first item\nconst inputJsonString = $input.first().json.message.content\n// The final structured output object\nlet structuredOutput = {\n  metadata: {},\n  questions: []\n  }\n  \n\ntry {\n  // 1. Clean and parse the JSON string\n  // Remove markdown code block markers if they exist\n  const cleanedJsonStr = inputJsonString\n    .replace(/^```json\\s*/, '')\n    .replace(/\\s*```$/, '');\n  \n  const rawData = JSON.parse(cleanedJsonStr);\n  \n  // 2. Process and consolidate metadata\n  // Extract and clean up the top-level fields\n  structuredOutput.metadata = {\n    school_name: rawData.school_name || 'not specified',\n    subject: rawData.subject || 'Not specified',\n    year_level: rawData.year_level || 'Not specified',\n    unit: rawData.unit || 'Not specified',\n  };\n\n  // 3. Process and clean the questions array\n  // We'll iterate through the questions and select only the most relevant fields\n  if (Array.isArray(rawData.questions)) {\n    structuredOutput.questions = rawData.questions.map(q => {\n      return {\n        q_id: q.q_id,\n        question_number: q.question_number,\n        question_text: q.question_text,\n        correct_answer: q.correct_answer,\n         question_coordinates: q.question_coordinates,\n        answer_coordinates:q.answer_coordinates,\n        \n      };\n    });\n  }\n\n} catch (err) {\n  // Return an error message if parsing fails\n  console.error(\"Error parsing JSON:\", err);\n  return [{\n    json: {\n      error: `Failed to parse JSON: ${err.message}`\n    }\n  }];\n}\n\n// Return the structured output as a single item\nreturn [{ json: structuredOutput }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        320
+      ],
+      "id": "c38c338d-d5d2-4735-be26-e4ac63a57f6b",
+      "name": "Format response1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// incoming must have binary.data_1 and binary.data_2\nreturn [\n  {\n   \n    binary: { data: items[0].binary.data_0 } // first file\n  },\n  {\n   \n    binary: { data: items[0].binary.data_1 } // second file\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        192
+      ],
+      "id": "2ffbbcae-4dda-4c1a-9b20-aaea9b73faf1",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert at matching educational assessment pages based on textual descriptions of each page.\nYou will be given an array of page descriptions. Each description represents one page of a test or worksheet. \nThese descriptions may come from two different versions of the same assessment:\n- One version is the question-only version.\n- One version is the question-with-answer version.\n\nYour tasks:\n1. Compare the page descriptions to detect which pages are based on the same underlying layout and content.\n   - A match does not require identical wording; minor changes, formatting differences, or extra answer content still count as a match.\n   - Consider both text content and described visual layout from the descriptions.\n\n2. For each matching set, determine:\n   - Which description is the question-only version (no answers present).\n   - Which description is the question-with-answer version (answers present or implied).\n\n3. If a page has no match in the other version, still include it in the output but mark the missing counterpart as null.\n\n4. Return the results as valid JSON in the following format:\n\n1.Only extract **metadata once** for the entire document set (not per page). This includes:\n   - school_name\n   - year_level\n   - subject\n   - unit\nEach question must include:\n   - question_number\n   - question_text (combine sub-parts a, b, c inline into one text field)\n   - question_coordinate\n   - correct_answer (full answer in text; if the answer is visual, describe it fully in words but don't write it on your own, just put down as the answer is)\n   - answer_coordinate\nReturn in this exact schema:\n\n{\n  \"school_name\": null\n  \"year_level\": null,\n  \"subject\": null,\n  \"unit\": null,\n  \"questions\": [\n    {\n      \"q_id\":generate an id for each questions\n      \"question_number\": \"1\",\n      \"question_text\": \"...\",\n      \"correct_answer\": \"...\",\n      \"question_coordinates\": { \"x\": 0, \"y\": 0, \"width\": 0, \"height\": 0 },\n      \"answer_coordinates\": { \"x\": 0, \"y\": 0, \"width\": 0, \"height\": 0 },\n    }\n  ],\n}\n\nGuidelines:\n- Use only the textual descriptions provided — do not assume you have the actual images.\n- \"Answers present\" means the page description contains model solutions, markings on diagrams, filled blanks, or textual explanations.\n- A “question-only” page will contain only the task prompts, diagrams without annotations, or empty fields for the student to fill.\n- The match_confidence should reflect how sure you are that the two pages are the same base question set.\n- Always output valid JSON — no extra text outside the JSON.\nhere is the data:{{$json.allContent  }}\nAfter matching the questions and filling the correct answer:\nDecide if the dataset is valid or invalid using the following rules:\n\n1. If there are **no questions** at all → invalid.\n2. If **all or almost all** of the questions have `correct_answer` that is empty (`\"\"`), `\"uncertain\"`, `\"no answer found\"`, `\"none_detected\"`, or missing entirely → invalid.\n3. A match only counts if:\n   - One object has `correct_answer` missing/empty/`\"uncertain\"`/`\"no answer found\"`/`\"none_detected\"` (**question-only**)\n   - One object has `correct_answer` present (**question-with-answer**)\n   - Their `question_text` is the same or very similar (partial match allowed)\n4. If there is **at least one** valid match as defined above → valid.\n5. If no valid match exists → invalid.\n\n**Output:**\n- If invalid, return only:\n```json\n{\n  \"invalid\": true,\n  \"reasoning\": \"<reason>\"\n}\nIf valid, return the dataset exactly as received without invalid or reasoning.\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1888,
+        192
+      ],
+      "id": "8ecc1dc0-2f25-401d-9bb1-5d06123a5e1f",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items\nconst items = $input.all();\n\n// Create an empty array to store the content\nconst allContent = [];\n\n// Loop through each item and push the content into the array\nfor (const item of items) {\n  allContent.push(item.json.content);\n}\n\nreturn [{\n  json: {\n    allContent: allContent\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        192
+      ],
+      "id": "3dfddc20-39f4-49eb-96fc-0ae2646e175d",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "content": "## upload 2 pdfs one question, one question with actual answer",
+        "height": 640,
+        "width": 532,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -496,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "1e218d97-993a-46b8-a840-63ca3e68306e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "##Gets the pdf ready for the gpt to analyze it",
+        "height": 496,
+        "width": 1216
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "2c031880-7494-4d31-9190-cee7edf54048",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## The gpt analyzes the image and prepares it or storage in the supabase vector database",
+        "height": 496,
+        "width": 412
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "b9d041e0-fab6-490c-a633-3230700e0772",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Vectorizes the data and stores it in the database",
+        "height": 896,
+        "width": 816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3872,
+        272
+      ],
+      "typeVersion": 1,
+      "id": "d8f3a122-9fc2-46b9-b895-f59d89af986c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "resize",
+        "width": 75,
+        "height": 75,
+        "resizeOption": "percent",
+        "options": {}
+      },
+      "id": "6c273554-a44d-4eaf-9ee9-d80a9abb83a8",
+      "name": "Resize Images For AI",
+      "type": "n8n-nodes-base.editImage",
+      "position": [
+        720,
+        1248
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [];\n\nfor (item of items) {\n    for (key of Object.keys(item.binary)) {\n        results.push({\n            json: {\n                fileName: item.binary[key].fileName\n            },\n            binary: {\n                data: item.binary[key],\n            }\n        });\n    }\n}\n\nreturn results;"
+      },
+      "id": "285798dc-656e-4503-a64e-197a0af4bf1f",
+      "name": "Images To List",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        320,
+        1248
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {},
+      "id": "34846ff5-4eb6-4ebf-99e1-08a26565086a",
+      "name": "Extract Zip File",
+      "type": "n8n-nodes-base.compression",
+      "position": [
+        144,
+        1248
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "fileName"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "45ad53c9-e0d4-4418-b13d-30e69dc8dcfe",
+      "name": "Sort Pages",
+      "type": "n8n-nodes-base.sort",
+      "position": [
+        512,
+        1248
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://45.32.189.71:8073/convert/",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "pdf_file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        1248
+      ],
+      "id": "f211038a-1f3a-4038-bffb-b040d18dfb9b",
+      "name": "HTTP Request1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload Clean Template",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "data",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "acceptFileTypes": "pdf"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -336,
+        1248
+      ],
+      "id": "e76ac808-2080-4f12-8ea3-7148650362f8",
+      "name": "On form submission",
+      "webhookId": "62c4fa78-7d5a-4243-bafe-afc4646750ce"
+    },
+    {
+      "parameters": {
+        "content": "## Send a test question to be checked",
+        "height": 400,
+        "width": 276
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -464,
+        1088
+      ],
+      "typeVersion": 1,
+      "id": "7f2108ea-8df9-438f-ab19-a395276892d3",
+      "name": "Sticky Note4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "text": "You are an expert OCR and document analysis assistant.\n\n**Task:**\nAnalyze the provided page image exactly as it appears.  \nTranscribe *all* visible text, numbers, tables, headings, and annotations — without summarizing, skipping, or rephrasing.\n\n**Special Rules:**\n- For any table (e.g., marking guide), preserve its structure exactly as seen:\n  - Rows, columns, and cell contents in their correct order.\n  - Keep headers exactly as they appear.\n- For diagrams, number lines, or images containing text, transcribe all text labels and numbers.\n- For handwritten answers, write them exactly as they appear, even if spelling or grammar is wrong.\n - **coordinates** for the question text (bounding box in pixels: x1, y1, x2, y2 include height & width)\n   - **coordinates** for the answer text/mark (bounding box in pixels: x1, y1, x2, y2  include height & width)\n- Do **not** guess or infer missing information — if unreadable, write `[unreadable]`.\n\n**Output Format:**\nReturn a JSON object\n",
+        "inputType": "base64",
+        "options": {
+          "detail": "high",
+          "maxTokens": 4000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        928,
+        1248
+      ],
+      "id": "8cb650e9-6c58-4093-820c-0421c70f41e9",
+      "name": "Analyze image",
+      "retryOnFail": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the incoming JSON string from the first item\nconst inputJsonString = $input.first().json.message.content;\n\n// The final structured output object\nlet structuredOutput = {\n  formatted: {\n    metadata: {},\n    questions: []\n  }\n};\n\ntry {\n  // 1. Clean and parse the JSON string\n  const cleanedJsonStr = inputJsonString\n    .replace(/^```json\\s*/, '')  // remove starting ```json\n    .replace(/\\s*```$/, '')      // remove trailing ```\n    .trim();\n\n  const rawData = JSON.parse(cleanedJsonStr);\n\n  // 2. Process and consolidate metadata\n  structuredOutput.formatted.metadata = {\n    school_name: rawData.school_name || 'Not specified',\n    subject: rawData.subject || 'Not specified',\n    year_level: rawData.year_level || 'Not specified',\n    unit: rawData.unit || 'Not specified',\n    marking_guide: rawData.marking_guide || [],\n     overall_confidence: rawData.detection_confidence !== undefined\n      ? `${(rawData.detection_confidence * 100).toFixed(0)}%`\n      : 'Not specified'\n  };\n\n  // 3. Process and clean the questions array\n  if (Array.isArray(rawData.questions)) {\n    structuredOutput.formatted.questions = rawData.questions.map(q => ({\n      question_number: q.question_number,\n      question_text: q.question_text,\n      student_answer: q.student_answer || null,\n      question_coordinates: q.question_coordinates || null,\n      answer_coordinates: q.answer_coordinates || null,\n      processing_notes: q.processing_notes || '',\n      question_confidence: q.detection_confidence !== undefined\n        ? `${(q.detection_confidence * 100).toFixed(0)}%`\n        : 'Not specified'\n    }));\n  }\n\n} catch (err) {\n  // Return an error message if parsing fails\n  console.error(\"Error parsing JSON:\", err);\n  return [{\n    json: {\n      error: `Failed to parse JSON: ${err.message}`\n    }\n  }];\n}\n\n// Return the structured output as a single item\nreturn [{ json: structuredOutput }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1712,
+        1248
+      ],
+      "id": "e32b8a89-ee2b-4719-b22d-3aae6356d9f3",
+      "name": "Format response"
+    },
+    {
+      "parameters": {
+        "content": "##Gets the pdf ready for the gpt to analyze it",
+        "height": 496,
+        "width": 1024
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -144,
+        1072
+      ],
+      "typeVersion": 1,
+      "id": "3de3f12b-62b8-449b-8c7a-788720e12687",
+      "name": "Sticky Note5",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4",
+          "mode": "list",
+          "cachedResultName": "gpt-4"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        4192,
+        2128
+      ],
+      "id": "f8315751-1e4b-47e5-9f3b-8f0e1b6c1c86",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "exam",
+        "toolDescription": "questions with correct answers",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.2,
+      "position": [
+        4368,
+        2096
+      ],
+      "id": "3668e528-9a17-4dc5-86bb-c7e594164ec3",
+      "name": "Supabase Vector Store2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "cZHVjFKhe54hk8Fu",
+          "name": "Supabase account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        4864,
+        2544
+      ],
+      "id": "dba47f1a-ede5-49d4-a2e4-510221924413",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3008,
+        528
+      ],
+      "id": "2295a3a6-d9e7-49fc-9e3c-6884431ebdc9",
+      "name": "Embeddings OpenAI3",
+      "credentials": {
+        "openAiApi": {
+          "id": "P97bW4SECej7SdA6",
+          "name": "don't use this eric"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "prompt": "=check if there is any data matching this {{ JSON.stringify($json.questions) }}.\nif you found the data return a similarity score out of 1",
+        "topK": 1,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.2,
+      "position": [
+        2912,
+        320
+      ],
+      "id": "c206aaed-dacc-430f-aa76-a0aee55bb7a3",
+      "name": "Supabase Vector Store3",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "cZHVjFKhe54hk8Fu",
+          "name": "Supabase account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the metadata for the new document\nconst newMetadataRaw = $('Format response1').first().json.metadata;\n\n// Normalize all dash characters\nconst normalizeDashes = str => str?.replace(/[\\u2013\\u2014]/g, '-');\n\n// Normalize new metadata\nconst newMetadata = {\n  school_name: newMetadataRaw.school_name,\n  subject: newMetadataRaw.subject,\n  year_level: newMetadataRaw.year_level,\n  unit: normalizeDashes(newMetadataRaw.unit)\n};\n\n// Get all matches (from vector DB or similar)\nconst matches = $input.all().map(item => item.json);\n\n// Initialize duplicateFound as false\nlet duplicateFound = false;\nlet dbMetadata = null;\n\n// Check against each match (if any)\nif (matches.length > 0) {\n  for (const match of matches) {\n    const md = match.document?.metadata;\n    if (!md) continue;\n\n    const normalized = {\n      school_name: md.school_name,\n      subject: md.subject,\n      year_level: md.year_level,\n      unit: normalizeDashes(md.unit)\n    };\n\n    // Compare fields\n    if (\n      normalized.school_name === newMetadata.school_name &&\n      normalized.subject === newMetadata.subject &&\n      normalized.year_level === newMetadata.year_level &&\n      normalized.unit === newMetadata.unit\n    ) {\n      duplicateFound = true;\n      dbMetadata = normalized;\n      break;\n    }\n  }\n}\n\nreturn [\n  {\n    json: {\n      duplicateFound,\n      message: duplicateFound ? \"Data already exists.\" : \"Data is unique.\",\n      dbMetadata,\n      newMetadata\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3328,
+        320
+      ],
+      "id": "652854aa-ea25-451e-a060-31f64800501c",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3990b055-ef01-45bb-9af5-32ab5e20392a",
+              "leftValue": "={{ $json.duplicateFound }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3568,
+        320
+      ],
+      "id": "a25f8f58-ccce-483d-93ef-684f23528c96",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d221ea2c-eafe-4eed-9e62-45db0a5bdbbc",
+              "name": "duplicateFound",
+              "value": "={{ $('Code4').item.json.duplicateFound }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3888,
+        -64
+      ],
+      "id": "2ef6df9a-e56f-4d5c-b549-1a76a759c1b7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "## Checks and grades each question, it also grades the total",
+        "height": 800,
+        "width": 960,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1664,
+        1072
+      ],
+      "typeVersion": 1,
+      "id": "3d772aed-173f-428d-971c-a481706656b5",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "= You are an automated grading assistant.\n\n\nYour job:\n\n1. Search the Supabase vector database once for each given student question to find the single most semantically similar stored question-answer pair.\n\n2. Retrieve the *exact* correct answer from the database for that matched question.\n\n3. Compare the student’s answer to the correct answer using the provided grading criteria.\n\n4. Assign a grade (A–E) for each question based on semantic correctness\n\n5. Calculate the final `\"total_score\"` as the **average letter grade** of all graded questions.\n\n\nStrict guidelines:\n\n- Only use answers retrieved from the database — never make them up.\n\n- Always grade based on semantic similarity, not exact wording.\n\n- Apply the grading criteria consistently to determine the letter grade.\n\n- Never query the database more than once per question.\n\n- Always output JSON in the exact format below without extra text, commentary, or explanations.\n\n\n**Required output format (JSON only, no markdown):**\n\n{\n\n  \"questions\": [\n\n    {\n\n      \"question_number\": 1,\n\n      \"question\": \"<student question>\",\n\n      \"student_answer\": \"<student answer>\",\n\n      \"correct_answer\": \"<retrieved correct answer>\",\n\n      \"grade\": \"<A|B|C|D|E>\"\n\n    },\n\n    {\n\n      \"question_number\": 2,\n\n      \"question\": \"<student question>\",\n\n      \"student_answer\": \"<student answer>\",\n\n      \"correct_answer\": \"<retrieved correct answer>\",\n\n      \"grade\": \"<A|B|C|D|E>\"\n\n    }\n\n  ],\n\n  \"total_score\": \"<A|B|C|D|E>\"\n\n}\n\n\nYou will be given:\n\n- `student_submitted_questions`: {{ JSON.stringify($json.formatted) }}\n\n- `grading_criteria`: {{ JSON.stringify($json.formatted.metadata.marking_guide[0].criteria) }}\n\n\nNow begin grading. ",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        4176,
+        1920
+      ],
+      "id": "a6a95e71-76a6-48ae-8c2f-7fbf15c8e3f1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9979d6b2-9aaa-435b-97a0-941e7957e14f",
+              "leftValue": "={{ $json.message.content }}",
+              "rightValue": "\"invalid\": true",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2320,
+        192
+      ],
+      "id": "369574ee-bdb0-4566-9eed-c281c608010e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the incoming string from the previous node\nconst rawString =  $input.first().json.message.content|| \"\";\n\n// Step 1: Clean up markdown-style code fences and escaped newlines\nconst cleanedString = rawString\n  .replace(/```json\\s*/gi, '') // remove ```json\n  .replace(/```/g, '')         // remove ```\n  .replace(/\\\\n/g, '');        // remove literal \\n\n\n// Step 2: Parse into an object\nlet parsed = {};\ntry {\n  parsed = JSON.parse(cleanedString);\n} catch (error) {\n  parsed = {\n    invalid: null,\n    reasoning: null,\n    error: \"Invalid JSON format\",\n    details: error.message\n  };\n}\n\n// Step 3: Return only the fields you want\nreturn [\n  {\n    json: {\n      invalid: parsed.invalid ?? null,\n      reasoning: parsed.reasoning ?? null\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        -128
+      ],
+      "id": "1cf6aa07-e92d-4387-b46c-4fa7f725ea2f",
+      "name": "Code5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        3664,
+        2192
+      ],
+      "id": "0ae3e987-ad7a-4cc3-ba0b-9d7397ebf3ae",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2192,
+        1456
+      ],
+      "id": "acbfea17-a2eb-4aff-a5f3-40efffe6e852",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "questions with correct answers",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        2480,
+        1488
+      ],
+      "id": "3b0c74b9-d9fd-4fab-81b4-c636230b12c4",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "cZHVjFKhe54hk8Fu",
+          "name": "Supabase account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2528,
+        1744
+      ],
+      "id": "b960454f-5533-472f-9d8f-3d656fcf1201",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all input items\nconst items = $input.all();\n\n// Create an empty array to store the content\nconst allContent = [];\n\n// Loop through each item and push the content into the array\nfor (const item of items) {\n  allContent.push(item.json.content);\n}\n\nreturn [{\n  json: {\n    allContent: allContent\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        1248
+      ],
+      "id": "cd331f6f-8c97-45e4-a2f1-f3ba1e344eb7",
+      "name": "combine analyzed image data"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a document structuring and enrichment assistant.\n\nInput:\nYou will receive a JSON object representing the student's answers to a test.\n{{ $json.allContent }}\nEach entry includes:\n\n    question_number\n\n    question_text\n\n    student_answer (can be very detailed text or a visual description)\n\n    Any grading instructions (point values, letter grade rules, etc.)\n\nTask:\n\n    Extract Metadata (once for the whole submission):\n\n        template_name\n\n        subject\n\n        year_level\n\n        task_title\n\n        unit_title\n\n        term\n\n        teacher_name\n\n        student_name\n\n        task_description\n\n        due_date\n\n        number_of_questions\n\n    Prepare Questions Array:\n    For each question:\n\n        Handle Question Numbering:\n\n            Keep the question_number exactly as provided in the input.\n\n            If a question has sub-parts (e.g., a main question 4 with parts a, b, c), assign the question_number as \"4a\", \"4b\", \"4c\", etc. Each sub-part should be treated as a separate and distinct question object in the final array.\n\n        Keep question_text exactly as provided.\n\n        Keep student_answer as the full answer in text. If the answer is visual, describe it fully in words; do not create your own answer. If it's just labeled with a number, record the label and number as the answer.\n\n        Set marks to null unless provided in the input.\n\n        Set category to null unless provided in the input.\n\n        Include:\n        JSON\n\n    \"question_coordinates\": { \"x\": 0, \"y\": 0, \"width\": 0, \"height\": 0 },\n    \"answer_coordinates\": { \"x\": 0, \"y\": 0, \"width\": 0, \"height\": 0 }\n\n    (or use actual values if they are available in the input).\n\n    Add a processing_notes field for any clarifications or assumptions made during processing.\n\nInclude Marking Guide:\nIf the input contains a marking guide (e.g., A–E criteria), preserve it exactly as provided. Link each marking guide entry to its corresponding question_number.\nJSON\n\n    {\n      \"grading_scale\": \"A–E\",\n      \"criteria\": {\n        \"A\": \"...\",\n        \"B\": \"...\",\n        \"C\": \"...\",\n        \"D\": \"...\",\n        \"E\": \"...\"\n      }\n    }\n\nOutput Schema:\nReturn only valid JSON in the following format:\nJSON\n\n{\n  \"school_name\": \"...\",\n  \"subject\": \"...\",\n  \"year_level\": \"...\",\n  \"unit\": \"...\",\n  \"teacher_name\": \"...\",\n  \"student_name\": \"...\",\n  \"due_date\": \"...\",\n  \"questions\": [\n    {\n      \"q_id\": \"...\", // Generate a unique ID for each question\n      \"question_number\": \"1\", // Example: \"1\", \"2a\", \"2b\"\n      \"question_text\": \"...\",\n      \"student_answer\": \"...\",\n      \"question_coordinates\": { \"x\": 0, \"y\": 0, \"width\": 0, \"height\": 0 },\n      \"answer_coordinates\": { \"x\": 0, \"y\": 0, \"width\": 0, \"height\": 0 },\n      \"detection_confidence\": 1.0,\n      \"processing_notes\": \"...\"\n    }\n  ],\n  \"marking_guide\": [\n    {\n      \"grading_scale\": \"A–E\",\n      \"criteria\": {\n        \"A\": \"...\",\n        \"B\": \"...\",\n        \"C\": \"...\",\n        \"D\": \"...\",\n        \"E\": \"...\"\n      }\n    }\n  ],\n  \"detection_confidence\": 1.0,\n  \"processing_notes\": \"...\"\n}\n\nRules:\n\n    Do not change the wording of questions or answers.\n\n    Preserve all grading rules and criteria exactly as given.\n\n    If any piece of information is missing from the input, set its value to null in the output.\n\n    Do not include any extra commentary, explanations, or text outside of the final JSON output."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1376,
+        1248
+      ],
+      "id": "a1efd3b8-086f-464e-8bc9-b1be5075ad9d",
+      "name": "Detect questions and answers",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Function node input: items from previous node (e.g., HTTP Request, Supabase fetch)\nconst inputData = items[0].json; // assuming your data is in the first item\n\n// Function to extract all questions dynamically\nfunction extractQuestions(dataset) {\n  const allQuestions = [];\n\n  dataset.forEach(entry => {\n    if (entry.formatted && entry.formatted.questions) {\n      entry.formatted.questions.forEach(q => {\n        allQuestions.push({\n          question_number: q.question_number,\n          question_text: q.question_text,\n          student_answer: q.student_answer,\n          question_coordinates: q.question_coordinates,\n          answer_coordinates: q.answer_coordinates,\n          processing_notes: q.processing_notes,\n          question_confidence: q.question_confidence\n        });\n      });\n    }\n  });\n\n  return allQuestions;\n}\n\n// Extract questions from the n8n input\nconst questionsArray = extractQuestions(Array.isArray(inputData) ? inputData : [inputData]);\n\n// Return each question as a separate n8n item for easy looping downstream\nreturn questionsArray.map(q => ({ json: q }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        1248
+      ],
+      "id": "cc9c5987-055e-4341-b08f-2400cba2a16a",
+      "name": "Get questions separately"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an automated grading assistant.\n\nYour job:\n\n1. Search the Supabase vector database **once** for the given student question. Use the **question_number** and/or **question_coordinates** and **answer_coordinates** to find the single most semantically similar stored question-answer pair.\n2. Retrieve the *exact* correct answer from the database for that matched question.\n3. Compare the student’s answer to the correct answer using the provided grading criteria.\n4. Assign a grade (A–E) based on semantic correctness.\n5. Output the result for this **single question** only.\n\nStrict guidelines:\n\n- Only use answers retrieved from the database — never make them up.\n- Always grade based on semantic similarity, not exact wording.\n- Apply the grading criteria consistently to determine the letter grade.\n- Never query the database more than once per question.\n- Always output JSON in the **exact format below**, with no extra text, commentary, or markdown.\n\n**Required output format (JSON only):**\n\n{\n  \"questions\": [\n    {\n      \"question_number\": \"<question_number>\",\n      \"question\": \"<student question>\",\n      \"student_answer\": \"<student answer>\",\n      \"correct_answer\": \"<retrieved correct answer>\",\n      \"grade\": \"<A|B|C|D|E>\"\n    }\n  ]\n}\n\n**Input for grading (all values must be stringified using JSON.stringify):**\n\n- `student_question`: {{ JSON.stringify($json.question_text) }}\n- `student_answer`: {{ JSON.stringify($json.student_answer) }}\n- `question_number`: {{ JSON.stringify($json.question_number) }}\n- `question_coordinates`: {{ JSON.stringify($json.question_coordinates) }}\n- `answer_coordinates`: {{ JSON.stringify($json.answer_coordinates) }}\n- `processing_notes`: {{ JSON.stringify($json.processing_notes) }}\n- `grading_criteria`: {{ JSON.stringify($('Format response').item.json.formatted.metadata.marking_guide) }}\n\nBegin grading **this single question now**.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        2272,
+        1248
+      ],
+      "id": "65bef2e1-2421-42b8-9288-55f0997c42a2",
+      "name": "Grade each questions separately"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "GPT-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a mathematics grading assistant. You will receive:\n\n- A marking guide with categories and performance levels A–E.\n- A list of questions, each with: question_number, question_text, correct_answer, student_answer.\n\nTasks:\n\n1. **Grade Each Question**\n   - Compare student_answer to correct_answer.\n   - Assign a level (A–E) using the marking guide.\n   - Mark \"correct\" as true, false, or partially.\n   - Provide brief reasoning (1–2 sentences).\n\n2. **Group by Marking Guide Column**\n   - For each group, provide:\n     - marking_guide_column (string)\n     - category_aliases (distinct category names)\n     - question_numbers (list)\n     - level_counts (object: counts of A–E)\n     - questions (graded question objects including question_number, question_text, correct_answer, student_answer, category, level, correct, reasoning)\n\n3. **Assign Overall Level per Group**\n   - overall_level (A–E) based on level distribution.\n   - overall_reasoning: 1–2 sentences summarizing group performance.\n\n4. **Assess the Marking Guide**\n   - Comment on clarity, distinctiveness, and fairness of categories.\n   - Suggest one actionable improvement.\n\n**Output JSON format**:\n\n{\n  \"groups\": [\n    {\n      \"marking_guide_column\": \"...\",\n      \"category_aliases\": [\"...\"],\n      \"overall_level\": \"A\",\n      \"overall_reasoning\": \"...\",\n      \"questions\": [\n        {\n          \"question_number\": 1,\n          \"question_text\": \"...\",\n          \"correct_answer\": \"...\",\n          \"student_answer\": \"...\",\n          \"category\": \"...\",\n          \"level\": \"...\",\n          \"correct\": true,\n          \"reasoning\": \"...\"\n        }\n      ]\n    }\n  ],\n  \"guide_assessment\": \"...\",\n  \"suggested_improvement\": \"...\"\n}\n\nMarking guide: {{ $('Format response').item.json.formatted.metadata.marking_guide }}\nQuestions: {{ JSON.stringify($json.questions) }}\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2944,
+        1248
+      ],
+      "id": "bfb20c58-4782-486b-ba01-e51f62f8b1b6",
+      "name": "Total grade",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * n8n Code Node: Teacher Feedback Extractor\n *\n * This script processes a complex JSON output from an AI model\n * and transforms it into a simplified, readable format for a teacher.\n * It can handle both direct JSON objects and JSON wrapped in a string/code block.\n * It processes all incoming items and outputs each \"group\" as a separate item.\n *\n * Input: Expects JSON data from the previous node.\n * Output: Returns a new JSON structure for each category group, output as separate items.\n */\n\n// Get all incoming items from the previous node.\nconst allItems = $input.all();\n\n// Process each item and flatten the results into a single array of output items.\nreturn allItems.flatMap(item => {\n  // The raw JSON data for the current item.\n  const rawInput = item.json;\n\n  // Initialize a variable to hold the parsed content groups.\n  let contentGroups;\n\n  // The root object might be an array or a single object. We need to find the 'message' object.\n  // If the input is an array, we'll assume the relevant data is in the first element.\n  const messageObject = Array.isArray(rawInput) ? rawInput[0] : rawInput;\n\n  if (!messageObject || !messageObject.message || !messageObject.message.content) {\n    throw new Error('Invalid input structure: Could not find \"message.content\" in the input data.');\n  }\n\n  // The content might be a direct object or a stringified JSON inside a code block.\n  const content = messageObject.message.content;\n\n  if (typeof content === 'string') {\n    // If the content is a string, try to extract JSON from a markdown code block.\n    const jsonMatch = content.match(/```json\\n([\\s\\S]*?)\\n```/);\n    if (jsonMatch && jsonMatch[1]) {\n      const parsedContent = JSON.parse(jsonMatch[1]);\n      contentGroups = parsedContent.groups;\n    } else {\n      // As a fallback, try to parse the string directly.\n      try {\n        const parsedContent = JSON.parse(content);\n        contentGroups = parsedContent.groups;\n      } catch (e) {\n        throw new Error('Input content is a string but not valid JSON or in the expected code block format.');\n      }\n    }\n  } else if (typeof content === 'object' && content.groups) {\n    // If the content is already an object with a 'groups' property, use it directly.\n    contentGroups = content.groups;\n  } else {\n    throw new Error('Invalid input format: Could not find content groups.');\n  }\n\n  // Ensure contentGroups were successfully extracted before proceeding.\n  if (!contentGroups) {\n    throw new Error('Failed to extract content groups from the input.');\n  }\n\n  // Map over each group to create a new, cleaner item for each one.\n  const teacherSummaryItems = contentGroups.map(group => {\n\n    // For each group, we extract the question-specific details.\n    const processedQuestions = group.questions.map(q => {\n      return {\n        number: q.question_number,\n        text: q.question_text,\n        student_answer: q.student_answer,\n        correct_answer: q.correct_answer,\n        grade: q.level, // The grade assigned to this specific question (e.g., \"B\", \"C\").\n        is_correct: q.correct, // Can be true, false, or \"partially\".\n        feedback: q.reasoning, // The justification for the assigned grade.\n      };\n    });\n\n    // This is the new data object for the item.\n    const summaryGroupObject = {\n      category: group.marking_guide_column,\n      overall_level: group.overall_level,\n      overall_reasoning: group.overall_reasoning,\n      questions: processedQuestions,\n    };\n    \n    // Return the object in the format n8n expects for a single item.\n    // The 'json' property now correctly points to an object.\n    return {\n      json: summaryGroupObject\n    };\n  });\n\n  // The flatMap will take the array of items we just created (e.g., [{json: group1}, {json: group2}])\n  // and flatten it into the node's final output.\n  return teacherSummaryItems;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3296,
+        1248
+      ],
+      "id": "133b4826-e5d9-4d18-889f-8781c85c1ed0",
+      "name": "Format Response1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a mathematics grading and assessment assistant. You will receive:\n\nA marking guide with category descriptions and performance levels A–E.\n\nA list of questions, each with:\n\nquestion_number\n\nquestion_text\n\ncorrect_answer\n\nstudent_answer\n\nYour tasks:\n\nSTEP 1 — Grade Each Question\n\nDetermine which marking guide category the question belongs to based on its skill focus:\n\nUnderstanding – Use integers to represent points on a number line and in the Cartesian plane.\n\nFluency, Reasoning – Order common fractions, give reasons, and add/subtract fractions with related denominators.\n\nCompare the student’s answer to the correct answer.\n\nAssign a performance level (A–E) according to the marking guide’s rubric.\n\nMark \"correct\" as true, false, or \"partially\".\n\nProvide short, clear reasoning for your classification.\n\nSTEP 2 — Group Questions by Marking Guide Column\n\nGroup the graded questions into the correct marking guide column.\n\nFor each group, include:\n\nmarking_guide_column (string)\n\ncategory_aliases (list of distinct category names used)\n\nquestion_numbers (list of question numbers in the group)\n\nlevel_counts (object: counts of A–E)\n\nquestions (graded question objects including question_number, question_text, correct_answer, student_answer, category, level, correct, reasoning)\n\nSTEP 3 — Assign Overall Grades per Column\n\nAssign one overall_level (A–E) based on the distribution of levels in the group.\n\nProvide overall_reasoning (1–2 sentences) summarizing group performance.\n\nSTEP 4 — Assess the Marking Guide\n\nEvaluate whether the marking guide’s categories and level descriptions are clear, distinct, and fairly applied.\n\nSuggest one specific, actionable improvement.\n\nOUTPUT FORMAT\n\nReturn a single JSON object exactly in this format, ensuring it is readable and easy to interpret:\n{\n  \n  \"groups\": [\n    {\n      \"marking_guide_column\": \"...\",\n      \"category_aliases\": [\"...\"],\n      \"level_counts\": { \"A\": 0, \"B\": 0, \"C\": 0, \"D\": 0, \"E\": 0 },\n      \"overall_level\": \"A\",\n      \"overall_reasoning\": \"...\",\n      \"questions\": [\n        {\n          \"question_number\": 1,\n          \"question_text\": \"...\",\n          \"correct_answer\": \"...\",\n          \"student_answer\": \"...\",\n          \"category\": \"...\",\n          \"level\": \"...\",\n          \"correct\": true,\n          \"reasoning\": \"...\"\n        }\n      ]\n    }\n  ],\n  \"guide_assessment\": \"...\",\n  \"suggested_improvement\": \"...\"\n}\nHere is the marking guide:{{ JSON.stringify($('Format response').item.json.formatted.metadata.marking_guide[0]) }}\nHere are the questions to grade: {{ JSON.stringify($json.questions) }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        4720,
+        2432
+      ],
+      "id": "1f2f4b3f-6eec-4a28-9ea9-65ccf533e259",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5",
+          "mode": "list",
+          "cachedResultName": "gpt-5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        4512,
+        2544
+      ],
+      "id": "4437db2d-754b-4dff-89ae-44100a2316ab",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "LoNYm3Tv1zMBaEBj",
+          "name": "KMT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize array to hold all questions\nconst mergedQuestions = [];\n\n// Loop through all incoming n8n items\nfor (const item of items) {\n  if (item.json.output) {\n    try {\n      // Parse the output string as JSON\n      const parsed = JSON.parse(item.json.output);\n\n      // Ensure it has a questions array\n      if (parsed.questions && Array.isArray(parsed.questions)) {\n        mergedQuestions.push(...parsed.questions); // Merge into main array\n      }\n    } catch (e) {\n      // Optional: log errors if parsing fails\n      console.error(\"Failed to parse item.output:\", item.json.output, e);\n    }\n  }\n}\n\n// Return a single n8n item containing all questions\nreturn [\n  {\n    json: {\n      questions: mergedQuestions\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2704,
+        1248
+      ],
+      "id": "903ee015-b65d-417a-b806-c9e8df3913f5",
+      "name": "Format grade Response"
+    }
+  ],
+  "connections": {
+    "On form submission2": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Zip File2": {
+      "main": [
+        [
+          {
+            "node": "Images To List3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Extract Zip File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Images For AI3": {
+      "main": [
+        [
+          {
+            "node": "Analyze image2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Images To List3": {
+      "main": [
+        [
+          {
+            "node": "Sort Pages3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort Pages3": {
+      "main": [
+        [
+          {
+            "node": "Resize Images For AI3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image2": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format response1": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resize Images For AI": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Images To List": {
+      "main": [
+        [
+          {
+            "node": "Sort Pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Zip File": {
+      "main": [
+        [
+          {
+            "node": "Images To List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort Pages": {
+      "main": [
+        [
+          {
+            "node": "Resize Images For AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Extract Zip File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "combine analyzed image data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format response": {
+      "main": [
+        [
+          {
+            "node": "Get questions separately",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store2": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store3",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store3": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Grade each questions separately",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Grade each questions separately",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "combine analyzed image data": {
+      "main": [
+        [
+          {
+            "node": "Detect questions and answers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect questions and answers": {
+      "main": [
+        [
+          {
+            "node": "Format response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get questions separately": {
+      "main": [
+        [
+          {
+            "node": "Grade each questions separately",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grade each questions separately": {
+      "main": [
+        [
+          {
+            "node": "Format grade Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Total grade": {
+      "main": [
+        [
+          {
+            "node": "Format Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format grade Response": {
+      "main": [
+        [
+          {
+            "node": "Total grade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "177cec44-0325-425e-ab98-925056707fbd",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-08-11T08:07:36.511Z",
+      "updatedAt": "2025-08-11T08:07:36.511Z",
+      "role": "workflow:owner",
+      "workflowId": "y952ygFhXgj6MacZ",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

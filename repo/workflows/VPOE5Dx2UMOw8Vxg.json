@@ -1,0 +1,823 @@
+{
+  "createdAt": "2025-05-22T07:04:44.227Z",
+  "updatedAt": "2025-05-23T06:36:23.686Z",
+  "id": "VPOE5Dx2UMOw8Vxg",
+  "name": "Skool Communities",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -180,
+        -100
+      ],
+      "id": "47e1e34c-16cc-4a8b-aa6e-df39f25f0f7c",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appxvd94awDfIbfKy",
+          "mode": "list",
+          "cachedResultName": "Skool Communities",
+          "cachedResultUrl": "https://airtable.com/appxvd94awDfIbfKy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcSqgafpRV2zZyj",
+          "mode": "list",
+          "cachedResultName": "Info",
+          "cachedResultUrl": "https://airtable.com/appxvd94awDfIbfKy/tblcSqgafpRV2zZyj"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        20,
+        -100
+      ],
+      "id": "dfc8024d-0b2a-4898-a474-1b78252c983c",
+      "name": "Airtable1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "l7tXJ2YUKdrm3OvF",
+          "name": "Airtable Skool Communities"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.Community }}",
+        "options": {
+          "systemMessage": "=Today is {{ $now.toLocaleString() }}.\n\nResearch and return the **top 10 trending topics or discussion-worthy ideas** from today in the space of:\n\n**Community Focus**: {{ $json.Community }}\n\nGuidelines:\n- Topics should be current (today’s trends if available)\n- Focus on what’s **relevant, exciting, or useful** for this community\n- Can include news, tools, use cases, pain points, viral posts, or debates\n- Prefer **short, clear topic titles or questions**\n\nOutput:\nReturn only the top 10 topic ideas as a numbered list.\nDo not include explanations or extra commentary."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        420,
+        -80
+      ],
+      "id": "f82b7840-47ee-43e4-829f-d87dd827c849",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_77h0c71rsRXepwgWo2Ribll0",
+          "mode": "list",
+          "cachedResultName": "Justin Welsh 1"
+        },
+        "prompt": "define",
+        "text": "=Today is {{ $now.toLocaleString() }}.\n\nYou are creating a **Poll Post** for the  Skool community.\n\nYou’ve been given the following 10 trending ideas or questions from a research agent:\n{{ $json.output }}\n\nPick the **most engaging question or idea** from the list that would spark conversation and curiosity among sales professionals.\n\nThen generate a **Skool-ready Poll post** with this format:\n- **Title**: make it short and intriguing\n- A short intro that frames the poll\n- 2–4 poll options (use creativity!)\n- End with a strong **Call to Action** inviting members to vote and comment\n\nOnly return the post content. Do not include explanation, metadata, or formatting syntax.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        880,
+        -380
+      ],
+      "id": "ac94007c-a7b1-4a07-8f3f-c9f4f3e8e68d",
+      "name": "Poll Monday Prompt",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_77h0c71rsRXepwgWo2Ribll0",
+          "mode": "list",
+          "cachedResultName": "Justin Welsh 1"
+        },
+        "prompt": "define",
+        "text": "=Today is {{ $now.toLocaleString() }}.\n\nYou are creating a **Trend Tuesday (AI News + Commentary)** post for the AI for Sales Skool community.\n\nYou’ve been given the following 10 trending AI or sales-related ideas from a research agent:\n{{ $json.output }}\n\nPick the **most relevant and timely idea** (e.g., tool release, stat, trend shift).\n\nWrite a Skool post using this structure:\n- **Title**: newsy, urgent or curiosity-inducing\n- Engaging intro that gives quick context\n- A breakdown of what’s happening and what it means for sales pros (use bullet points if helpful)\n- End with a **Call to Action** asking how members are reacting to this trend or if they’re using it\n\nOnly return the post content. Do not include metadata, headings, or explanation.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        880,
+        -240
+      ],
+      "id": "3a7aa3b5-1d70-4532-9738-def69f082273",
+      "name": "Trend Tuesday Prompt",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_77h0c71rsRXepwgWo2Ribll0",
+          "mode": "list",
+          "cachedResultName": "Justin Welsh 1"
+        },
+        "prompt": "define",
+        "text": "=Today is {{ $now.toLocaleString() }}.\n\nYou are creating a **Win Wednesday** post to celebrate and spark wins in the AI for Sales Skool community.\n\nYou’ve received a list of 10 automation wins, use-cases, or sales boosts that members might resonate with:\n{{ $json.output }}\n\nPick the **most relatable and inspiring win** (even small ones).\n\nWrite a Skool post like this:\n- **Title**: highlight the win or its benefit\n- Quick story or example around the win\n- Encourage others to share **1 small win** they had this week\n- End with a motivating **Call to Action**: “What’s one thing you automated, improved, or learned with AI this week?”\n\nOnly return the post content. No metadata, tags, or extra formatting.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        880,
+        -80
+      ],
+      "id": "b594b1f2-4763-481a-b46a-c07e2610fe88",
+      "name": "Win Wednesday Prompt",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_77h0c71rsRXepwgWo2Ribll0",
+          "mode": "list",
+          "cachedResultName": "Justin Welsh 1"
+        },
+        "prompt": "define",
+        "text": "=Today is {{ $now.toLocaleString() }}.\n\nYou are creating a **Thought Thursday** post for the AI for Sales Skool community.\n\nYou’ve been given the following 10 questions, dilemmas, or insights around AI + Sales:\n{{ $json.output }}\n\nPick the **most thought-provoking idea**.\n\nWrite a **discussion-style post** like this:\n- **Title**: state the question or contradiction\n- Brief explanation or example\n- Include 2–3 thought angles or viewpoints (bullet points if helpful)\n- Add a **Visual Idea**: what kind of image, diagram, or visual metaphor could support this?\n- End with a **Call to Action** asking members for their take\n\nReturn only the post body.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        880,
+        80
+      ],
+      "id": "68a48e2b-797a-44a2-917c-04552c9ec404",
+      "name": "Thought Thursday Prompt",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_77h0c71rsRXepwgWo2Ribll0",
+          "mode": "list",
+          "cachedResultName": "Justin Welsh 1"
+        },
+        "prompt": "define",
+        "text": "=Today is {{ $now.toLocaleString() }}.\n\nYou are creating a **Framework Friday** post for the AI for Sales Skool community.\n\nYou’ve received 10 ideas for workflows, automations, or templates that help sales pros:\n{{ $json.output }}\n\nPick the **most actionable and useful one**.\n\nWrite a Skool post like this:\n- **Title**: start with “Framework:” and name the system\n- Quick intro on what it solves and why it matters\n- Step-by-step breakdown or bullet list of how it works\n- Include a **Visual Idea** (optional)\n- End with a **Call to Action** like: “Want the template? Drop a 🔥 below and I’ll send it.”\n\nOnly return the post content. No extra notes or explanation.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        880,
+        240
+      ],
+      "id": "e52075da-e066-4bb9-9a73-77e43abe0bc3",
+      "name": "Framework Friday Prompt",
+      "credentials": {
+        "openAiApi": {
+          "id": "TUNbbZhFy4QjUJm0",
+          "name": "New Open ai "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        120
+      ],
+      "id": "21fdb288-c01b-4486-9dd3-489fd57adb33",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "zX2livQODEYFHZvm",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appxvd94awDfIbfKy",
+          "mode": "list",
+          "cachedResultName": "Skool Communities",
+          "cachedResultUrl": "https://airtable.com/appxvd94awDfIbfKy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblOmYidCVjCdR6ic",
+          "mode": "list",
+          "cachedResultName": "Idea",
+          "cachedResultUrl": "https://airtable.com/appxvd94awDfIbfKy/tblOmYidCVjCdR6ic"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Poll Monday Content": "={{ $json.Poll }}",
+            "Trend Tuesday Content": "={{ $json.trend }}",
+            "Win Wednesday Content": "={{ $json.Win }}",
+            "Thought Thursday Content": "={{ $json.Thought }}",
+            "Framework Friday Content": "={{ $json.Framework }}",
+            "Info": "=[{{ $('Airtable1').item.json.ID }}]"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Poll Monday Content",
+              "displayName": "Poll Monday Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Trend Tuesday Content",
+              "displayName": "Trend Tuesday Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Win Wednesday Content",
+              "displayName": "Win Wednesday Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Thought Thursday Content",
+              "displayName": "Thought Thursday Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Framework Friday Content",
+              "displayName": "Framework Friday Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Approval",
+              "displayName": "Approval",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Not Approved",
+                  "value": "Not Approved"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Info",
+              "displayName": "Info",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Week (from Info)",
+              "displayName": "Week (from Info)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Client (from Info)",
+              "displayName": "Client (from Info)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Community (from Info)",
+              "displayName": "Community (from Info)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1720,
+        280
+      ],
+      "id": "9d84bfe9-4854-412c-a5b2-392b6ac896a3",
+      "name": "Airtable6",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "l7tXJ2YUKdrm3OvF",
+          "name": "Airtable Skool Communities"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c7b1414-a4c8-4438-a39c-8b20fbd7485a",
+              "name": "Poll",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1140,
+        -380
+      ],
+      "id": "1a23ea5c-7f80-4302-9d5f-7c90c24856bf",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c7b1414-a4c8-4438-a39c-8b20fbd7485a",
+              "name": "trend",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1140,
+        -240
+      ],
+      "id": "c2014f37-4f52-4970-8964-54c1a6f3860a",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c7b1414-a4c8-4438-a39c-8b20fbd7485a",
+              "name": "Win",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1140,
+        -80
+      ],
+      "id": "fc4507da-4ec0-415a-b41e-eed996c76e91",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c7b1414-a4c8-4438-a39c-8b20fbd7485a",
+              "name": "Thought",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1140,
+        80
+      ],
+      "id": "b09e6246-8de3-4e83-b280-dc0cfc669c00",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c7b1414-a4c8-4438-a39c-8b20fbd7485a",
+              "name": "Framework",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1140,
+        240
+      ],
+      "id": "17dfc73b-33da-4447-a49c-a1d6dca03463",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 5,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1420,
+        -120
+      ],
+      "id": "56578fcd-3792-4231-a990-7ec7d16d99a8",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        220,
+        -100
+      ],
+      "id": "756bb068-64ea-452d-9919-37ba66f2c37f",
+      "name": "Loop Over Items"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Airtable1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Poll Monday Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trend Tuesday Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Win Wednesday Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Thought Thursday Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Framework Friday Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Poll Monday Prompt": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trend Tuesday Prompt": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Win Wednesday Prompt": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Thought Thursday Prompt": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Framework Friday Prompt": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Airtable6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable6": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "deadb199-a013-48c3-bf5f-fc9b35e4781e",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-05-22T07:04:44.227Z",
+      "updatedAt": "2025-05-22T07:04:44.227Z",
+      "role": "workflow:owner",
+      "workflowId": "VPOE5Dx2UMOw8Vxg",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

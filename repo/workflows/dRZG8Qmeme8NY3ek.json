@@ -1,0 +1,413 @@
+{
+  "createdAt": "2025-06-19T00:55:28.388Z",
+  "updatedAt": "2025-06-19T12:23:32.871Z",
+  "id": "dRZG8Qmeme8NY3ek",
+  "name": "PR Reviewer",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "2640d691-b78c-4d2a-89e1-25ae3901b7c2",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        920,
+        100
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "NdqrWvU3kkpHiuep",
+          "name": "Tebita-openai"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.github.com/repos/yoni1342/{{$json.body.repository.name}}/pulls/{{$json.body.number}}/files",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "a7ffd166-0e13-43fb-8eea-be206d6ba59f",
+      "name": "Get file's Diffs from PR",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        480,
+        -120
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "dIT59GBXITuGYMKr",
+          "name": "github"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const files = $input.all().map(item => item.json);\n\nlet diffs = '';\n\nfor (const file of files) {\n  diffs += `### Fichier : ${file.filename}\\n\\n`;\n\n  if (file.patch) {\n    // IMPORTANT : On remplace tous les triple backticks par simple (ou échappement)\n    const safePatch = file.patch.replace(/```/g, \"''\");\n\n    diffs += \"```diff\\n\";\n    diffs += safePatch;\n    diffs += \"\\n```\\n\";\n  } else {\n    diffs += \"_Pas de patch disponible (probablement fichier binaire)._\";\n  }\n\n  diffs += \"\\n---\\n\\n\";\n}\n\nconst userMessage = `\nYou are a senior iOS developer. \nPlease review the following code changes in these files :\n\n${diffs}\n\n---\n\nYour mission:\n\n- Review the proposed code changes file by file and by significant modification.\n\n- Generate inline comments on the relevant lines of code.\n\n- Ignore files without patches.\n\n- Do not repeat the code snippet or the filename.\n\n- Write the comments directly, without introducing the context.\n`;\n\nreturn [\n  {\n    json: {\n      user_message: userMessage.trim()\n    }\n  }\n];"
+      },
+      "id": "98e38d09-78c6-4619-be5d-aa00f3f4dfd8",
+      "name": "Create target Prompt from PR Diffs",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        700,
+        -120
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "resource": "review",
+        "owner": {
+          "__rl": true,
+          "value": "yoni1342",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "FeedIn",
+          "mode": "list",
+          "cachedResultName": "FeedIn",
+          "cachedResultUrl": "https://github.com/yoni1342/FeedIn"
+        },
+        "pullRequestNumber": "={{ $('PR Trigger').first().json.body.number }}",
+        "event": "comment",
+        "body": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "id": "201c3db3-fbce-4ee1-a2f0-40a1330b56ab",
+      "name": "GitHub Robot",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1780,
+        80
+      ],
+      "webhookId": "39c2fe8b-f686-4699-8450-2a5b4c263d93",
+      "typeVersion": 1.1,
+      "credentials": {
+        "githubApi": {
+          "id": "JUG4g0pcnM4y9hy7",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "edit",
+        "owner": {
+          "__rl": true,
+          "value": "yoni1342",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "upwork",
+          "mode": "list",
+          "cachedResultName": "upwork",
+          "cachedResultUrl": "https://github.com/yoni1342/upwork"
+        },
+        "issueNumber": "={{ $('PR Trigger').first().json.body.number }}",
+        "editFields": {
+          "labels": [
+            {
+              "label": "ReviewedByAI"
+            }
+          ]
+        }
+      },
+      "id": "17a68e60-9dbf-412f-ac8f-fb881ba1e46a",
+      "name": "Add Label to PR",
+      "type": "n8n-nodes-base.github",
+      "position": [
+        1780,
+        -60
+      ],
+      "webhookId": "c98f39f1-603b-4013-9149-53b4cc31b611",
+      "typeVersion": 1,
+      "credentials": {
+        "githubApi": {
+          "id": "JUG4g0pcnM4y9hy7",
+          "name": "GitHub account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "**1-The GitHub Trigger** node initiates the workflow whenever a pull request event occurs on a specified repository. It enables real-time automation based on GitHub activity.\n"
+      },
+      "id": "4faa70a4-de6d-4715-a2f7-675ce00cbae6",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        120,
+        -300
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "**2-Get PR Diffs**\nThe HTTP Request node fetches the list of changed files and their diffs from the pull request that triggered the workflow. It uses the GitHub REST API to retrieve this data dynamically based on the trigger payload.\n\nhttps://api.github.com/repos/{{$json.body.sender.login}}/{{$json.body.repository.name}}/pulls/{{$json.body.number}}/files",
+        "height": 220,
+        "width": 340,
+        "color": 3
+      },
+      "id": "f1030979-bb01-4906-974f-5c3ec594e458",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        320,
+        60
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "**3-Create Prompt from diffs**\nThis Code node runs a JavaScript snippet to:\n-Parse file diffs from the previous HTTP Request node\n-Format each diff with its file name\n-Build a structured natural language prompt for the AI agent\n\nThe final output is a clear, contextual instruction like:\n*\"You are a senior iOS developer. Please review the following code changes in these files...\"*\n",
+        "height": 240,
+        "width": 360,
+        "color": 2
+      },
+      "id": "afecc3c7-f446-44e5-a1f9-6de1363281a7",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        580,
+        -380
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "**Github Comment Poster**\nPosts the AI-generated review as a comment on the pull request using GitHub API.",
+        "color": 5
+      },
+      "id": "fc9a07be-1938-43f9-97fd-606f71955749",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        -460
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.user_message }}",
+        "options": {}
+      },
+      "id": "d49e33c6-ff18-4750-87f7-f25d44384622",
+      "name": "Code Review Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        940,
+        -120
+      ],
+      "typeVersion": 1.9
+    },
+    {
+      "parameters": {
+        "content": "**PR Labeler (optional)**\nAutomatically adds a label like *ReviewedByAI* to the pull request once the AI comment is posted.",
+        "color": 7
+      },
+      "id": "eba40467-3e24-41b6-b18d-040ad1d82ec5",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1220,
+        -500
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "**Google Sheet Best Practices**\nEnables the AI agent to reference to your team coding guidelines stored in a Google Sheet for more accurate and opinionated reviews.\nYou can replace Google Sheets with any other database or tool.",
+        "width": 260,
+        "color": 6
+      },
+      "id": "8b335259-d21b-4aa2-91c0-05ab7c9855cd",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        80
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "owner": {
+          "__rl": true,
+          "value": "yoni1342",
+          "mode": "name"
+        },
+        "repository": {
+          "__rl": true,
+          "value": "upwork",
+          "mode": "list",
+          "cachedResultName": "upwork",
+          "cachedResultUrl": "https://github.com/yoni1342/upwork"
+        },
+        "events": [
+          "pull_request"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.githubTrigger",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -120
+      ],
+      "id": "09f6b385-4eaf-4331-8fd7-1c156961711e",
+      "name": "PR Trigger",
+      "webhookId": "6437d63b-2f7d-4c17-9efe-26ef3ca15635",
+      "credentials": {
+        "githubApi": {
+          "id": "JUG4g0pcnM4y9hy7",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08P75WN266",
+          "mode": "list",
+          "cachedResultName": "yonatantesfaye30"
+        },
+        "text": "={{ $json.output }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1300,
+        -120
+      ],
+      "id": "fe6ea218-defb-4736-8962-461dfa55c0dc",
+      "name": "Slack",
+      "webhookId": "e47f39b9-8419-4b1b-a735-ad2c5b9b1a20",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "vcv6r674EVNMorsX",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Code Review Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get file's Diffs from PR": {
+      "main": [
+        [
+          {
+            "node": "Create target Prompt from PR Diffs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create target Prompt from PR Diffs": {
+      "main": [
+        [
+          {
+            "node": "Code Review Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub Robot": {
+      "main": [
+        []
+      ]
+    },
+    "Code Review Agent": {
+      "main": [
+        [
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PR Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get file's Diffs from PR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Github Trigger": {},
+    "node:PR Trigger1": {},
+    "node:PR Trigger": {
+      "webhookId": 553180894,
+      "webhookEvents": [
+        "pull_request"
+      ]
+    }
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "cec7ca4f-a633-4747-8064-653f2b5aba0d",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-06-19T00:55:28.388Z",
+      "updatedAt": "2025-06-19T00:55:28.388Z",
+      "role": "workflow:owner",
+      "workflowId": "dRZG8Qmeme8NY3ek",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

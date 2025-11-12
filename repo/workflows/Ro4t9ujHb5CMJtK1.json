@@ -1,0 +1,1293 @@
+{
+  "createdAt": "2025-02-25T18:04:16.577Z",
+  "updatedAt": "2025-02-26T08:32:04.904Z",
+  "id": "Ro4t9ujHb5CMJtK1",
+  "name": "Facebook ads",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "0b7f57e4-3df2-4879-9d80-a00ab2fd07b9",
+        "options": {
+          "allowedOrigins": "*",
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -2560,
+        700
+      ],
+      "id": "aeec11d7-e122-48e3-929f-44ce15032ffa",
+      "name": "Webhook",
+      "webhookId": "0b7f57e4-3df2-4879-9d80-a00ab2fd07b9"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -680,
+        740
+      ],
+      "id": "d923d2ae-f3e8-4cc9-9f57-a912bbf15c68",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -920,
+        740
+      ],
+      "id": "6c550652-5aba-46fd-8e09-edeba709d031",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json.body.data;\n\nfunction extractAdData(data) {\n    return data.flatMap(ad => \n        ad.comments.data.map(comment => ({\n            json: {\n                ad_id: ad.id,\n                ad_body: ad.ad_creative.body,\n                image_url: ad.ad_creative.image_url,\n                video_url: ad.ad_creative.video_url,\n                comment_id: comment.id,\n                comment_message: comment.message,\n                like_count: comment.like_count\n            }\n        }))\n    );\n}\n\nreturn extractAdData(data);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2340,
+        700
+      ],
+      "id": "09edf208-48d9-48dc-ab5e-d4f792d06fca",
+      "name": "Get Data"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ 10 }}",
+        "options": {
+          "reset": "={{ false }}"
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -2100,
+        700
+      ],
+      "id": "954ee5d1-262c-415d-8ead-85da07648b9b",
+      "name": "Loop Over Iteems"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map((item) => item.json);\n\nconst uniqueAds = items.reduce((acc, item) => {\n  const existingAd = acc.find((ad) => ad.ad_id === item.ad_id);\n  if (!existingAd) {\n    acc.push({\n      ad_id: item.ad_id,\n      ad_body: item.ad_body,\n      image_url: item.image_url,\n      video_url: item.video_url,\n    });\n  }\n  return acc;\n}, []);\n\nreturn uniqueAds;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1860,
+        720
+      ],
+      "id": "736f643c-29c8-476f-9b81-4e59685d2103",
+      "name": "Ad creatives extractor"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst extractedData = items.map((item) => {\n  return {\n    ad_id: item?.json?.ad_id,\n    comment_id: item?.json?.comment_id,\n    comment_message: item?.json?.comment_message,\n  };\n});\nreturn extractedData;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1740,
+        1240
+      ],
+      "id": "5f0df85a-04b1-4612-b041-21031c2de59f",
+      "name": "Comments Extractor"
+    },
+    {
+      "parameters": {
+        "content": "This loop iterates over each Ad.",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2140,
+        620
+      ],
+      "typeVersion": 1,
+      "id": "096caf51-525d-4c08-83e1-9150b86cb980",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Extracting Ad, and comment data from the input",
+        "height": 280,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2380,
+        620
+      ],
+      "typeVersion": 1,
+      "id": "17ae6f89-d987-4b36-9217-b877ed15d1a0",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Extracts each Ad's comment.",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1780,
+        1160
+      ],
+      "typeVersion": 1,
+      "id": "d67493a8-6927-48d5-ac33-bbbb7be5fffe",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Extracts each Ad's copy, image_url, and video_url.",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1900,
+        620
+      ],
+      "typeVersion": 1,
+      "id": "7246d2fb-9cab-4d3f-9d7c-f21cbcf83bd8",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "Stores Ad Id, Ad Image and Ad Video url.",
+        "height": 260,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1620,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "9ecbb788-138e-4eec-ae3d-701dcea2f30f",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "This loop iterates over each ad copy, image_url, and video_url.",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1640,
+        620
+      ],
+      "typeVersion": 1,
+      "id": "e63baa5a-e8c2-427e-b412-45ccdebe812a",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1600,
+        720
+      ],
+      "id": "4e42b6f6-67d1-47b7-aaaa-3cc7e16b11f4",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "content": "Sends video url to analyzer node",
+        "height": 200,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1320,
+        460
+      ],
+      "typeVersion": 1,
+      "id": "e8788bd2-690f-4055-8f22-178dd1d789cd",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.tebita.com/webhook/f3685c34-9780-42d9-ade4-edf58e0597a9",
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"video_url\": \"{{ $json.video_url }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1260,
+        500
+      ],
+      "id": "7ad47415-4acf-45e7-83af-d71cb7b10fc4",
+      "name": "Video Analysis webhook"
+    },
+    {
+      "parameters": {
+        "content": "Sends image url to analyzer node",
+        "height": 200,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1320,
+        700
+      ],
+      "typeVersion": 1,
+      "id": "780b8e08-3e5d-4a7e-8c29-2262de1bcd13",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.tebita.com/webhook/acda43e6-4167-4068-b767-bc934bdb743b",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"image_url\": \"{{ $json.image_url }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1260,
+        740
+      ],
+      "id": "c6605450-8086-4251-a2de-a88f90ade21d",
+      "name": "Image Analysis webhook"
+    },
+    {
+      "parameters": {
+        "content": "Sends ad_id, and ad_copy to keep the ad content together",
+        "height": 200,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1320,
+        940
+      ],
+      "typeVersion": 1,
+      "id": "7041a5d2-ae00-4c9f-8720-d7bc661b678f",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst extractedData = items.map((item) => {\n  return {\n    ad_id: $input.first().json.ad_id,\n    ad_body: $input.first().json.ad_body\n  };\n});\nreturn extractedData;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1260,
+        1000
+      ],
+      "id": "983a7e81-21e7-4526-bbc6-6504a00ba809",
+      "name": "Ad copy extractor"
+    },
+    {
+      "parameters": {
+        "content": "This loop iterates over merged data.",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -720,
+        640
+      ],
+      "typeVersion": 1,
+      "id": "e7287a11-3829-42dc-822c-14b9d4a3a467",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "Merges each Ad's copy, image_url, and video_url. To Analyze the overall Ad message",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        640
+      ],
+      "typeVersion": 1,
+      "id": "b236ceca-ac65-4792-b475-bdc9ead9c348",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "This loop iterates over each comment message.",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1160,
+        1160
+      ],
+      "typeVersion": 1,
+      "id": "f7ff760a-8432-4a0b-9bcd-efab3e7ee153",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "Analyze comments theme",
+        "height": 200,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -680,
+        1200
+      ],
+      "typeVersion": 1,
+      "id": "7f596b64-4efd-45e2-87f9-e2707d3ff016",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all().map((item) => item.json);\nconst response = {\n  ad_id: inputs[2]?.ad_id,\n  ad_body: inputs[2]?.ad_body,\n  image_message: inputs[1]?.data,\n  video_message: inputs[0]?.data,\n};\n\nreturn response;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -920,
+        360
+      ],
+      "id": "b8af60ef-e888-47cf-b0b9-03bd8c18e1de",
+      "name": "Format data"
+    },
+    {
+      "parameters": {
+        "content": "Analyze ad message_angle, and awareness stage",
+        "height": 200,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -600,
+        300
+      ],
+      "typeVersion": 1,
+      "id": "375b22ca-8eaa-4dd5-ac72-99a0cf8c3002",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1120,
+        1240
+      ],
+      "id": "2efdea7a-6147-43bc-ac8c-7f943856f50f",
+      "name": "loop"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst formattedData = items.map((item) => {\n  try {\n    const cleanContent = item?.json?.message?.content.replace(/```json\\n|```/g, '');\n    const content = JSON.parse(cleanContent);\n    return content[0];\n  } catch (error) {\n    return { error: `Invalid JSON: ${item?.json?.message?.content}`, detail: error.message };\n  }\n});\nreturn formattedData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -280,
+        1260
+      ],
+      "id": "b8b9a502-44f6-47a0-9e1b-25d68d29e9a5",
+      "name": "Format data1"
+    },
+    {
+      "parameters": {
+        "content": "Analyze comments theme",
+        "height": 200,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        20,
+        860
+      ],
+      "typeVersion": 1,
+      "id": "fc4be872-5535-45b2-87c1-d7ede3fdd14e",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst formattedData = items.map((item) => {\n  try {\n    const cleanContent = item?.json?.message?.content.replace(\n      /```json\\n|```/g,\n      \"\",\n    );\n    const content = JSON.parse(cleanContent);\n    return {\n      ad_id: content.ad_id,\n      comment_id: content.comment_id,\n      comment_message: content.comment_message,\n      theme: content.theme,\n      sentiment: content.sentiment,\n    };\n  } catch (error) {\n    return {\n      error: `Invalid JSON: ${item?.json?.message?.content}`,\n      detail: error.message,\n    };\n  }\n});\nreturn formattedData;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        920
+      ],
+      "id": "3b6d52b6-f15e-4dd2-a412-62879504f23f",
+      "name": "Format data2"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        120,
+        1260
+      ],
+      "id": "c3a282cd-48fa-4697-bf51-dccf0cee55a5",
+      "name": "Loop over each comment theme"
+    },
+    {
+      "parameters": {
+        "content": "Format the output of the analysis in a way that will be stored in the sheet",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -320,
+        1160
+      ],
+      "typeVersion": 1,
+      "id": "314eaecf-b4be-4733-a3d1-76cac26a79b8",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze the sentiment of this comment: \"{{ $json[\"comment_message\"] }}\" and it's theme \"{{ $json.theme }}\".\nReturn only one of these labels: \"Positive\", \"Negative\", or \"Neutral\".\nReturn format json:\n{\n\"ad_id\":{{ $json.ad_id }},\n\"comment_id\":{{ $json.comment_id}},\n\"comment_message\":{{ $json.comment_message }},\n\"theme\":{{ $json.theme }},\n\"sentiment\":\"...\",\n} "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        40,
+        920
+      ],
+      "id": "331e1196-2d46-4f4c-b658-10eebd4660fe",
+      "name": "Sentiment Analyzer",
+      "credentials": {
+        "openAiApi": {
+          "id": "YW9ZsdAeAy4i8EgN",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an AI that categorizes ad comments into meaningful themes.Don't hallucinat, it is strictly forbedeedn\nYour task is to analyze the provided comments and assign each one a short, **relevant** theme that represents its main idea.\n\n**Guidelines:**  \n- Use themes that accurately describe the comment’s intent or sentiment.  \n- Themes should be **concise and meaningful** (e.g., \"Excitement\", \"Purchase Intent\", \"Price Concern\", \"Customer Inquiry\", \"Sustainability\", \"Product Availability\").  \n- If a comment asks a question, the theme should reflect the **type of inquiry** (e.g., \"Shipping Inquiry\", \"Product Inquiry\").  \n- If a comment expresses a **feeling** (e.g., love, frustration), the theme should reflect that (e.g., \"Excitement\", \"Dissatisfaction\").  \n- **Do not use generic labels** like \"General Comment\"—instead, always assign a meaningful theme.  \n\nad_id:{{ $json.ad_id }},\ncomment_id:{{ $json.comment_id }},\ncomment_message:{{ $json.comment_message }},\n**Output Format:**  \nReturn the response as a JSON array, where each object includes, don't add any symbols or slashs, answer only the json:  \n- `\"ad_id\"` (string) → The ID of the ad the comment belongs to  \n- `\"comment_id\"` (string) → The unique ID of the comment  \n- `\"comment_message\"` (string) → The original comment text  \n- `\"theme\"` (string) → The assigned theme  ",
+              "role": "assistant"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -660,
+        1260
+      ],
+      "id": "52f6f34e-9da8-423b-a4d6-d72641b6969b",
+      "name": "Theme Analyzer",
+      "credentials": {
+        "openAiApi": {
+          "id": "YW9ZsdAeAy4i8EgN",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Analyze the following ad and determine:\n1. The core messaging angle (e.g., discount offer, product benefit, social proof).\n2. The likely customer awareness stage (Problem-Aware, Solution-Aware, Product-Aware).\n\nAd Details:\n- Ad Text: {{ $json.ad_body }},\n- Image Analysis: {{ $json.image_message }},\n- Video Transcription: {{ $json.video_message }},\n\nReturn JSON:\n{\n  \"ad_id\": {{ $json.ad_id }},\n  \"message_angle\": \"...\",\n  \"awareness_stage\": \"...\"\n}\n {{ $json.ad_body }}",
+              "role": "assistant"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -580,
+        360
+      ],
+      "id": "4865c85f-a85f-4060-938d-dbdfa4e184b6",
+      "name": "Ad Analyzer",
+      "credentials": {
+        "openAiApi": {
+          "id": "YW9ZsdAeAy4i8EgN",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Format the output of the loop  in a way that will be used in the analysis.",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        260
+      ],
+      "typeVersion": 1,
+      "id": "574451b7-dec9-4ef9-ac2e-d25e50432354",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "Stores Ad Analysis Result",
+        "height": 260,
+        "width": 200
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -60,
+        280
+      ],
+      "typeVersion": 1,
+      "id": "fa9c6a42-57de-4f4d-85eb-828f7bbf0eeb",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "Stores Comment Analysis Result",
+        "height": 260,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        740,
+        840
+      ],
+      "typeVersion": 1,
+      "id": "1051e80c-11bc-473f-b224-16ce19080767",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "content": "Format the output of the analysis in a way that will be stored in the sheet",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        360,
+        820
+      ],
+      "typeVersion": 1,
+      "id": "87767570-7506-438d-98a4-d9977029f0a8",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "content": "This loop iterates over each comment, and it's theme.",
+        "height": 280,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        80,
+        1160
+      ],
+      "typeVersion": 1,
+      "id": "5e687661-aa42-416e-9e79-c983a7f358c5",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnSyqgQb5sRXDoY",
+          "mode": "list",
+          "cachedResultName": "Ads 2",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tblnSyqgQb5sRXDoY"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ad_id": "={{ $json.ad_id }}",
+            "ad_copy": "={{ $json.ad_body }}",
+            "image_url": "={{ $json.image_url }}",
+            "video_url": "={{ $json.video_url }}"
+          },
+          "matchingColumns": [
+            "ad_id"
+          ],
+          "schema": [
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_copy",
+              "displayName": "ad_copy",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "video_url",
+              "displayName": "video_url",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "message_angle",
+              "displayName": "message_angle",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "awareness_stage",
+              "displayName": "awareness_stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -1580,
+        0
+      ],
+      "id": "57afbcee-8ae8-41f0-a6f5-0879544e5a7a",
+      "name": "Store Ad copy",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "09KYWhLln9wgqa94",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxjd23Sgipuwbkt",
+          "mode": "list",
+          "cachedResultName": "Ad_Comment",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tblxjd23Sgipuwbkt"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ad_id": "={{ $json.ad_id }}",
+            "comment_id": "={{ $json.comment_id }}",
+            "comment_message": "={{ $json.comment_message }}",
+            "theme": "={{ $json.theme }}",
+            "sentiment": "={{ $json.sentiment }}"
+          },
+          "matchingColumns": [
+            "ad_id"
+          ],
+          "schema": [
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comment_id",
+              "displayName": "comment_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comment_message",
+              "displayName": "comment_message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "theme",
+              "displayName": "theme",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Negative",
+                  "value": "Negative"
+                },
+                {
+                  "name": "Positive",
+                  "value": "Positive"
+                },
+                {
+                  "name": "Neutral",
+                  "value": "Neutral"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        800,
+        920
+      ],
+      "id": "367df5a9-a70a-4750-b599-4e3932146172",
+      "name": "Comment Analysis Result1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "09KYWhLln9wgqa94",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appwm4UZbaXu66zac",
+          "mode": "list",
+          "cachedResultName": "Facebook Ads Research",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnSyqgQb5sRXDoY",
+          "mode": "list",
+          "cachedResultName": "Ads 2",
+          "cachedResultUrl": "https://airtable.com/appwm4UZbaXu66zac/tblnSyqgQb5sRXDoY"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_angle": "={{ $json.message.content.message_angle }}",
+            "awareness_stage": "={{ $json.message.content.awareness_stage }}",
+            "ad_id": "={{ $json.message.content.ad_id }}"
+          },
+          "matchingColumns": [
+            "ad_id"
+          ],
+          "schema": [
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ad_copy",
+              "displayName": "ad_copy",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "video_url",
+              "displayName": "video_url",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "message_angle",
+              "displayName": "message_angle",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "awareness_stage",
+              "displayName": "awareness_stage",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -20,
+        360
+      ],
+      "id": "2846a5bd-602c-4f10-bed8-255d529ac033",
+      "name": "Ad  Analysis result",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "09KYWhLln9wgqa94",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Format data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Iteems",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Iteems": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Ad creatives extractor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Comments Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ad creatives extractor": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store Ad copy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Comments Extractor": {
+      "main": [
+        [
+          {
+            "node": "loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Ad copy extractor",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Video Analysis webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Image Analysis webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video Analysis webhook": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Analysis webhook": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Ad copy extractor": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Format data": {
+      "main": [
+        [
+          {
+            "node": "Ad Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "loop": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Theme Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format data1": {
+      "main": [
+        [
+          {
+            "node": "Loop over each comment theme",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Sentiment Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format data2": {
+      "main": [
+        [
+          {
+            "node": "Comment Analysis Result1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop over each comment theme": {
+      "main": [
+        [],
+        [
+          {
+            "node": "loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Format data2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Theme Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Format data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ad Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Ad  Analysis result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "61858c23-6647-4d6c-add5-87681cc906f9",
+  "triggerCount": 0,
+  "tags": [
+    {
+      "createdAt": "2025-02-05T06:40:19.181Z",
+      "updatedAt": "2025-02-05T06:40:19.181Z",
+      "id": "JqCj5tAHj8mJnTwR",
+      "name": "RFP"
+    }
+  ],
+  "shared": [
+    {
+      "createdAt": "2025-02-25T18:04:16.577Z",
+      "updatedAt": "2025-02-25T18:04:16.577Z",
+      "role": "workflow:owner",
+      "workflowId": "Ro4t9ujHb5CMJtK1",
+      "projectId": "VgkBsgW7KMLc7cPH",
+      "project": {
+        "createdAt": "2025-02-22T09:23:18.057Z",
+        "updatedAt": "2025-02-22T09:24:27.776Z",
+        "id": "VgkBsgW7KMLc7cPH",
+        "name": "Elisha Abriham <elishabu28@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

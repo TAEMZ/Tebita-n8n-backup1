@@ -1,0 +1,238 @@
+{
+  "createdAt": "2025-02-15T10:02:49.337Z",
+  "updatedAt": "2025-02-25T23:36:29.278Z",
+  "id": "pW37G9cCpxo8tDAq",
+  "name": "workflow chat",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "agent": "openAiFunctionsAgent",
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        360,
+        -20
+      ],
+      "id": "6a9b2d91-0723-4a3f-b62f-c504a36e8006",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        560,
+        200
+      ],
+      "id": "6e621f2d-ba51-4b15-9201-60e67a9ff5af",
+      "name": "Wikipedia"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        120,
+        -20
+      ],
+      "id": "309ab854-715c-429f-983f-a772e5ee6d24",
+      "name": "Telegram Trigger",
+      "webhookId": "0f824e1f-8072-4dc9-a280-be9df7709108",
+      "credentials": {
+        "telegramApi": {
+          "id": "mgdcyGWQcZzcvbFy",
+          "name": "Telegram account dawa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "replyMarkup": "replyKeyboardRemove",
+        "replyKeyboardRemove": {},
+        "additionalFields": {
+          "appendAttribution": true
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        780,
+        -20
+      ],
+      "id": "b1bf1182-2d90-4e30-9319-4a29cee4f5b8",
+      "name": "Telegram",
+      "webhookId": "dea09230-346f-4010-a9f1-dae50b42f81c",
+      "credentials": {
+        "telegramApi": {
+          "id": "mgdcyGWQcZzcvbFy",
+          "name": "Telegram account dawa"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolCalculator",
+      "typeVersion": 1,
+      "position": [
+        680,
+        200
+      ],
+      "id": "6afea723-5e5a-4438-b2f0-e4fcc2f91e94",
+      "name": "Calculator"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        300,
+        200
+      ],
+      "id": "1bb5a29f-6c3e-4f02-9ca2-312019915c60",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "LECbHwV7WQjNhD2I",
+          "name": "OpenAi account "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        420,
+        200
+      ],
+      "id": "d56ebd62-7e05-4d95-bd2f-bcc06dfed23b",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "cjkdwtC5Edi9fxdS",
+          "name": "dawa 2.0"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculator": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "55ca614f-a301-45ae-adf2-888f4b3bdd6f",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-04-29T07:28:32.695Z",
+      "updatedAt": "2025-04-29T07:28:32.695Z",
+      "role": "workflow:owner",
+      "workflowId": "pW37G9cCpxo8tDAq",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,1333 @@
+{
+  "createdAt": "2025-07-11T08:50:46.252Z",
+  "updatedAt": "2025-07-14T14:13:30.343Z",
+  "id": "B8NYobFAYLLtGMQE",
+  "name": "cluster_theme_and_sentiment_analyzer",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * \nFROM comments \nWHERE comment_id = '{{ $json.comment_id }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1180,
+        580
+      ],
+      "id": "874929e8-1c38-4011-9fd4-5f5fdd8682de",
+      "name": "Get Comment",
+      "credentials": {
+        "postgres": {
+          "id": "OMYFjXB6PcaqQaDI",
+          "name": "btmls_staging_db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "67976844-9050-4fb3-bdb1-c3878373b0a5",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "432b1833-826c-43c4-bfca-d5ddc9497062",
+              "leftValue": "={{ $json.sentiment }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -940,
+        580
+      ],
+      "id": "032d423e-db5c-4f30-8e3e-b17da92d5646",
+      "name": "Passes only if 'message' has text"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {
+          "temperature": 0.4
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        600
+      ],
+      "id": "c8b7429d-1177-46b6-9d31-899b38a63f34",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HWd6Xp63S87f8in7",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT cluster_name, cluster_description FROM clusters where is_active = true;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -560,
+        140
+      ],
+      "id": "e95cefbc-4d95-4030-9221-6d8632019691",
+      "name": "Get Cluster",
+      "credentials": {
+        "postgres": {
+          "id": "OMYFjXB6PcaqQaDI",
+          "name": "btmls_staging_db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "cluster",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -280,
+        140
+      ],
+      "id": "2e564a5e-6631-44ba-9b0b-26b7e8bfd027",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "comment",
+        "include": "specifiedFields",
+        "fieldsToInclude": "comment_id, message",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        700
+      ],
+      "id": "6460976a-caeb-4ce9-949c-83d0d9d6dc0c",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=[META CLUSTERS]: Neutral/Other, Negative Feedback, Product Expertise, Positive Feedback, Inquiries, Skepticism.\n\n[EXISTING CLUSTERS]:\n{{ JSON.stringify ($json.cluster) }}\n\n[NEW COMMENTS]:\n{{ JSON.stringify ($json.comment) }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=**ROLE AND GOAL:** You are a hyper-vigilant and precise data analysis engine. Your exclusive function is to process and categorize a batch of new user comments. This is a two-step process: you will **first** assign each comment to a fixed `meta_cluster`, and **second**, assign it to a specific `cluster`.\n\n-----\n\n### INPUT DATA:\n\n  * **[META CLUSTERS]:** `Neutral/Other`, `Negative Feedback`, `Product Expertise`, `Positive Feedback`, `Inquiries`, `Skepticism`\n  * **[EXISTING CLUSTERS]:** (A list of existing specific cluster objects)\n  * **[NEW COMMENTS]:** (A list/array of new comment objects to be processed)\n\n-----\n\n### NON-NEGOTIABLE DIRECTIVES:\n\n1.  **META-CLUSTER ASSIGNMENT (MANDATORY FIRST STEP):** For each comment, you will first assign it to one of the **immutable** `meta_clusters` provided in the list above. You are **forbidden** from creating, altering, or deviating from this list. Every comment **must** be classified into one of these six categories. This decision is your primary analysis step.\n\n2.  **SPECIFIC CLUSTER ASSIGNMENT (PRIORITIZE EXISTING):** After assigning the meta-cluster, you will proceed to the specific cluster assignment. For every single comment, you must exhaust all possibilities of fitting it into one of the `[EXISTING CLUSTERS]`. Do not mistake unique phrasing for a unique topic. This is not a suggestion; it is a primary directive.\n\n3.  **EXTREME CONDITIONS FOR NEW SPECIFIC CLUSTER CREATION:** You are forbidden from creating a new *specific* cluster unless a comment introduces a concept that is entirely novel, fundamentally distinct, and has zero semantic overlap with the existing cluster descriptions. This action requires absolute certainty and is a last resort. You may **never** create a new meta-cluster.\n\n4.  **SPECIFICATIONS FOR NEW SPECIFIC CLUSTERS:** In the rare instance that a new *specific* cluster is unavoidable, its `cluster_name` must be a concise and powerful 2-5 word descriptor. The `cluster_description` must be a single, declarative sentence that defines the new category with no ambiguity.\n\n5.  **MANDATORY OUTPUT FORMAT:** Your entire response **MUST** be a valid JSON array. This array will contain one JSON object for **each** comment provided in the input. The order of objects in the output array must perfectly mirror the order of the comments in the input. Under no circumstances will you wrap the output in markdown notation (like ` ```json `) or include any text, commentary, or pleasantries before or after the raw JSON array. Your output is the code itself.\n\n-----\n\n### REQUIRED JSON OUTPUT STRUCTURE:\n\nYour output must be a raw JSON array structured exactly like this example for two comments. Note the addition of the `meta_cluster` field.\n\n```json\n[\n  {\n    \"meta_cluster\": \"The assigned meta-cluster from the fixed list (e.g., Inquiries)\",\n    \"assignment_type\": \"EXISTING\" or \"NEW\",\n    \"cluster_name\": \"The name of the assigned or newly created specific cluster\",\n    \"cluster_description\": \"The description of the NEW specific cluster. For 'EXISTING', this must be an empty string.\",\n    \"comment_id\": \"The comment id of the first comment you clustered\"\n  },\n  {\n    \"meta_cluster\": \"The assigned meta-cluster from the fixed list (e.g., Positive Feedback)\",\n    \"assignment_type\": \"EXISTING\" or \"NEW\",\n    \"cluster_name\": \"The name of the assigned or newly created specific cluster\",\n    \"cluster_description\": \"The description of the NEW specific cluster. For 'EXISTING', this must be an empty string.\",\n    \"comment_id\": \"The comment id of the second comment you clustered\"\n  }\n]\n```"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        360
+      ],
+      "id": "ad91c237-18a7-44a0-a214-8ee0d50c5f34",
+      "name": "Analyze Cluster",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1e7ac0e3-93b3-46eb-b946-836eb0bc35bc",
+              "leftValue": "={{ $json.assignment_type }}",
+              "rightValue": "NEW",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        540
+      ],
+      "id": "4cf6d3d1-bc9e-4ba8-a287-0b1182edfbc8",
+      "name": "If created new cluster"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9d7f3c6e-c60b-4858-9cc7-a60f5ed99864",
+              "leftValue": "={{ $json.cluster_description }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        900,
+        700
+      ],
+      "id": "1618cd4f-0cd6-40c8-9efa-20e300f51a4e",
+      "name": "If used existing cluster"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body;\nconst commentIds = body.comment_ids;\nconst brandId = body.brand_id;\n\nif (!commentIds || !Array.isArray(commentIds)) {\n  return []; // Return nothing if comment_ids is missing or not an array\n}\n\n// Create a new n8n item for each comment ID\nconst newItems = commentIds.map(id => {\n  return {\n    json: {\n      comment_id: id,\n      brand_id: brandId\n    }\n  };\n});\n\nreturn newItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1420,
+        580
+      ],
+      "id": "ec70fcb5-a601-4eae-b64b-352a3764395b",
+      "name": "Filter IDs"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        20,
+        360
+      ],
+      "id": "54ccfb0a-048c-45ea-a212-efe573e8fc47",
+      "name": "Merge to one"
+    },
+    {
+      "parameters": {
+        "jsCode": "// The AI node outputs a single item. We access its 'text' property.\nconst rawText = $input.first().json.text;\n\n// --- Step 1: Reliably extract the JSON string ---\n// This finds the first '[' and the last ']' to isolate the JSON array,\n// ignoring the ```json wrapper and any other text the AI might have added.\nconst startIndex = rawText.indexOf('[');\nconst endIndex = rawText.lastIndexOf(']');\n\nif (startIndex === -1 || endIndex === -1) {\n  throw new Error(\"Could not find a valid JSON array in the AI's response.\");\n}\n\nconst jsonString = rawText.substring(startIndex, endIndex + 1);\n\n\n// --- Step 2: Convert the clean string into a real JavaScript array ---\nconst parsedArray = JSON.parse(jsonString);\n\n\n// --- Step 3: Turn the single array into multiple n8n items ---\n// This is the crucial part for the PostgreSQL node. We map over the array\n// and return each object as a new, separate item in the n8n format.\nreturn parsedArray.map(singleObject => {\n  return {\n    json: singleObject\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        360
+      ],
+      "id": "9289cae3-3417-4c77-8af6-b64fe27dc34f",
+      "name": "Clean JSON"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "comment_cluster",
+          "mode": "list",
+          "cachedResultName": "comment_cluster"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "meta_cluster": "={{ $json.meta_cluster }}",
+            "cluster_name": "={{ $json.cluster_name }}",
+            "cluster_description": "={{ $json.cluster_description }}",
+            "comment_id": "={{ $json.comment_id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cluster_name",
+              "displayName": "cluster_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cluster_description",
+              "displayName": "cluster_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ad",
+              "displayName": "ad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "meta_cluster",
+              "displayName": "meta_cluster",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "comment_id",
+              "displayName": "comment_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1260,
+        360
+      ],
+      "id": "c20ac727-fe3d-450a-9572-339db729535d",
+      "name": "Update comment_cluster",
+      "credentials": {
+        "postgres": {
+          "id": "OMYFjXB6PcaqQaDI",
+          "name": "btmls_staging_db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clusters",
+          "mode": "list",
+          "cachedResultName": "clusters"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "cluster_name": "={{ $json.cluster_name }}",
+            "cluster_description": "={{ $json.cluster_description }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "cluster_id",
+              "displayName": "cluster_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "cluster_name",
+              "displayName": "cluster_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cluster_description",
+              "displayName": "cluster_description",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_active",
+              "displayName": "is_active",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1260,
+        520
+      ],
+      "id": "e27428c0-7d08-4aa8-871f-886b0ce07b11",
+      "name": "Update clusters",
+      "credentials": {
+        "postgres": {
+          "id": "OMYFjXB6PcaqQaDI",
+          "name": "btmls_staging_db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE public.comment_cluster\nSET\n    cluster_description = $1,\n    ad_id = $2\nWHERE\n    comment_id = $3;",
+        "options": {
+          "queryReplacement": "={{ $json.cluster_description }}, {{ $json.ad_id }}, {{ $json.comment_id }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1480,
+        680
+      ],
+      "id": "5f2748db-a014-45de-9644-65968a21ad3a",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "postgres": {
+          "id": "OMYFjXB6PcaqQaDI",
+          "name": "btmls_staging_db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    '{{ $json.comment_id }}' AS comment_id,\n\n    (\n        SELECT ad_id\n        FROM public.comments\n        WHERE comment_id = '{{ $json.comment_id }}'\n        LIMIT 1\n    ) AS ad_id,\n\n    (\n        SELECT cluster_description\n        FROM public.clusters\n        WHERE cluster_name = '{{ $json.cluster_name }}'\n        LIMIT 1\n    ) AS cluster_description;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1260,
+        680
+      ],
+      "id": "7c8f0546-29dc-4717-aed2-e17c13f96e07",
+      "name": "Get details",
+      "credentials": {
+        "postgres": {
+          "id": "OMYFjXB6PcaqQaDI",
+          "name": "btmls_staging_db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -600,
+        700
+      ],
+      "id": "4232b2cc-f147-4f39-83f3-45e53005fd7e",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        200
+      ],
+      "id": "1013dd75-c4ca-47a5-8b19-9f0bbfbea285",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HWd6Xp63S87f8in7",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// The AI node outputs a single item. We access its 'text' property.\nconst rawText = $input.first().json.text;\n\n// --- Step 1: Reliably extract the JSON string ---\n// This finds the first '[' and the last ']' to isolate the JSON array,\n// ignoring the ```json wrapper and any other text the AI might have added.\nconst startIndex = rawText.indexOf('[');\nconst endIndex = rawText.lastIndexOf(']');\n\nif (startIndex === -1 || endIndex === -1) {\n  throw new Error(\"Could not find a valid JSON array in the AI's response.\");\n}\n\nconst jsonString = rawText.substring(startIndex, endIndex + 1);\n\n\n// --- Step 2: Convert the clean string into a real JavaScript array ---\nconst parsedArray = JSON.parse(jsonString);\n\n\n// --- Step 3: Turn the single array into multiple n8n items ---\n// This is the crucial part for the PostgreSQL node. We map over the array\n// and return each object as a new, separate item in the n8n format.\nreturn parsedArray.map(singleObject => {\n  return {\n    json: singleObject\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        -20
+      ],
+      "id": "ee62f2a9-dae5-4a42-824b-a7921b20aa4e",
+      "name": "Clean JSON1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the comments provided.\n\nComments: {{ JSON.stringify ($json.comment) }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a specialized AI engine for bulk comment analysis. Your sole function is to process a JSON array of comments and return a structured analysis for each one.\n\nYour input will be a single JSON object containing a key named \"Comments\". The value will be an array of comment objects, where each object has a \"comment_id\" and a \"message\".\n\n**Your Task:**\nAnalyze every comment object in the input array. For each comment, you will perform two tasks:\n1.  **Sentiment Analysis:** You must classify the \"message\" text. The only valid classifications are \"positive\", \"negative\", or \"neutral\". For simple names or non-descriptive text, classify the sentiment as \"neutral\".\n2.  **Theme Identification:** You must extract the core subject of the \"message\" and summarize it into a concise text theme. For names or irrelevant text, the theme should be \"General mention\".\n\n**Output Format Rules (Strict):**\n1.  Your output must be a single, valid JSON array containing the analysis for each comment.\n2.  Each object in this output array must correspond to a comment from the input and contain exactly three keys: \"comment_id\", \"sentiment\", and \"theme\".\n3.  Ensure all string values within the JSON are properly escaped. For instance, a double quote inside a string must be represented as `\\\"`.\n\n**CRITICAL COMMAND:**\nYour entire response body MUST be the raw JSON array itself. It must start with the `[` character and end with the `]` character.\nABSOLUTELY DO NOT wrap the array in Markdown, explanatory text, or any parent object (e.g., `{\"text\": [...]}`). The response must be ONLY the array.\n\n**Example:**\n*   **FOR THIS INPUT:**\n    `{\"Comments\": [{\"comment_id\":\"123\",\"message\":\"This feature is great!\"},{\"comment_id\":\"456\",\"message\":\"Where did the button go?\"}]}`\n*   **YOUR DIRECT OUTPUT MUST BE:**\n    `[{\"comment_id\":\"123\",\"sentiment\":\"positive\",\"theme\":\"Praise for a feature\"},{\"comment_id\":\"456\",\"sentiment\":\"negative\",\"theme\":\"Confusion about UI element location\"}]`"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        220,
+        -20
+      ],
+      "id": "6490be98-1390-4ad4-9df8-669092a9c194",
+      "name": "Analyze Sentiment and Theme",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "comments",
+          "mode": "list",
+          "cachedResultName": "comments"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comment_id": "={{ $json.comment_id }}",
+            "theme": "={{ $json.theme }}",
+            "sentiment": "={{ $json.sentiment }}"
+          },
+          "matchingColumns": [
+            "comment_id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "comment_id",
+              "displayName": "comment_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": true
+            },
+            {
+              "id": "created_time",
+              "displayName": "created_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false,
+              "removed": true
+            },
+            {
+              "id": "ad_id",
+              "displayName": "ad_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false,
+              "removed": true
+            },
+            {
+              "id": "theme",
+              "displayName": "theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "sentiment",
+              "displayName": "sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "brand",
+              "displayName": "brand",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        900,
+        -20
+      ],
+      "id": "45936b0f-0afe-41f7-8791-ef29c990271d",
+      "name": "Update Theme and Sentiment",
+      "credentials": {
+        "postgres": {
+          "id": "OMYFjXB6PcaqQaDI",
+          "name": "btmls_staging_db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d404dca9-0c41-42f5-a83e-c83992339474",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1920,
+        340
+      ],
+      "id": "317256c7-6161-4375-a552-591877f1b1de",
+      "name": "Recieve comment and brand IDs",
+      "webhookId": "d404dca9-0c41-42f5-a83e-c83992339474"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE brands\nSET is_comment_analyzing = FALSE\nWHERE brand_name = '{{ $json.brand }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -360,
+        520
+      ],
+      "id": "0fbadf25-b8c3-424f-ad97-c99f799e2193",
+      "name": "Toggle-OFF is_analyzing-comment",
+      "credentials": {
+        "postgres": {
+          "id": "OMYFjXB6PcaqQaDI",
+          "name": "btmls_staging_db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2160,
+        1340
+      ],
+      "id": "854e772a-9a23-4a18-ac4b-b6dc1ff1dd60",
+      "name": "Wait for all operations to finish"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "brands",
+          "mode": "list",
+          "cachedResultName": "brands"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "is_comment_analyzing": true,
+            "brand_name": "={{ $json.data[0].brand }}"
+          },
+          "matchingColumns": [
+            "brand_name"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "brand_name",
+              "displayName": "brand_name",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "logo",
+              "displayName": "logo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "is_ad_analyzing",
+              "displayName": "is_ad_analyzing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "is_comment_analyzing",
+              "displayName": "is_comment_analyzing",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -580,
+        420
+      ],
+      "id": "93366894-2a54-420a-957e-90842d8ea3df",
+      "name": "Toggle-ON is_analyzing_comment",
+      "credentials": {
+        "postgres": {
+          "id": "OMYFjXB6PcaqQaDI",
+          "name": "btmls_staging_db"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -760,
+        460
+      ],
+      "id": "b4ff39f8-e7db-488d-bd97-9c58e2703fe2",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "B8NYobFAYLLtGMQE",
+          "mode": "list",
+          "cachedResultName": "cluster_theme_and_sentiment_analyzer"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2120,
+        1700
+      ],
+      "id": "fa33d862-289d-4613-b9b8-6de7cedf2b53",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1840,
+        120
+      ],
+      "id": "42817bdb-d10e-4912-91b8-1f56763774f2",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "connections": {
+    "Get Comment": {
+      "main": [
+        [
+          {
+            "node": "Passes only if 'message' has text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Passes only if 'message' has text": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyze Cluster",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Cluster": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Merge to one",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Merge to one",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Analyze Cluster": {
+      "main": [
+        [
+          {
+            "node": "Clean JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If created new cluster": {
+      "main": [
+        [
+          {
+            "node": "Update clusters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter IDs": {
+      "main": [
+        [
+          {
+            "node": "Get Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge to one": {
+      "main": [
+        [
+          {
+            "node": "Analyze Sentiment and Theme",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Analyze Cluster",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean JSON": {
+      "main": [
+        [
+          {
+            "node": "Update comment_cluster",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If created new cluster",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If used existing cluster",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If used existing cluster": {
+      "main": [
+        [
+          {
+            "node": "Get details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get details": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Toggle-OFF is_analyzing-comment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Analyze Sentiment and Theme",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean JSON1": {
+      "main": [
+        [
+          {
+            "node": "Update Theme and Sentiment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Sentiment and Theme": {
+      "main": [
+        [
+          {
+            "node": "Clean JSON1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recieve comment and brand IDs": {
+      "main": [
+        [
+          {
+            "node": "Filter IDs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Cluster",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait for all operations to finish",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update comment_cluster": {
+      "main": [
+        [
+          {
+            "node": "Wait for all operations to finish",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Update Theme and Sentiment": {
+      "main": [
+        [
+          {
+            "node": "Wait for all operations to finish",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Update clusters": {
+      "main": [
+        [
+          {
+            "node": "Wait for all operations to finish",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Wait for all operations to finish",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Wait for all operations to finish": {
+      "main": [
+        []
+      ]
+    },
+    "Toggle-ON is_analyzing_comment": {
+      "main": [
+        []
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Toggle-ON is_analyzing_comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Cluster",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "cc1927d2-afff-4de6-aaf0-169530f54ccd",
+  "triggerCount": 1,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-07-11T08:50:46.252Z",
+      "updatedAt": "2025-07-11T08:50:46.252Z",
+      "role": "workflow:owner",
+      "workflowId": "B8NYobFAYLLtGMQE",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}

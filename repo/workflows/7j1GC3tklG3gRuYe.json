@@ -1,0 +1,181 @@
+{
+  "createdAt": "2025-05-22T07:35:54.156Z",
+  "updatedAt": "2025-05-22T14:16:24.939Z",
+  "id": "7j1GC3tklG3gRuYe",
+  "name": "Skool Communities Info",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Information",
+        "formDescription": "Skool Communities Information",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Client",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Community",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Week",
+              "fieldType": "date",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -440,
+        -160
+      ],
+      "id": "de8dbcc1-5333-4c85-8149-32b4b07a8953",
+      "name": "On form submission",
+      "webhookId": "986e2838-8d80-4f4a-9855-6a38f90a01ab"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appxvd94awDfIbfKy",
+          "mode": "list",
+          "cachedResultName": "Skool Communities",
+          "cachedResultUrl": "https://airtable.com/appxvd94awDfIbfKy"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblcSqgafpRV2zZyj",
+          "mode": "list",
+          "cachedResultName": "Info",
+          "cachedResultUrl": "https://airtable.com/appxvd94awDfIbfKy/tblcSqgafpRV2zZyj"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Client": "={{ $json.Client }}",
+            "Community": "={{ $json.Community }}",
+            "Week": "={{ $json.Week }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Client",
+              "displayName": "Client",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Community",
+              "displayName": "Community",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Week",
+              "displayName": "Week",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -220,
+        -160
+      ],
+      "id": "1d0b8eb8-4f5f-4fae-b58d-fdecc56073a8",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "l7tXJ2YUKdrm3OvF",
+          "name": "Airtable Skool Communities"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e575a318-9cf9-4a47-8ea1-db8c38797b4d",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-05-22T07:35:54.156Z",
+      "updatedAt": "2025-05-22T07:35:54.156Z",
+      "role": "workflow:owner",
+      "workflowId": "7j1GC3tklG3gRuYe",
+      "projectId": "hv3RoiUVwxA7lyyB",
+      "project": {
+        "createdAt": "2025-02-05T08:00:32.485Z",
+        "updatedAt": "2025-02-05T08:01:09.976Z",
+        "id": "hv3RoiUVwxA7lyyB",
+        "name": "Beamlak Adane <bnobodygetmoney@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
