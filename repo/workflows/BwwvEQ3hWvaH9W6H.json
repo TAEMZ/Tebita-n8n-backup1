@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T07:05:22.463Z",
-  "updatedAt": "2025-11-12T11:21:59.773Z",
+  "updatedAt": "2025-11-12T11:40:31.506Z",
   "id": "BwwvEQ3hWvaH9W6H",
   "name": "backup workflow",
   "active": false,
@@ -92,7 +92,7 @@
             {
               "id": "21e60933-3eca-4eff-b1f8-fc80cd073239",
               "name": "username",
-              "value": "yoni1342",
+              "value": "TAEMZ",
               "type": "string"
             },
             {
@@ -104,13 +104,13 @@
             {
               "id": "b64122cd-314a-49d4-a1cb-dce704e22d26",
               "name": "repo",
-              "value": "Tebita-n8n-backup.git",
+              "value": "Tebita-n8n-backup1.git",
               "type": "string"
             },
             {
               "id": "9e54106c-fe6e-4660-b06e-d60e64e4b069",
               "name": "email",
-              "value": "yonatantesfaye30@gmail.com",
+              "value": "abiykibru6@gmail.com",
               "type": "string"
             }
           ]
@@ -308,7 +308,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "bd022991-82b7-4221-9b9d-b911b294ae73",
+  "versionId": "f587fae2-939c-4c08-bb26-72e9566ac0f5",
   "triggerCount": 0,
   "tags": [],
   "shared": [
