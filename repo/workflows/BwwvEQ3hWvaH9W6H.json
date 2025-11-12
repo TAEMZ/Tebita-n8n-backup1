@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T07:05:22.463Z",
-  "updatedAt": "2025-11-12T17:04:50.680Z",
+  "updatedAt": "2025-11-12T17:16:37.383Z",
   "id": "BwwvEQ3hWvaH9W6H",
   "name": "backup workflow",
   "active": false,
@@ -98,7 +98,7 @@
             {
               "id": "a2307c01-cfe7-4be4-9b5b-65eb3ef46154",
               "name": "token",
-              "value": "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",
+              "value": "ghp_QcgLB2QSsL6k87T8N2sPsWmFM62mBO3YcLMm",
               "type": "string"
             },
             {
@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "command": "=git push \"https://{{ $('Set Values').first().json.username }}:{{ $('Set Values').first().json.token }}@github.com/{{ $('Set Values').first().json.username }}/{{ $('Set Values').first().json.repo }}\" main"
+        "command": "=git push \"https://{{ $('Set Values').first().json.username }}:{{ $('Set Values').first().json.token }}@github.com/yoni1342/{{ $('Set Values').first().json.repo }}\" main"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -308,7 +308,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "4d9d4f30-3ad1-46a8-b5fd-986506d329e6",
+  "versionId": "aa3e320e-e416-40f8-91fd-0cf5ca049ce8",
   "triggerCount": 0,
   "tags": [],
   "shared": [
