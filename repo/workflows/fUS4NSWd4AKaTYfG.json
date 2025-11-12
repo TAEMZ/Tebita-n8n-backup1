@@ -1,0 +1,330 @@
+{
+  "createdAt": "2025-11-12T09:04:48.100Z",
+  "updatedAt": "2025-11-12T09:04:48.100Z",
+  "id": "fUS4NSWd4AKaTYfG",
+  "name": "My workflow 48",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1024,
+        224
+      ],
+      "id": "abb1e8fe-c8ed-4fa6-aef8-21ca73767261",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "command": "ls .git"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        240
+      ],
+      "id": "782ab18c-3e44-417f-9b3b-6c090d19df8f",
+      "name": "Execute Command",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "73d2b9ee-9fdd-468f-b3e0-c1d9d4a7a1bf",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -320,
+        160
+      ],
+      "id": "138ed94f-fe7c-4115-b53b-699842a7726d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "command": "=export GITHUB_USER={{ $('Set Values').first().json.username }}\nexport GITHUB_TOKEN={{ $('Set Values').first().json.token }}\n\ngit init\ngit config user.name \"{{ $('Set Values').first().json.username }}\"\ngit config user.email \"{{ $('Set Values').first().json.email }}\"\necho \"= ndb Backups\" > README.md\ngit add README.md\ngit commit -m \"Initial commit: backup files\"\ngit branch -m main\ngit remote add origin \"https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/${GITHUB_USER}/{{ $('Set Values').first().json.repo }}\"\ngit push -u origin main"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        64
+      ],
+      "id": "a451ff4a-adaa-4640-8d8d-02af649f1ad7",
+      "name": "Execute Command1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "21e60933-3eca-4eff-b1f8-fc80cd073239",
+              "name": "username",
+              "value": "yoni1342",
+              "type": "string"
+            },
+            {
+              "id": "a2307c01-cfe7-4be4-9b5b-65eb3ef46154",
+              "name": "token",
+              "value": "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",
+              "type": "string"
+            },
+            {
+              "id": "b64122cd-314a-49d4-a1cb-dce704e22d26",
+              "name": "repo",
+              "value": "Tebita-n8n-backup.git",
+              "type": "string"
+            },
+            {
+              "id": "9e54106c-fe6e-4660-b06e-d60e64e4b069",
+              "name": "email",
+              "value": "yonatantesfaye30@gmail.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -784,
+        224
+      ],
+      "id": "2ad4d443-b74f-4536-a42c-139c43eee80a",
+      "name": "Set Values"
+    },
+    {
+      "parameters": {
+        "command": "npx n8n export:workflow --backup --output repo/workflows/"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        208,
+        160
+      ],
+      "id": "94db9451-1d53-4d40-abe1-d5a11f37351e",
+      "name": "Execute Command2"
+    },
+    {
+      "parameters": {
+        "command": "npx  n8n export:credentials --backup --output repo/credentials/"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        464
+      ],
+      "id": "67446657-00a3-4f98-b3bb-15a89ce6b6d0",
+      "name": "cred"
+    },
+    {
+      "parameters": {
+        "command": "git -C . add repo/"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        464
+      ],
+      "id": "55c4d1db-8b3f-4a86-9009-a9abc06782c7",
+      "name": "git add"
+    },
+    {
+      "parameters": {
+        "command": "git -C repo push --set-upstream origin main\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        704,
+        480
+      ],
+      "id": "ec16d14a-ed49-4f0a-aff9-7fb4a3fa3615",
+      "name": "git push"
+    },
+    {
+      "parameters": {
+        "command": "=git -C repo commit -m \"Auto backup ({{ new Date().toISOString()}})\" "
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        160,
+        464
+      ],
+      "id": "d2c6d344-d7ff-419f-b245-80310d3702f2",
+      "name": "Execute Command3"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Command2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command1": {
+      "main": [
+        [
+          {
+            "node": "Execute Command2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Values": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command2": {
+      "main": [
+        [
+          {
+            "node": "cred",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cred": {
+      "main": [
+        [
+          {
+            "node": "git add",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "git add": {
+      "main": [
+        [
+          {
+            "node": "Execute Command3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command3": {
+      "main": [
+        [
+          {
+            "node": "git push",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "7b2abd31-b2cd-4c25-8a97-3c8bb9c1817d",
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "createdAt": "2025-11-12T09:04:48.100Z",
+      "updatedAt": "2025-11-12T09:04:48.100Z",
+      "role": "workflow:owner",
+      "workflowId": "fUS4NSWd4AKaTYfG",
+      "projectId": "IQ4w3zW02fJzIdTt",
+      "project": {
+        "createdAt": "2025-01-25T02:11:56.995Z",
+        "updatedAt": "2025-01-25T21:11:21.957Z",
+        "id": "IQ4w3zW02fJzIdTt",
+        "name": "Yonatan Tesfaye <yonatantesfaye30@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null
+      }
+    }
+  ]
+}
