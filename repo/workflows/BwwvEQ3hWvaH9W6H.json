@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T07:05:22.463Z",
-  "updatedAt": "2025-11-12T16:15:33.908Z",
+  "updatedAt": "2025-11-12T16:55:14.748Z",
   "id": "BwwvEQ3hWvaH9W6H",
   "name": "backup workflow",
   "active": false,
@@ -25,7 +25,7 @@
     },
     {
       "parameters": {
-        "command": "ls .git"
+        "command": "=git remote -v\n\n"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -92,7 +92,7 @@
             {
               "id": "21e60933-3eca-4eff-b1f8-fc80cd073239",
               "name": "username",
-              "value": "yoni1342",
+              "value": "TAEMZ",
               "type": "string"
             },
             {
@@ -110,7 +110,7 @@
             {
               "id": "9e54106c-fe6e-4660-b06e-d60e64e4b069",
               "name": "email",
-              "value": "yonatantesfaye30@gmail.com",
+              "value": "abiykibru6@gmail.com",
               "type": "string"
             }
           ]
@@ -120,7 +120,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -1200,
+        -1248,
         -112
       ],
       "id": "9703480e-2f3b-4973-9716-f2a97b067c93",
@@ -167,7 +167,7 @@
     },
     {
       "parameters": {
-        "command": "=git push \"https://{{ $('Set Values').first().json.username }}:{{ $('Set Values').first().json.token }}@github.com/{{ $('Set Values').first().json.username }}/{{ $('Set Values').first().json.repo }}\" main"
+        "command": "=git push https://github.com/yoni1342/Tebita-n8n-backup.git main\n"
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -308,7 +308,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "907c18e6-c1a0-4832-b169-212bd879a5c9",
+  "versionId": "0dc4ab8e-cba1-4585-8680-1de97e837c4b",
   "triggerCount": 0,
   "tags": [],
   "shared": [
