@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-13T06:12:30.754Z",
-  "updatedAt": "2025-11-13T06:12:30.754Z",
+  "updatedAt": "2025-11-13T06:19:27.979Z",
   "id": "NhjZb6D21vZo7xF2",
   "name": "My workflow 48",
   "active": false,
@@ -70,9 +70,7 @@
       "id": "7e5d4a4b-047c-4ac5-8461-2cee1bd8a94f"
     },
     {
-      "parameters": {
-        "command": "git -C repo push"
-      },
+      "parameters": {},
       "name": "git push",
       "type": "n8n-nodes-base.executeCommand",
       "position": [
@@ -187,7 +185,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "158b9a21-51f0-463d-8846-8255d4d461e4",
+  "versionId": "90048b94-065f-4b10-8b8d-72358eb06a33",
   "triggerCount": 0,
   "tags": [],
   "shared": [

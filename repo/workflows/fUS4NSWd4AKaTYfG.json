@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T09:04:48.100Z",
-  "updatedAt": "2025-11-12T12:52:30.122Z",
+  "updatedAt": "2025-11-13T06:29:27.693Z",
   "id": "fUS4NSWd4AKaTYfG",
   "name": "_backup",
   "active": false,
@@ -30,7 +30,7 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -560,
+        -352,
         240
       ],
       "id": "782ab18c-3e44-417f-9b3b-6c090d19df8f",
@@ -66,7 +66,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -320,
+        -112,
         160
       ],
       "id": "138ed94f-fe7c-4115-b53b-699842a7726d",
@@ -79,7 +79,7 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -80,
+        128,
         64
       ],
       "id": "a451ff4a-adaa-4640-8d8d-02af649f1ad7",
@@ -92,7 +92,7 @@
             {
               "id": "21e60933-3eca-4eff-b1f8-fc80cd073239",
               "name": "username",
-              "value": "yoni1342",
+              "value": "TAEMZ",
               "type": "string"
             },
             {
@@ -104,13 +104,13 @@
             {
               "id": "b64122cd-314a-49d4-a1cb-dce704e22d26",
               "name": "repo",
-              "value": "Tebita-n8n-backup.git",
+              "value": "Tebita-n8n-backup1.git",
               "type": "string"
             },
             {
               "id": "9e54106c-fe6e-4660-b06e-d60e64e4b069",
               "name": "email",
-              "value": "yonatantesfaye30@gmail.com",
+              "value": "abiykibru6@gmail.com",
               "type": "string"
             }
           ]
@@ -133,7 +133,7 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        144,
+        352,
         176
       ],
       "id": "94db9451-1d53-4d40-abe1-d5a11f37351e",
@@ -146,7 +146,7 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -272,
+        -64,
         464
       ],
       "id": "67446657-00a3-4f98-b3bb-15a89ce6b6d0",
@@ -159,7 +159,7 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        -16,
+        192,
         464
       ],
       "id": "55c4d1db-8b3f-4a86-9009-a9abc06782c7",
@@ -172,7 +172,7 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        384,
+        592,
         464
       ],
       "id": "ec16d14a-ed49-4f0a-aff9-7fb4a3fa3615",
@@ -185,11 +185,24 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        160,
+        368,
         464
       ],
       "id": "d2c6d344-d7ff-419f-b245-80310d3702f2",
       "name": "Execute Command3"
+    },
+    {
+      "parameters": {
+        "command": "=git -C repo remote set-url origin https://TAEMZ:${$('Set Values').first().json.token}@github.com/TAEMZ/Tebita-n8n-backup1.git"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        224
+      ],
+      "id": "68dd24d7-2f58-4a70-a688-87ede137bf95",
+      "name": "Execute Command4"
     }
   ],
   "connections": {
@@ -248,7 +261,7 @@
       "main": [
         [
           {
-            "node": "Execute Command",
+            "node": "Execute Command4",
             "type": "main",
             "index": 0
           }
@@ -298,6 +311,17 @@
           }
         ]
       ]
+    },
+    "Execute Command4": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -306,7 +330,7 @@
   "staticData": null,
   "meta": null,
   "pinData": {},
-  "versionId": "1d1412b5-fe9e-4126-916c-c0df1af6f380",
+  "versionId": "bdd67f0b-746b-4818-b942-cfc4034aa199",
   "triggerCount": 0,
   "tags": [],
   "shared": [

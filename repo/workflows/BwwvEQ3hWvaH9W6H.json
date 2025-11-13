@@ -1,6 +1,6 @@
 {
   "createdAt": "2025-11-12T07:05:22.463Z",
-  "updatedAt": "2025-11-12T17:56:51.796Z",
+  "updatedAt": "2025-11-13T06:33:27.291Z",
   "id": "BwwvEQ3hWvaH9W6H",
   "name": "backup workflow",
   "active": false,
@@ -25,7 +25,7 @@
     },
     {
       "parameters": {
-        "command": "=git remote -v\n\n"
+        "command": "=git remote set-url origin \"https://{{ $('Set Values').first().json.username }}:{{ $('Set Values').first().json.token }}@github.com/{{ $('Set Values').first().json.username }}/{{ $('Set Values').first().json.repo }}\""
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
@@ -308,7 +308,7 @@
     "templateCredsSetupCompleted": true
   },
   "pinData": {},
-  "versionId": "c1ee92e2-9e37-45ff-8b0e-5d642dfa0e46",
+  "versionId": "d57c237b-d7f4-4c28-b9e5-596b4d3e52a9",
   "triggerCount": 0,
   "tags": [],
   "shared": [
